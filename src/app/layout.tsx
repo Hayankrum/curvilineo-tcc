@@ -13,7 +13,26 @@ const geist = Geist({
 
 export const metadata: Metadata = {
   title: "Meu App",
-  description: "Meu app Next.js",
+  description: "Meu app Next.js com modo offline",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Meu App",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+  },
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: "#09090b",
 };
 
 export default async function RootLayout({
@@ -25,6 +44,28 @@ export default async function RootLayout({
 
   return (
     <html lang="pt-BR" className={`${geist.variable} h-full antialiased`}>
+      <head>
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                      console.log('SW registered: ', registration);
+                    })
+                    .catch(function(registrationError) {
+                      console.log('SW registration failed: ', registrationError);
+                    });
+                });
+              }
+            `,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col bg-zinc-950 text-zinc-100">
         <nav className="border-b border-zinc-800 px-6 py-4">
           <div className="max-w-3xl mx-auto flex items-center gap-6">
