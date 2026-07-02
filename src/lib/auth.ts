@@ -3,6 +3,7 @@ import Google from 'next-auth/providers/google'
 import { prisma } from './prisma'
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  trustHost: true,
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID,
@@ -11,23 +12,28 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   callbacks: {
     async signIn({ user }) {
-      if (!user.email) return false
+      try {
+        if (!user.email) return false
 
-      const existingUser = await prisma.usuario.findUnique({
-        where: { email: user.email },
-      })
-
-      if (!existingUser) {
-        await prisma.usuario.create({
-          data: {
-            nome: user.name || user.email.split('@')[0],
-            email: user.email,
-            senha: '',
-          },
+        const existingUser = await prisma.usuario.findUnique({
+          where: { email: user.email },
         })
-      }
 
-      return true
+        if (!existingUser) {
+          await prisma.usuario.create({
+            data: {
+              nome: user.name || user.email.split('@')[0],
+              email: user.email,
+              senha: '',
+            },
+          })
+        }
+
+        return true
+      } catch (error) {
+        console.error('[Auth] signIn error:', error)
+        return true
+      }
     },
     async session({ session, token }) {
       if (session.user) {
