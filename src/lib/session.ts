@@ -61,6 +61,7 @@ export async function obterSessao() {
     const jwt = await getToken({
       req: { headers: { cookie: cookieHeader } },
       secret: process.env.AUTH_SECRET,
+      secureCookie: await isSecureConnection(),
     })
     if (jwt?.email) {
       const usuario = await prisma.usuario.findUnique({ where: { email: jwt.email } })
