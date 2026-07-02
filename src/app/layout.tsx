@@ -45,7 +45,7 @@ export default async function RootLayout({
   return (
     <html lang="pt-BR" className={`${geist.variable} h-full antialiased`}>
       <head>
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <link rel="apple-touch-icon" href="/icons/icon.svg" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <script
@@ -55,10 +55,10 @@ export default async function RootLayout({
                 window.addEventListener('load', function() {
                   navigator.serviceWorker.register('/sw.js')
                     .then(function(registration) {
-                      console.log('SW registered: ', registration);
+                      console.log('SW registered:', registration.scope);
                     })
-                    .catch(function(registrationError) {
-                      console.log('SW registration failed: ', registrationError);
+                    .catch(function(err) {
+                      console.log('SW registration failed:', err);
                     });
                 });
               }
