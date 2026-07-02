@@ -21,6 +21,10 @@ function validarEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 }
 
+function isContaGoogle(usuario: { senha: string }): boolean {
+  return !usuario.senha
+}
+
 // ---------- PERFIL ----------
 
 export async function editarPerfil(id: number, nome: string, bio: string) {
@@ -49,7 +53,7 @@ export async function deletarUsuario(id: number, senha: string) {
   const usuario = await prisma.usuario.findUnique({ where: { id } })
   if (!usuario) return { error: 'Usuário não encontrado' }
 
-  if (usuario.senha) {
+  if (!isContaGoogle(usuario)) {
     const senhaCorreta = await bcrypt.compare(senha, usuario.senha)
     if (!senhaCorreta) return { error: 'Senha incorreta' }
   }
@@ -86,6 +90,10 @@ export async function login(email: string, senha: string) {
   const usuario = await prisma.usuario.findUnique({ where: { email } })
   if (!usuario) return { error: 'Email ou senha inválidos' }
 
+  if (isContaGoogle(usuario)) {
+    return { error: 'Esta conta usa login com Google. Entre pela opção "Continuar com Google".' }
+  }
+
   const senhaCorreta = await bcrypt.compare(senha, usuario.senha)
   if (!senhaCorreta) return { error: 'Email ou senha inválidos' }
 
@@ -114,6 +122,10 @@ export async function alterarSenha(id: number, senhaAtual: string, novaSenha: st
 
   const usuario = await prisma.usuario.findUnique({ where: { id } })
   if (!usuario) return { error: 'Usuário não encontrado' }
+
+  if (isContaGoogle(usuario)) {
+    return { error: 'Esta conta usa login com Google e não possui senha para alterar.' }
+  }
 
   const senhaCorreta = await bcrypt.compare(senhaAtual, usuario.senha)
   if (!senhaCorreta) return { error: 'Senha atual incorreta' }

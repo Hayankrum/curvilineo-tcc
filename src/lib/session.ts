@@ -83,12 +83,9 @@ export async function destruirSessao() {
     cookieStore.delete(SESSION_COOKIE)
   }
 
-  cookieStore.delete('authjs.session-token')
-  cookieStore.delete('__Secure-authjs.session-token')
-
   try {
     await signOut({ redirect: false })
   } catch {
-    // ignore
+    // ignore - pode falhar se não existe sessão NextAuth
   }
 }
