@@ -1,0 +1,38 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  titulo    String
+  conteudo  String
+  criadoEm  DateTime @default(now())
+  autorId   Int
+  autor     Usuario  @relation(fields: [autorId], references: [id], onDelete: Cascade)
+}
+
+model Usuario {
+  id        Int       @id @default(autoincrement())
+  nome      String
+  email     String    @unique
+  senha     String
+  bio       String?
+  fotoUrl   String?
+  criadoEm  DateTime  @default(now())
+  posts     Post[]
+  sessoes   Sessao[]
+}
+
+model Sessao {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  usuarioId Int
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  expiraEm  DateTime
+  criadoEm  DateTime @default(now())
+}
