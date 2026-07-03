@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePushSubscription } from '@/lib/usePushSubscription'
+import { toggleNotificacoes } from '@/modules/usuarios/usuarios.actions'
 
 interface NotificacaoHistorico {
   id: number
@@ -35,10 +36,18 @@ export default function NotificacoesPage() {
   const handleToggle = async () => {
     if (isSubscribed) {
       const result = await unsubscribe()
-      if (!result.success) alert(result.error)
+      if (!result.success) {
+        alert(result.error)
+      } else {
+        await toggleNotificacoes()
+      }
     } else {
       const result = await subscribe()
-      if (!result.success) alert(result.error || 'Erro ao ativar notificações.')
+      if (!result.success) {
+        alert(result.error || 'Erro ao ativar notificações.')
+      } else {
+        await toggleNotificacoes()
+      }
     }
   }
 
@@ -50,6 +59,17 @@ export default function NotificacoesPage() {
     })
     setHistorico((prev) =>
       prev.map((n) => (n.id === id ? { ...n, lida: true } : n))
+    )
+  }
+
+  const marcarTodasComoLidas = async () => {
+    await fetch('/api/notifications/read', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ all: true }),
+    })
+    setHistorico((prev) =>
+      prev.map((n) => ({ ...n, lida: true }))
     )
   }
 
@@ -105,7 +125,17 @@ export default function NotificacoesPage() {
       </div>
 
       <div className="border-t border-zinc-800 pt-6">
-        <h2 className="font-medium mb-4">Histórico</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-medium">Histórico</h2>
+          {historico.some((n) => !n.lida) && (
+            <button
+              onClick={marcarTodasComoLidas}
+              className="text-xs text-zinc-500 hover:text-white transition-colors"
+            >
+              Marcar todas como lidas
+            </button>
+          )}
+        </div>
 
         {loadingHistorico ? (
           <p className="text-zinc-500 text-sm">Carregando histórico...</p>

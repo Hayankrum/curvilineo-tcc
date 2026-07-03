@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { getUsuarioLogado } from '@/modules/usuarios/usuarios.actions'
 import BotaoDeletarPerfil from './BotaoDeletarPerfil'
-import BotaoNotificacoes from './BotaoNotificacoes'
 import { primeiroNome } from '@/lib/utils'
 
 interface Props {
@@ -65,7 +64,9 @@ export default async function UsuarioDetailPage({ id }: Props) {
               Alterar senha
             </Link>
           )}
-          <BotaoNotificacoes notificacoesAtivas={usuario.notificacoesAtivas} />
+          <Link href="/notificacoes" className="text-sm text-zinc-400 hover:text-white transition-colors">
+            Notificações
+          </Link>
           <BotaoDeletarPerfil id={usuario.id} temSenha={!!usuario.senha} />
         </div>
       )}
