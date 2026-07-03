@@ -38,7 +38,7 @@ self.addEventListener('fetch', (event) => {
         }
 
         return networkResponse;
-      } catch (error) {
+        } catch {
         const cachedResponse = await caches.match(event.request);
         if (cachedResponse) {
           return cachedResponse;
@@ -54,5 +54,50 @@ self.addEventListener('fetch', (event) => {
         return new Response('Offline', { status: 503 });
       }
     })()
+  );
+});
+
+self.addEventListener('push', (event) => {
+  if (!event.data) return;
+
+  const data = event.data.json();
+
+  const options = {
+    body: data.body || data.mensagem,
+    icon: '/icons/icon.svg',
+    badge: '/icons/icon.svg',
+    vibrate: [100, 50, 100],
+    data: {
+      url: data.url || '/',
+    },
+    actions: [
+      { action: 'open', title: 'Abrir' },
+      { action: 'dismiss', title: 'Dispensar' },
+    ],
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(data.title, options)
+  );
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+
+  if (event.action === 'dismiss') return;
+
+  const urlToOpen = event.notification.data?.url || '/';
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+      for (const client of windowClients) {
+        if (client.url === urlToOpen && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      if (clients.openWindow) {
+        return clients.openWindow(urlToOpen);
+      }
+    })
   );
 });

@@ -17,15 +17,16 @@ model Post {
 }
 
 model Usuario {
-  id        Int       @id @default(autoincrement())
-  nome      String
-  email     String    @unique
-  senha     String
-  bio       String?
-  fotoUrl   String?
-  criadoEm  DateTime  @default(now())
-  posts     Post[]
-  sessoes   Sessao[]
+  id            Int              @id @default(autoincrement())
+  nome          String
+  email         String           @unique
+  senha         String
+  bio           String?
+  fotoUrl       String?
+  criadoEm      DateTime         @default(now())
+  posts         Post[]
+  sessoes       Sessao[]
+  inscricoes    InscricaoPush[]
 }
 
 model Sessao {
@@ -35,4 +36,25 @@ model Sessao {
   usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   expiraEm  DateTime
   criadoEm  DateTime @default(now())
+}
+
+model InscricaoPush {
+  id           Int      @id @default(autoincrement())
+  endpoint     String
+  p256dh       String
+  auth         String
+  usuarioId    Int
+  usuario      Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  criadoEm     DateTime @default(now())
+
+  @@unique([endpoint])
+}
+
+model Notificacao {
+  id        Int      @id @default(autoincrement())
+  titulo    String
+  mensagem  String
+  url       String?
+  criadaEm  DateTime @default(now())
+  enviadaEm DateTime?
 }
