@@ -79,6 +79,9 @@ export default async function RootLayout({
             <div className="ml-auto flex items-center gap-4">
               {usuario ? (
               <>
+                <Link href="/notificacoes" className="text-sm text-zinc-400 hover:text-white transition-colors">
+                  Notificações
+                </Link>
                 <Link
                   href={`/usuarios/${usuario.id}`}
                   className="text-sm text-zinc-400 hover:text-white transition-colors flex items-center gap-2"

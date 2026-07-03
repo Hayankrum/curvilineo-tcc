@@ -2,7 +2,15 @@
 
 import { useState, useEffect, useCallback } from 'react'
 
-const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!
+function getVapidKey() {
+  if (typeof window === 'undefined') return null
+  const key = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
+  if (!key) {
+    console.error('[Push] NEXT_PUBLIC_VAPID_PUBLIC_KEY não configurada')
+    return null
+  }
+  return key
+}
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
@@ -20,7 +28,8 @@ function getInitialState() {
     return { isSupported: false, isLoading: true }
   }
   const supported = 'serviceWorker' in navigator && 'PushManager' in window
-  return { isSupported: supported, isLoading: supported }
+  const isSecure = location.protocol === 'https:' || location.hostname === 'localhost'
+  return { isSupported: supported && isSecure, isLoading: supported }
 }
 
 export function usePushSubscription() {
@@ -56,11 +65,16 @@ export function usePushSubscription() {
   }, [state.isSupported])
 
   const subscribe = useCallback(async () => {
+    const vapidKey = getVapidKey()
+    if (!vapidKey) {
+      return { success: false, error: 'Chave VAPID não configurada. Verifique as variáveis de ambiente.' }
+    }
+
     try {
       const registration = await navigator.serviceWorker.ready
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+        applicationServerKey: urlBase64ToUint8Array(vapidKey),
       })
 
       const subscriptionJson = subscription.toJSON()
@@ -74,15 +88,16 @@ export function usePushSubscription() {
       })
 
       if (!response.ok) {
+        const data = await response.json()
         await subscription.unsubscribe()
-        throw new Error('Falha ao salvar inscrição no servidor')
+        return { success: false, error: data.error || 'Erro ao salvar inscrição' }
       }
 
       setIsSubscribed(true)
       return { success: true }
     } catch (error) {
       console.error('[Push] Subscribe error:', error)
-      return { success: false, error: 'Erro ao ativar notificações' }
+      return { success: false, error: 'Erro ao ativar notificações. Verifique se está usando HTTPS.' }
     }
   }, [])
 
