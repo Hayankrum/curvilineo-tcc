@@ -28,18 +28,19 @@ model Comentario {
 }
 
 model Usuario {
-  id                Int              @id @default(autoincrement())
-  nome              String
-  email             String           @unique
-  senha             String
-  bio               String?
-  fotoUrl           String?
-  notificacoesAtivas Boolean         @default(true)
-  criadoEm          DateTime         @default(now())
-  posts             Post[]
-  comentarios       Comentario[]
-  sessoes           Sessao[]
-  inscricoes        InscricaoPush[]
+  id                 Int              @id @default(autoincrement())
+  nome               String
+  email              String           @unique
+  senha              String
+  bio                String?
+  fotoUrl            String?
+  notificacoesAtivas Boolean          @default(true)
+  criadoEm           DateTime         @default(now())
+  posts              Post[]
+  comentarios        Comentario[]
+  sessoes            Sessao[]
+  inscricoes         InscricaoPush[]
+  notificacoes       Notificacao[]
 }
 
 model Sessao {
@@ -64,10 +65,13 @@ model InscricaoPush {
 }
 
 model Notificacao {
-  id        Int      @id @default(autoincrement())
-  titulo    String
-  mensagem  String
-  url       String?
-  criadaEm  DateTime @default(now())
-  enviadaEm DateTime?
+  id         Int      @id @default(autoincrement())
+  titulo     String
+  mensagem   String
+  url        String?
+  lida       Boolean  @default(false)
+  criadaEm   DateTime @default(now())
+  enviadaEm  DateTime?
+  usuarioId  Int
+  usuario    Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 }

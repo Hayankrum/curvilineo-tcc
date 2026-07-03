@@ -4,6 +4,7 @@ import Link from "next/link";
 import "./globals.css";
 import { getUsuarioLogado } from "@/modules/usuarios/usuarios.actions";
 import BotaoLogout from "@/modules/usuarios/BotaoLogout";
+import SinoNotificacoes from "@/modules/notificacoes/SinoNotificacoes";
 import { primeiroNome } from "@/lib/utils";
 
 const geist = Geist({
@@ -79,9 +80,7 @@ export default async function RootLayout({
             <div className="ml-auto flex items-center gap-4">
               {usuario ? (
               <>
-                <Link href="/notificacoes" className="text-sm text-zinc-400 hover:text-white transition-colors">
-                  Notificações
-                </Link>
+                <SinoNotificacoes />
                 <Link
                   href={`/usuarios/${usuario.id}`}
                   className="text-sm text-zinc-400 hover:text-white transition-colors flex items-center gap-2"

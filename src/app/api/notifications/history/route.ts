@@ -10,6 +10,7 @@ export async function GET() {
     }
 
     const notificacoes = await prisma.notificacao.findMany({
+      where: { usuarioId: usuario.id },
       orderBy: { criadaEm: 'desc' },
       take: 50,
     })

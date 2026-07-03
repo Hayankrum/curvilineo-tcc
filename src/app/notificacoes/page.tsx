@@ -9,6 +9,7 @@ interface NotificacaoHistorico {
   titulo: string
   mensagem: string
   url: string | null
+  lida: boolean
   criadaEm: string
 }
 
@@ -17,7 +18,7 @@ export default function NotificacoesPage() {
   const [historico, setHistorico] = useState<NotificacaoHistorico[]>([])
   const [loadingHistorico, setLoadingHistorico] = useState(true)
 
-  useEffect(() => {
+  const fetchHistorico = () => {
     fetch('/api/notifications/history')
       .then((res) => res.json())
       .then((data) => {
@@ -25,6 +26,10 @@ export default function NotificacoesPage() {
         setLoadingHistorico(false)
       })
       .catch(() => setLoadingHistorico(false))
+  }
+
+  useEffect(() => {
+    fetchHistorico()
   }, [])
 
   const handleToggle = async () => {
@@ -35,6 +40,17 @@ export default function NotificacoesPage() {
       const result = await subscribe()
       if (!result.success) alert(result.error || 'Erro ao ativar notificações.')
     }
+  }
+
+  const marcarComoLida = async (id: number) => {
+    await fetch('/api/notifications/read', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    })
+    setHistorico((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, lida: true } : n))
+    )
   }
 
   if (isLoading) {
@@ -96,20 +112,32 @@ export default function NotificacoesPage() {
         ) : historico.length === 0 ? (
           <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 text-center">
             <p className="text-zinc-500 text-sm">Nenhuma notificação recebida ainda.</p>
-            <p className="text-zinc-600 text-xs mt-2">
-              Quando alguém comentar no seu post, aparecerá aqui.
-            </p>
           </div>
         ) : (
           <div className="space-y-3">
             {historico.map((notificacao) => (
               <div
                 key={notificacao.id}
-                className="bg-zinc-900 border border-zinc-800 rounded-lg p-4"
+                className={`border rounded-lg p-4 cursor-pointer transition-colors ${
+                  notificacao.lida
+                    ? 'bg-zinc-900 border-zinc-800'
+                    : 'bg-zinc-900 border-zinc-700'
+                }`}
+                onClick={() => {
+                  if (!notificacao.lida) marcarComoLida(notificacao.id)
+                  if (notificacao.url) window.location.href = notificacao.url
+                }}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <h3 className="font-medium text-sm">{notificacao.titulo}</h3>
+                    <div className="flex items-center gap-2">
+                      {!notificacao.lida && (
+                        <span className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
+                      )}
+                      <h3 className={`font-medium text-sm ${notificacao.lida ? 'text-zinc-400' : 'text-white'}`}>
+                        {notificacao.titulo}
+                      </h3>
+                    </div>
                     <p className="text-zinc-400 text-sm mt-1">{notificacao.mensagem}</p>
                   </div>
                   <span className="text-xs text-zinc-600 ml-4 flex-shrink-0">
@@ -125,6 +153,7 @@ export default function NotificacoesPage() {
                   <Link
                     href={notificacao.url}
                     className="text-xs text-zinc-500 hover:text-white transition-colors mt-2 inline-block"
+                    onClick={(e) => e.stopPropagation()}
                   >
                     Ver →
                   </Link>

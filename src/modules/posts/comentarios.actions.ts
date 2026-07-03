@@ -60,6 +60,7 @@ async function enviarNotificacao(
         titulo: dados.titulo,
         mensagem: dados.mensagem,
         url: dados.url,
+        usuarioId,
       },
     })
 
