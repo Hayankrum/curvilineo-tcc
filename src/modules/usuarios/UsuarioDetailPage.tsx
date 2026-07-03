@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { getUsuarioLogado } from '@/modules/usuarios/usuarios.actions'
 import BotaoDeletarPerfil from './BotaoDeletarPerfil'
+import BotaoNotificacoes from './BotaoNotificacoes'
 import { primeiroNome } from '@/lib/utils'
 
 interface Props {
@@ -48,7 +49,7 @@ export default async function UsuarioDetailPage({ id }: Props) {
         <p className="text-zinc-300 text-sm mb-6 leading-relaxed">{usuario.bio}</p>
       )}
 
-          {isDono && (
+      {isDono && (
         <div className="flex flex-wrap gap-4 mb-8 pb-6 border-b border-zinc-800">
           <Link
             href={`/usuarios/${usuario.id}/editar`}
@@ -64,6 +65,7 @@ export default async function UsuarioDetailPage({ id }: Props) {
               Alterar senha
             </Link>
           )}
+          <BotaoNotificacoes notificacoesAtivas={usuario.notificacoesAtivas} />
           <BotaoDeletarPerfil id={usuario.id} temSenha={!!usuario.senha} />
         </div>
       )}

@@ -8,25 +8,38 @@ datasource db {
 }
 
 model Post {
+  id         Int         @id @default(autoincrement())
+  titulo     String
+  conteudo   String
+  criadoEm   DateTime    @default(now())
+  autorId    Int
+  autor      Usuario     @relation(fields: [autorId], references: [id], onDelete: Cascade)
+  comentarios Comentario[]
+}
+
+model Comentario {
   id        Int      @id @default(autoincrement())
-  titulo    String
-  conteudo  String
+  texto     String
   criadoEm  DateTime @default(now())
+  postId    Int
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   autorId   Int
   autor     Usuario  @relation(fields: [autorId], references: [id], onDelete: Cascade)
 }
 
 model Usuario {
-  id            Int              @id @default(autoincrement())
-  nome          String
-  email         String           @unique
-  senha         String
-  bio           String?
-  fotoUrl       String?
-  criadoEm      DateTime         @default(now())
-  posts         Post[]
-  sessoes       Sessao[]
-  inscricoes    InscricaoPush[]
+  id                Int              @id @default(autoincrement())
+  nome              String
+  email             String           @unique
+  senha             String
+  bio               String?
+  fotoUrl           String?
+  notificacoesAtivas Boolean         @default(true)
+  criadoEm          DateTime         @default(now())
+  posts             Post[]
+  comentarios       Comentario[]
+  sessoes           Sessao[]
+  inscricoes        InscricaoPush[]
 }
 
 model Sessao {

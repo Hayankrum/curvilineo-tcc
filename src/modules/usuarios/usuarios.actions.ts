@@ -136,6 +136,23 @@ export async function alterarSenha(id: number, senhaAtual: string, novaSenha: st
   return { success: 'Senha alterada com sucesso' }
 }
 
+// ---------- NOTIFICAÇÕES ----------
+
+export async function toggleNotificacoes() {
+  const usuarioLogado = await obterSessao()
+  if (!usuarioLogado) return { error: 'Não autorizado' }
+
+  const usuario = await prisma.usuario.findUnique({ where: { id: usuarioLogado.id } })
+  if (!usuario) return { error: 'Usuário não encontrado' }
+
+  await prisma.usuario.update({
+    where: { id: usuarioLogado.id },
+    data: { notificacoesAtivas: !usuario.notificacoesAtivas },
+  })
+
+  return { success: true }
+}
+
 // ---------- HELPERS ----------
 
 export async function getUsuarioLogado() {
