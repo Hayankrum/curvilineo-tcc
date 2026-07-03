@@ -55,6 +55,14 @@ async function enviarNotificacao(
   dados: { titulo: string; mensagem: string; url: string }
 ) {
   try {
+    await prisma.notificacao.create({
+      data: {
+        titulo: dados.titulo,
+        mensagem: dados.mensagem,
+        url: dados.url,
+      },
+    })
+
     const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
     const vapidPrivateKey = process.env.VAPID_PRIVATE_KEY
     const vapidEmail = process.env.VAPID_EMAIL
