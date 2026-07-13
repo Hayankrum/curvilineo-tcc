@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { deletarUsuario } from './usuarios.actions'
+import { deletarUsuario } from '../usuarios.actions'
 import CampoSenha from './CampoSenha'
 
 interface Props {
@@ -44,9 +44,9 @@ export default function BotaoDeletarPerfil({ id, temSenha }: Props) {
 
       {aberto && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-zinc-900 border border-zinc-700 rounded-xl p-6 w-full max-w-sm mx-4">
-            <h2 className="text-lg font-semibold mb-2">Deletar conta</h2>
-            <p className="text-zinc-400 text-sm mb-4">
+          <div className="rounded-xl p-6 w-full max-w-sm mx-4" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--border-color)' }}>
+            <h2 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Deletar conta</h2>
+            <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
               Tem certeza que quer deletar sua conta? Todos os seus posts também serão deletados. Esta ação não pode ser desfeita.
             </p>
             {temSenha && (
@@ -54,11 +54,12 @@ export default function BotaoDeletarPerfil({ id, temSenha }: Props) {
                 <CampoSenha name="senha" label="Digite sua senha para confirmar" />
               </div>
             )}
-            {erro && <p className="text-red-400 text-sm mb-4">{erro}</p>}
+            {erro && <p className="text-sm mb-4" style={{ color: '#f87171' }}>{erro}</p>}
             <div className="flex gap-3 justify-end">
               <button
                 onClick={() => { setAberto(false); setSenha(''); setErro('') }}
-                className="px-4 py-2 text-sm rounded-lg bg-zinc-800 hover:bg-zinc-700 transition-colors"
+                className="px-4 py-2 text-sm rounded-lg transition-colors"
+                style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}
               >
                 Cancelar
               </button>

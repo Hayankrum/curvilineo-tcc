@@ -1,10 +1,10 @@
 'use client'
 
 import { useActionState } from 'react'
-import { login } from './usuarios.actions'
+import { login } from '../usuarios.actions'
 import { signIn } from 'next-auth/react'
 import Link from 'next/link'
-import CampoSenha from './CampoSenha'
+import CampoSenha from '../components/CampoSenha'
 
 async function loginAction(_prev: { error?: string } | null, formData: FormData) {
   const email = formData.get('email') as string
@@ -17,22 +17,23 @@ export default function LoginPage() {
 
   return (
     <div className="max-w-sm">
-      <h1 className="text-2xl font-semibold mb-6">Entrar</h1>
+      <h1 className="text-2xl font-semibold mb-6" style={{ color: 'var(--text-primary)' }}>Entrar</h1>
 
       <form action={formAction} className="flex flex-col gap-4">
         {estado?.error && (
-          <p className="text-red-400 text-sm bg-red-950/40 border border-red-900 rounded-lg px-4 py-2">
+          <p className="text-sm bg-red-950/40 border border-red-900 rounded-lg px-4 py-2" style={{ color: '#f87171' }}>
             {estado.error}
           </p>
         )}
 
         <div className="flex flex-col gap-1">
-          <label className="text-sm text-zinc-400">Email</label>
+          <label className="text-sm" style={{ color: 'var(--text-secondary)' }}>Email</label>
           <input
             name="email"
             type="email"
             placeholder="seu@email.com"
-            className="bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-2 text-white placeholder:text-zinc-600 focus:outline-none focus:border-zinc-500"
+            className="rounded-lg px-4 py-2 text-sm focus:outline-none transition-colors"
+            style={{ backgroundColor: 'var(--input-bg)', border: '1px solid var(--input-border)', color: 'var(--text-primary)' }}
           />
         </div>
 
@@ -41,7 +42,8 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={pending}
-          className="bg-white text-zinc-950 font-medium rounded-lg px-4 py-2 hover:bg-zinc-200 transition-colors w-fit disabled:opacity-50"
+          className="font-medium rounded-lg px-4 py-2 transition-colors w-fit disabled:opacity-50"
+          style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
         >
           {pending ? 'Entrando...' : 'Entrar'}
         </button>
@@ -49,16 +51,17 @@ export default function LoginPage() {
 
       <div className="relative my-6">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-zinc-800"></div>
+          <div className="w-full" style={{ borderTop: '1px solid var(--border-color)' }}></div>
         </div>
         <div className="relative flex justify-center text-sm">
-          <span className="bg-zinc-950 px-3 text-zinc-500">ou</span>
+          <span className="px-3" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-tertiary)' }}>ou</span>
         </div>
       </div>
 
       <button
         onClick={() => signIn('google', { callbackUrl: '/' })}
-        className="w-full flex items-center justify-center gap-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg px-4 py-2 transition-colors"
+        className="w-full flex items-center justify-center gap-3 rounded-lg px-4 py-2 transition-colors"
+        style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}
       >
         <svg className="w-5 h-5" viewBox="0 0 24 24">
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
@@ -69,9 +72,9 @@ export default function LoginPage() {
         Entrar com Google
       </button>
 
-      <p className="text-sm text-zinc-500 mt-6">
+      <p className="text-sm mt-6" style={{ color: 'var(--text-tertiary)' }}>
         Não tem conta?{' '}
-        <Link href="/usuarios/registro" className="text-white hover:underline">
+        <Link href="/usuarios/registro" className="hover:underline" style={{ color: 'var(--text-primary)' }}>
           Cadastre-se
         </Link>
       </p>

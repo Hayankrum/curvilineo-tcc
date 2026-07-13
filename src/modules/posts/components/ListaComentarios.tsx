@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { deletarComentario } from './comentarios.actions'
+import { deletarComentario } from '../comentarios.actions'
 import { useState } from 'react'
 
 interface Comentario {
@@ -31,23 +31,23 @@ export default function ListaComentarios({ comentarios, usuarioLogadoId }: Lista
   }
 
   if (comentarios.length === 0) {
-    return <p className="text-zinc-500 text-sm mt-4">Nenhum comentário ainda.</p>
+    return <p className="text-sm mt-4" style={{ color: 'var(--text-tertiary)' }}>Nenhum comentário ainda.</p>
   }
 
   return (
     <div className="mt-4 space-y-3">
-      <h3 className="text-sm font-medium text-zinc-400">
+      <h3 className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
         {comentarios.length} comentário{comentarios.length !== 1 ? 's' : ''}
       </h3>
       {comentarios.map((comentario) => (
-        <div key={comentario.id} className="bg-zinc-900 rounded-lg p-3">
+        <div key={comentario.id} className="rounded-lg p-3" style={{ backgroundColor: 'var(--card-bg)' }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="w-5 h-5 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-xs">
+              <span className="w-5 h-5 rounded-full flex items-center justify-center text-xs" style={{ backgroundColor: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', color: 'var(--text-secondary)' }}>
                 {comentario.autor.nome.charAt(0).toUpperCase()}
               </span>
-              <span className="text-sm text-zinc-300">{comentario.autor.nome}</span>
-              <span className="text-xs text-zinc-600">
+              <span className="text-sm" style={{ color: 'var(--text-primary)' }}>{comentario.autor.nome}</span>
+              <span className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
                 {new Date(comentario.criadoEm).toLocaleDateString('pt-BR')}
               </span>
             </div>
@@ -55,13 +55,14 @@ export default function ListaComentarios({ comentarios, usuarioLogadoId }: Lista
               <button
                 onClick={() => handleDeletar(comentario.id)}
                 disabled={deletandoId === comentario.id}
-                className="text-xs text-zinc-600 hover:text-red-400 transition-colors"
+                className="text-xs transition-colors hover:underline"
+                style={{ color: 'var(--text-tertiary)' }}
               >
                 {deletandoId === comentario.id ? '...' : 'Excluir'}
               </button>
             )}
           </div>
-          <p className="text-sm text-zinc-300 mt-2">{comentario.texto}</p>
+          <p className="text-sm mt-2" style={{ color: 'var(--text-primary)' }}>{comentario.texto}</p>
         </div>
       ))}
     </div>

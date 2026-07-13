@@ -15,13 +15,21 @@ async function obterPostDoUsuario(id: number) {
   return { post, usuario }
 }
 
-export async function criarPost(titulo: string, conteudo: string) {
+export async function criarPost(titulo: string, conteudo: string, latitude?: number | null, longitude?: number | null) {
   const usuario = await getUsuarioLogado()
   if (!usuario) return { error: 'Você precisa estar logado para criar um post' }
 
-  await prisma.post.create({ data: { titulo, conteudo, autorId: usuario.id } })
+  await prisma.post.create({
+    data: {
+      titulo,
+      conteudo,
+      latitude: latitude ?? null,
+      longitude: longitude ?? null,
+      autorId: usuario.id,
+    }
+  })
   revalidatePath('/posts')
-  redirect('/posts')
+  revalidatePath('/mapa')
 }
 
 export async function deletarPost(id: number) {
@@ -30,12 +38,23 @@ export async function deletarPost(id: number) {
 
   await prisma.post.delete({ where: { id } })
   revalidatePath('/posts')
+  revalidatePath('/mapa')
 }
 
-export async function editarPost(id: number, titulo: string, conteudo: string) {
+export async function editarPost(id: number, titulo: string, conteudo: string, latitude?: number | null, longitude?: number | null) {
   const { error } = await obterPostDoUsuario(id)
   if (error) return { error }
 
-  await prisma.post.update({ where: { id }, data: { titulo, conteudo } })
+  await prisma.post.update({
+    where: { id },
+    data: {
+      titulo,
+      conteudo,
+      latitude: latitude ?? null,
+      longitude: longitude ?? null,
+    }
+  })
+  revalidatePath('/posts')
+  revalidatePath('/mapa')
   redirect(`/posts/${id}`)
 }

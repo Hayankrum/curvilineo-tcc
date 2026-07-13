@@ -11,6 +11,8 @@ model Post {
   id         Int         @id @default(autoincrement())
   titulo     String
   conteudo   String
+  latitude   Float?
+  longitude  Float?
   criadoEm   DateTime    @default(now())
   autorId    Int
   autor      Usuario     @relation(fields: [autorId], references: [id], onDelete: Cascade)

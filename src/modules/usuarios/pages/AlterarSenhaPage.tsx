@@ -1,9 +1,9 @@
 'use client'
 
 import { useActionState } from 'react'
-import { alterarSenha } from './usuarios.actions'
+import { alterarSenha } from '../usuarios.actions'
 import Link from 'next/link'
-import CampoSenha from './CampoSenha'
+import CampoSenha from '../components/CampoSenha'
 
 interface Props {
   usuarioId: number
@@ -24,24 +24,25 @@ export default function AlterarSenhaPage({ usuarioId }: Props) {
     <div className="max-w-sm">
       <Link
         href={`/usuarios/${usuarioId}`}
-        className="text-sm text-zinc-500 hover:text-white transition-colors mb-6 inline-block"
+        className="text-sm transition-colors mb-6 inline-block hover:underline"
+        style={{ color: 'var(--text-tertiary)' }}
       >
         ← Voltar
       </Link>
 
-      <h1 className="text-2xl font-semibold mb-6">Alterar senha</h1>
+      <h1 className="text-2xl font-semibold mb-6" style={{ color: 'var(--text-primary)' }}>Alterar senha</h1>
 
       <form action={formAction} className="flex flex-col gap-4">
         <input type="hidden" name="id" value={usuarioId} />
 
         {estado?.error && (
-          <p className="text-red-400 text-sm bg-red-950/40 border border-red-900 rounded-lg px-4 py-2">
+          <p className="text-sm bg-red-950/40 border border-red-900 rounded-lg px-4 py-2" style={{ color: '#f87171' }}>
             {estado.error}
           </p>
         )}
 
         {estado?.success && (
-          <p className="text-green-400 text-sm bg-green-950/40 border border-green-900 rounded-lg px-4 py-2">
+          <p className="text-sm bg-green-950/40 border border-green-900 rounded-lg px-4 py-2" style={{ color: '#4ade80' }}>
             {estado.success}
           </p>
         )}
@@ -55,7 +56,8 @@ export default function AlterarSenhaPage({ usuarioId }: Props) {
         <button
           type="submit"
           disabled={pending}
-          className="bg-white text-zinc-950 font-medium rounded-lg px-4 py-2 hover:bg-zinc-200 transition-colors w-fit disabled:opacity-50"
+          className="font-medium rounded-lg px-4 py-2 transition-colors w-fit disabled:opacity-50"
+          style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
         >
           {pending ? 'Alterando...' : 'Alterar senha'}
         </button>

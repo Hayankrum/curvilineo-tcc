@@ -16,7 +16,7 @@ export default function CampoSenha({ name, placeholder = '•••••••�
 
   return (
     <div className="flex flex-col gap-1">
-      <label className="text-sm text-zinc-400">{label}</label>
+      <label className="text-sm" style={{ color: 'var(--text-secondary)' }}>{label}</label>
       <div className="relative">
         <input
           name={name}
@@ -25,12 +25,14 @@ export default function CampoSenha({ name, placeholder = '•••••••�
           required={required}
           minLength={minLength}
           defaultValue={defaultValue}
-          className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-2 pr-10 text-white placeholder:text-zinc-600 focus:outline-none focus:border-zinc-500"
+          className="w-full rounded-lg px-4 py-2 pr-10 text-sm focus:outline-none transition-colors"
+          style={{ backgroundColor: 'var(--input-bg)', border: '1px solid var(--input-border)', color: 'var(--text-primary)' }}
         />
         <button
           type="button"
           onClick={() => setVisivel(!visivel)}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors"
+          className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
+          style={{ color: 'var(--text-tertiary)' }}
           tabIndex={-1}
         >
           {visivel ? (

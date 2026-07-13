@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { criarComentario } from './comentarios.actions'
+import { criarComentario } from '../comentarios.actions'
 
 export default function FormComentario({ postId }: { postId: number }) {
   const router = useRouter()
@@ -37,13 +37,15 @@ export default function FormComentario({ postId }: { postId: number }) {
         onChange={(e) => setTexto(e.target.value)}
         placeholder="Escreva um comentário..."
         rows={2}
-        className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-zinc-600 resize-none"
+        className="w-full rounded-lg px-3 py-2 text-sm focus:outline-none resize-none transition-colors"
+        style={{ backgroundColor: 'var(--input-bg)', border: '1px solid var(--input-border)', color: 'var(--text-primary)' }}
       />
-      {error && <p className="text-red-400 text-xs mt-1">{error}</p>}
+      {error && <p className="text-xs mt-1" style={{ color: '#f87171' }}>{error}</p>}
       <button
         type="submit"
         disabled={isSubmitting || !texto.trim()}
-        className="mt-2 bg-zinc-800 text-white text-sm rounded-lg px-4 py-1.5 hover:bg-zinc-700 transition-colors disabled:opacity-50"
+        className="mt-2 text-sm rounded-lg px-4 py-1.5 transition-colors disabled:opacity-50"
+        style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}
       >
         {isSubmitting ? 'Enviando...' : 'Comentar'}
       </button>

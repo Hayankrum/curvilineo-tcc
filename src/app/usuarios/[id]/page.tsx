@@ -1,4 +1,4 @@
-import UsuarioDetailPage from '@/modules/usuarios/UsuarioDetailPage'
+import UsuarioDetailPage from '@/modules/usuarios/pages/UsuarioDetailPage'
 
 interface Props {
   params: Promise<{ id: string }>

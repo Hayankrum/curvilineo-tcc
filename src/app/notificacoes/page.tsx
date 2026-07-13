@@ -76,8 +76,8 @@ export default function NotificacoesPage() {
   if (isLoading) {
     return (
       <div className="max-w-xl">
-        <h1 className="text-2xl font-semibold mb-6">Notificações</h1>
-        <p className="text-zinc-400">Carregando...</p>
+        <h1 className="text-2xl font-semibold mb-6" style={{ color: 'var(--text-primary)' }}>Notificações</h1>
+        <p style={{ color: 'var(--text-secondary)' }}>Carregando...</p>
       </div>
     )
   }
@@ -85,9 +85,9 @@ export default function NotificacoesPage() {
   if (!isSupported) {
     return (
       <div className="max-w-xl">
-        <h1 className="text-2xl font-semibold mb-6">Notificações</h1>
-        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6">
-          <p className="text-zinc-400">Seu navegador não suporta notificações push.</p>
+        <h1 className="text-2xl font-semibold mb-6" style={{ color: 'var(--text-primary)' }}>Notificações</h1>
+        <div className="rounded-lg p-6" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
+          <p style={{ color: 'var(--text-secondary)' }}>Seu navegador não suporta notificações push.</p>
         </div>
       </div>
     )
@@ -95,42 +95,40 @@ export default function NotificacoesPage() {
 
   return (
     <div className="max-w-xl">
-      <h1 className="text-2xl font-semibold mb-6">Notificações</h1>
+      <h1 className="text-2xl font-semibold mb-6" style={{ color: 'var(--text-primary)' }}>Notificações</h1>
 
-      <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 mb-6">
+      <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="font-medium mb-1">Notificações Push</h2>
-            <p className="text-sm text-zinc-400">
+            <h2 className="font-medium mb-1" style={{ color: 'var(--text-primary)' }}>Notificações Push</h2>
+            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
               Receba notificações quando alguém comentar nos seus posts
             </p>
           </div>
           <button
             onClick={handleToggle}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              isSubscribed
-                ? 'bg-zinc-800 text-white hover:bg-zinc-700'
-                : 'bg-white text-zinc-950 hover:bg-zinc-200'
-            }`}
+            className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            style={isSubscribed ? { backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' } : { backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
           >
             {isSubscribed ? 'Desativar' : 'Ativar'}
           </button>
         </div>
         <div className="mt-4 flex items-center gap-2">
           <span className={`w-2 h-2 rounded-full ${isSubscribed ? 'bg-green-500' : 'bg-zinc-600'}`} />
-          <span className="text-sm text-zinc-400">
+          <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
             {isSubscribed ? 'Notificações ativas' : 'Notificações desativadas'}
           </span>
         </div>
       </div>
 
-      <div className="border-t border-zinc-800 pt-6">
+      <div className="pt-6" style={{ borderTop: '1px solid var(--border-color)' }}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-medium">Histórico</h2>
+          <h2 className="font-medium" style={{ color: 'var(--text-primary)' }}>Histórico</h2>
           {historico.some((n) => !n.lida) && (
             <button
               onClick={marcarTodasComoLidas}
-              className="text-xs text-zinc-500 hover:text-white transition-colors"
+              className="text-xs transition-colors hover:underline"
+              style={{ color: 'var(--text-tertiary)' }}
             >
               Marcar todas como lidas
             </button>
@@ -138,21 +136,18 @@ export default function NotificacoesPage() {
         </div>
 
         {loadingHistorico ? (
-          <p className="text-zinc-500 text-sm">Carregando histórico...</p>
+          <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>Carregando histórico...</p>
         ) : historico.length === 0 ? (
-          <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 text-center">
-            <p className="text-zinc-500 text-sm">Nenhuma notificação recebida ainda.</p>
+          <div className="rounded-lg p-6 text-center" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
+            <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>Nenhuma notificação recebida ainda.</p>
           </div>
         ) : (
           <div className="space-y-3">
             {historico.map((notificacao) => (
               <div
                 key={notificacao.id}
-                className={`border rounded-lg p-4 cursor-pointer transition-colors ${
-                  notificacao.lida
-                    ? 'bg-zinc-900 border-zinc-800'
-                    : 'bg-zinc-900 border-zinc-700'
-                }`}
+                className="rounded-lg p-4 cursor-pointer transition-colors"
+                style={{ backgroundColor: 'var(--card-bg)', border: `1px solid ${notificacao.lida ? 'var(--card-border)' : 'var(--border-color)'}` }}
                 onClick={() => {
                   if (!notificacao.lida) marcarComoLida(notificacao.id)
                   if (notificacao.url) window.location.href = notificacao.url
@@ -164,13 +159,13 @@ export default function NotificacoesPage() {
                       {!notificacao.lida && (
                         <span className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
                       )}
-                      <h3 className={`font-medium text-sm ${notificacao.lida ? 'text-zinc-400' : 'text-white'}`}>
+                      <h3 className="font-medium text-sm" style={{ color: notificacao.lida ? 'var(--text-secondary)' : 'var(--text-primary)' }}>
                         {notificacao.titulo}
                       </h3>
                     </div>
-                    <p className="text-zinc-400 text-sm mt-1">{notificacao.mensagem}</p>
+                    <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>{notificacao.mensagem}</p>
                   </div>
-                  <span className="text-xs text-zinc-600 ml-4 flex-shrink-0">
+                  <span className="text-xs ml-4 flex-shrink-0" style={{ color: 'var(--text-tertiary)' }}>
                     {new Date(notificacao.criadaEm).toLocaleDateString('pt-BR', {
                       day: '2-digit',
                       month: '2-digit',
@@ -182,7 +177,8 @@ export default function NotificacoesPage() {
                 {notificacao.url && (
                   <Link
                     href={notificacao.url}
-                    className="text-xs text-zinc-500 hover:text-white transition-colors mt-2 inline-block"
+                    className="text-xs transition-colors mt-2 inline-block hover:underline"
+                    style={{ color: 'var(--text-tertiary)' }}
                     onClick={(e) => e.stopPropagation()}
                   >
                     Ver →
@@ -195,7 +191,7 @@ export default function NotificacoesPage() {
       </div>
 
       <div className="mt-6">
-        <Link href="/posts" className="text-sm text-zinc-500 hover:text-white transition-colors">
+        <Link href="/posts" className="text-sm transition-colors hover:underline" style={{ color: 'var(--text-tertiary)' }}>
           ← Voltar para os posts
         </Link>
       </div>

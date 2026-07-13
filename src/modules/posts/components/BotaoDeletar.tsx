@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { deletarPost } from './posts.actions'
+import { deletarPost } from '../posts.actions'
 import { useRouter } from 'next/navigation'
 
 interface Props {
@@ -28,15 +28,16 @@ export default function BotaoDeletar({ id }: Props) {
 
       {aberto && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-zinc-900 border border-zinc-700 rounded-xl p-6 w-full max-w-sm mx-4">
-            <h2 className="text-lg font-semibold mb-2">Deletar post</h2>
-            <p className="text-zinc-400 text-sm mb-6">
+          <div className="rounded-xl p-6 w-full max-w-sm mx-4" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--border-color)' }}>
+            <h2 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Deletar post</h2>
+            <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>
               Tem certeza que quer deletar este post? Esta ação não pode ser desfeita.
             </p>
             <div className="flex gap-3 justify-end">
               <button
                 onClick={() => setAberto(false)}
-                className="px-4 py-2 text-sm rounded-lg bg-zinc-800 hover:bg-zinc-700 transition-colors"
+                className="px-4 py-2 text-sm rounded-lg transition-colors"
+                style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}
               >
                 Cancelar
               </button>

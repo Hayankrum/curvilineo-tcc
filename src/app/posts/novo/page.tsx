@@ -1,5 +1,5 @@
 import { Suspense } from 'react'
-import PostFormPage from '@/modules/posts/PostFormPage'
+import PostFormPage from '@/modules/posts/pages/PostFormPage'
 
 interface Props {
   searchParams: Promise<{ error?: string }>

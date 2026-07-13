@@ -1,6 +1,6 @@
 import { notFound, redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
-import PostFormPage from '@/modules/posts/PostFormPage'
+import PostFormPage from '@/modules/posts/pages/PostFormPage'
 import { getUsuarioLogado } from '@/modules/usuarios/usuarios.actions'
 
 interface Props {

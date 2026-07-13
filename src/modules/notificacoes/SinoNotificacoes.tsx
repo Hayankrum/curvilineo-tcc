@@ -25,7 +25,8 @@ export default function SinoNotificacoes() {
   return (
     <Link
       href="/notificacoes"
-      className="relative text-zinc-400 hover:text-white transition-colors"
+      className="relative transition-colors"
+      style={{ color: 'var(--text-secondary)' }}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

@@ -1,2 +1,2 @@
-import RegistroPage from '@/modules/usuarios/RegistroPage'
+import RegistroPage from '@/modules/usuarios/pages/RegistroPage'
 export default RegistroPage

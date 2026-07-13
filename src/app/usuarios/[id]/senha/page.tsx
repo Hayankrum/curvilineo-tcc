@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { getUsuarioLogado } from '@/modules/usuarios/usuarios.actions'
-import AlterarSenhaPage from '@/modules/usuarios/AlterarSenhaPage'
+import AlterarSenhaPage from '@/modules/usuarios/pages/AlterarSenhaPage'
 
 interface Props {
   params: Promise<{ id: string }>

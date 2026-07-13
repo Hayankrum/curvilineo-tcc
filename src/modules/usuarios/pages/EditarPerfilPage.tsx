@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState } from 'react'
-import { editarPerfil } from './usuarios.actions'
+import { editarPerfil } from '../usuarios.actions'
 import Link from 'next/link'
 
 interface Props {
@@ -22,47 +22,51 @@ export default function EditarPerfilPage({ usuario }: Props) {
     <div className="max-w-sm">
       <Link
         href={`/usuarios/${usuario.id}`}
-        className="text-sm text-zinc-500 hover:text-white transition-colors mb-6 inline-block"
+        className="text-sm transition-colors mb-6 inline-block hover:underline"
+        style={{ color: 'var(--text-tertiary)' }}
       >
         ← Voltar
       </Link>
 
-      <h1 className="text-2xl font-semibold mb-6">Editar perfil</h1>
+      <h1 className="text-2xl font-semibold mb-6" style={{ color: 'var(--text-primary)' }}>Editar perfil</h1>
 
       <form action={formAction} className="flex flex-col gap-4">
         <input type="hidden" name="id" value={usuario.id} />
 
         {estado?.error && (
-          <p className="text-red-400 text-sm bg-red-950/40 border border-red-900 rounded-lg px-4 py-2">
+          <p className="text-sm bg-red-950/40 border border-red-900 rounded-lg px-4 py-2" style={{ color: '#f87171' }}>
             {estado.error}
           </p>
         )}
 
         <div className="flex flex-col gap-1">
-          <label className="text-sm text-zinc-400">Nome</label>
+          <label className="text-sm" style={{ color: 'var(--text-secondary)' }}>Nome</label>
           <input
             name="nome"
             defaultValue={usuario.nome}
             maxLength={50}
-            className="bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-2 text-white placeholder:text-zinc-600 focus:outline-none focus:border-zinc-500"
+            className="rounded-lg px-4 py-2 text-sm focus:outline-none transition-colors"
+            style={{ backgroundColor: 'var(--input-bg)', border: '1px solid var(--input-border)', color: 'var(--text-primary)' }}
           />
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-sm text-zinc-400">Bio</label>
+          <label className="text-sm" style={{ color: 'var(--text-secondary)' }}>Bio</label>
           <textarea
             name="bio"
             defaultValue={usuario.bio ?? ''}
             placeholder="Fale um pouco sobre você..."
             rows={3}
-            className="bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-2 text-white placeholder:text-zinc-600 focus:outline-none focus:border-zinc-500 resize-none"
+            className="rounded-lg px-4 py-2 text-sm focus:outline-none resize-none transition-colors"
+            style={{ backgroundColor: 'var(--input-bg)', border: '1px solid var(--input-border)', color: 'var(--text-primary)' }}
           />
         </div>
 
         <button
           type="submit"
           disabled={pending}
-          className="bg-white text-zinc-950 font-medium rounded-lg px-4 py-2 hover:bg-zinc-200 transition-colors w-fit disabled:opacity-50"
+          className="font-medium rounded-lg px-4 py-2 transition-colors w-fit disabled:opacity-50"
+          style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
         >
           {pending ? 'Salvando...' : 'Salvar'}
         </button>

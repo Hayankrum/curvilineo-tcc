@@ -1,9 +1,9 @@
 'use client'
 
 import { useActionState } from 'react'
-import { registrar } from './usuarios.actions'
+import { registrar } from '../usuarios.actions'
 import Link from 'next/link'
-import CampoSenha from './CampoSenha'
+import CampoSenha from '../components/CampoSenha'
 
 async function registrarAction(_prev: { error?: string } | null, formData: FormData) {
   const nome = formData.get('nome') as string
@@ -18,32 +18,34 @@ export default function RegistroPage() {
 
   return (
     <div className="max-w-sm">
-      <h1 className="text-2xl font-semibold mb-6">Criar conta</h1>
+      <h1 className="text-2xl font-semibold mb-6" style={{ color: 'var(--text-primary)' }}>Criar conta</h1>
 
       <form action={formAction} className="flex flex-col gap-4">
         {estado?.error && (
-          <p className="text-red-400 text-sm bg-red-950/40 border border-red-900 rounded-lg px-4 py-2">
+          <p className="text-sm bg-red-950/40 border border-red-900 rounded-lg px-4 py-2" style={{ color: '#f87171' }}>
             {estado.error}
           </p>
         )}
 
         <div className="flex flex-col gap-1">
-          <label className="text-sm text-zinc-400">Nome</label>
+          <label className="text-sm" style={{ color: 'var(--text-secondary)' }}>Nome</label>
           <input
             name="nome"
             placeholder="Seu nome"
             maxLength={50}
-            className="bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-2 text-white placeholder:text-zinc-600 focus:outline-none focus:border-zinc-500"
+            className="rounded-lg px-4 py-2 text-sm focus:outline-none transition-colors"
+            style={{ backgroundColor: 'var(--input-bg)', border: '1px solid var(--input-border)', color: 'var(--text-primary)' }}
           />
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-sm text-zinc-400">Email</label>
+          <label className="text-sm" style={{ color: 'var(--text-secondary)' }}>Email</label>
           <input
             name="email"
             type="email"
             placeholder="seu@email.com"
-            className="bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-2 text-white placeholder:text-zinc-600 focus:outline-none focus:border-zinc-500"
+            className="rounded-lg px-4 py-2 text-sm focus:outline-none transition-colors"
+            style={{ backgroundColor: 'var(--input-bg)', border: '1px solid var(--input-border)', color: 'var(--text-primary)' }}
           />
         </div>
 
@@ -54,14 +56,15 @@ export default function RegistroPage() {
         <button
           type="submit"
           disabled={pending}
-          className="bg-white text-zinc-950 font-medium rounded-lg px-4 py-2 hover:bg-zinc-200 transition-colors w-fit disabled:opacity-50"
+          className="font-medium rounded-lg px-4 py-2 transition-colors w-fit disabled:opacity-50"
+          style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
         >
           {pending ? 'Criando...' : 'Criar conta'}
         </button>
 
-        <p className="text-sm text-zinc-500">
+        <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>
           Já tem conta?{' '}
-          <Link href="/usuarios/login" className="text-white hover:underline">
+          <Link href="/usuarios/login" className="hover:underline" style={{ color: 'var(--text-primary)' }}>
             Entrar
           </Link>
         </p>

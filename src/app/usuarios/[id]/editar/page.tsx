@@ -1,7 +1,7 @@
 import { notFound, redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { getUsuarioLogado } from '@/modules/usuarios/usuarios.actions'
-import EditarPerfilPage from '@/modules/usuarios/EditarPerfilPage'
+import EditarPerfilPage from '@/modules/usuarios/pages/EditarPerfilPage'
 
 interface Props {
   params: Promise<{ id: string }>
