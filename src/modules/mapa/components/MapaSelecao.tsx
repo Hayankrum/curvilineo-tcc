@@ -123,6 +123,40 @@ export default function MapaSelecao({ initialLat, initialLng, onLocationSelect, 
     }
   }, [initialLat, initialLng, dark, handleLocationSelect])
 
+  function useMyLocation() {
+    if (!navigator.geolocation || !mapInstance.current) return
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude: lat, longitude: lng } = pos.coords
+        mapInstance.current!.flyTo([lat, lng], 15)
+        setPosition({ lat, lng })
+        handleLocationSelect(lat, lng)
+        if (markerRef.current) {
+          mapInstance.current!.removeLayer(markerRef.current)
+        }
+        const icon = L.divIcon({
+          className: 'custom-marker',
+          html: `<div style="
+            width: 24px;
+            height: 24px;
+            background: ${dark ? '#fafafa' : '#18181b'};
+            border: 3px solid ${dark ? '#18181b' : '#ffffff'};
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+          "></div>`,
+          iconSize: [24, 24],
+          iconAnchor: [12, 12],
+        })
+        markerRef.current = L.marker([lat, lng], { icon })
+          .addTo(mapInstance.current!)
+          .bindPopup('Sua localização')
+          .openPopup()
+      },
+      () => {},
+      { enableHighAccuracy: true, timeout: 10000 }
+    )
+  }
+
   return (
     <div className="flex flex-col gap-2">
       <div
@@ -130,6 +164,14 @@ export default function MapaSelecao({ initialLat, initialLng, onLocationSelect, 
         className="w-full rounded-lg overflow-hidden cursor-crosshair"
         style={{ height: '300px', border: '1px solid var(--card-border)' }}
       />
+      <button
+        type="button"
+        onClick={useMyLocation}
+        className="text-sm rounded-lg px-3 py-2 transition-colors w-fit"
+        style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)', border: '1px solid var(--input-border)' }}
+      >
+        📍 Usar minha localização
+      </button>
       {position && (
         <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
           Localização: {position.lat.toFixed(6)}, {position.lng.toFixed(6)}

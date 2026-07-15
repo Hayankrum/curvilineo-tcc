@@ -7,8 +7,6 @@ import 'leaflet-fullscreen/dist/leaflet.fullscreen.css'
 import 'leaflet-fullscreen/dist/Leaflet.fullscreen'
 import 'leaflet.locatecontrol/dist/L.Control.Locate.min.css'
 import 'leaflet.locatecontrol/dist/L.Control.Locate.min.js'
-import 'leaflet-minimap/dist/Control.MiniMap.min.css'
-import 'leaflet-minimap/dist/Control.MiniMap.min.js'
 
 interface PostMarker {
   id: number
@@ -89,15 +87,6 @@ export default function MapaGlobal({ posts, dark }: Props) {
         timeout: 10000,
       },
     } as Record<string, unknown>).addTo(map)
-
-    const miniMapLayer = L.tileLayer(dark ? tileDark : tileLight)
-    L.control.minimap(miniMapLayer, {
-      position: 'bottomright',
-      toggleDisplay: true,
-      minimized: false,
-      aimingRectOptions: { color: '#ef4444', weight: 2 },
-      shadowRectOptions: { color: '#ef4444', weight: 2, opacity: 0.2 },
-    }).addTo(map)
 
     markersLayerRef.current = L.layerGroup().addTo(map)
     mapInstance.current = map

@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { getUsuarioLogado } from '@/modules/usuarios/usuarios.actions'
 import { primeiroNome } from '@/lib/utils'
-import MapaGlobalClient from '@/modules/mapa/components/MapaGlobalClient'
 
 export default async function PostListPage() {
   const usuario = await getUsuarioLogado()
@@ -11,46 +10,20 @@ export default async function PostListPage() {
     orderBy: { criadoEm: 'desc' }
   })
 
-  const postsComCoordenadas = posts
-    .filter(p => p.latitude && p.longitude)
-    .map(p => ({
-      id: p.id,
-      titulo: p.titulo,
-      latitude: p.latitude!,
-      longitude: p.longitude!,
-      autorNome: p.autor.nome,
-      criadoEm: p.criadoEm.toISOString(),
-    }))
-
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>Posts</h1>
-        <div className="flex items-center gap-3">
+        {usuario && (
           <Link
-            href="/mapa"
-            className="text-sm transition-colors hover:underline"
-            style={{ color: 'var(--text-secondary)' }}
+            href="/posts/novo"
+            className="font-medium rounded-lg px-4 py-2 text-sm transition-colors"
+            style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
           >
-            Mapa global
+            Novo post
           </Link>
-          {usuario && (
-            <Link
-              href="/posts/novo"
-              className="font-medium rounded-lg px-4 py-2 text-sm transition-colors"
-              style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
-            >
-              Novo post
-            </Link>
-          )}
-        </div>
+        )}
       </div>
-
-      {postsComCoordenadas.length > 0 && (
-        <div className="mb-8">
-          <MapaGlobalClient posts={postsComCoordenadas} />
-        </div>
-      )}
 
       {posts.length === 0 && (
         <p style={{ color: 'var(--text-tertiary)' }}>Nenhum post ainda.</p>
