@@ -62,7 +62,11 @@ export default function ListaComentarios({ comentarios, usuarioLogadoId }: Lista
               </button>
             )}
           </div>
-          <p className="text-sm mt-2" style={{ color: 'var(--text-primary)' }}>{comentario.texto}</p>
+          <div
+            className="prose prose-sm max-w-none mt-2 text-sm"
+            style={{ color: 'var(--text-primary)' }}
+            dangerouslySetInnerHTML={{ __html: comentario.texto }}
+          />
         </div>
       ))}
     </div>

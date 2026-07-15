@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { getUsuarioLogado } from '@/modules/usuarios/usuarios.actions'
 import { primeiroNome } from '@/lib/utils'
+import { truncateHtml } from '@/lib/html'
 
 export default async function PostListPage() {
   const usuario = await getUsuarioLogado()
@@ -39,7 +40,7 @@ export default async function PostListPage() {
                 {primeiroNome(post.autor.nome)}
               </Link>
             </p>
-            <p className="text-sm mb-4 line-clamp-2" style={{ color: 'var(--text-secondary)' }}>{post.conteudo}</p>
+            <p className="text-sm mb-4 line-clamp-2" style={{ color: 'var(--text-secondary)' }}>{truncateHtml(post.conteudo, 150)}</p>
             <Link
               href={`/posts/${post.id}`}
               className="text-sm transition-colors hover:underline"

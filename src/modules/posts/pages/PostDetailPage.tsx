@@ -45,7 +45,11 @@ export default async function PostDetailPage({ id }: Props) {
           {primeiroNome(post.autor.nome)}
         </Link>
       </p>
-      <p className="leading-relaxed mb-6" style={{ color: 'var(--text-secondary)' }}>{post.conteudo}</p>
+      <div
+        className="prose prose-sm max-w-none mb-6"
+        style={{ color: 'var(--text-secondary)' }}
+        dangerouslySetInnerHTML={{ __html: post.conteudo }}
+      />
 
       {post.latitude && post.longitude && (
         <div className="mb-8">
