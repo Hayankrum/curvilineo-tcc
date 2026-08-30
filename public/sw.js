@@ -20,10 +20,11 @@ self.addEventListener('activate', (event) => {
 
 // Network first para API, com fallback cache
 async function networkFirstWithCache(request) {
+  if (request.url.startsWith('chrome-extension://')) return fetch(request)
   const cache = await caches.open(CACHE_API)
   try {
     const response = await fetch(request)
-    if (response && response.status === 200) {
+    if (response && response.status === 200 && request.url.startsWith('http')) {
       cache.put(request, response.clone())
     }
     return response
