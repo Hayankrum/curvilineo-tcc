@@ -95,9 +95,9 @@ export function usePushSubscription() {
 
       setIsSubscribed(true)
       return { success: true }
-    } catch (error) {
-      console.error('[Push] Subscribe error:', error)
-      return { success: false, error: 'Erro ao ativar notificações. Verifique se está usando HTTPS.' }
+    } catch (error: any) {
+      console.error('[Push] Subscribe error:', error?.message || error)
+      return { success: false, error: `Erro ao ativar notificações: ${error?.message || 'desconhecido'}` }
     }
   }, [])
 
