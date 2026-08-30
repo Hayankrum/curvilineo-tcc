@@ -15,11 +15,12 @@ function urlBase64ToUint8Array(base64String: string) {
 
 function getInitialState() {
   if (typeof window === 'undefined') {
-    return { isSupported: false, isLoading: true }
+    return { isSupported: false, isLoading: true, permissionDenied: false }
   }
   const supported = 'serviceWorker' in navigator && 'PushManager' in window
   const isSecure = location.protocol === 'https:' || location.hostname === 'localhost'
-  return { isSupported: supported && isSecure, isLoading: supported }
+  const denied = 'Notification' in window && Notification.permission === 'denied'
+  return { isSupported: supported && isSecure, isLoading: supported, permissionDenied: denied }
 }
 
 export function usePushSubscription() {
@@ -167,6 +168,7 @@ export function usePushSubscription() {
     isSubscribed,
     isSupported: state.isSupported,
     isLoading: state.isLoading,
+    permissionDenied: state.permissionDenied,
     subscribe,
     unsubscribe,
   }

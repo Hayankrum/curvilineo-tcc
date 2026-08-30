@@ -1,87 +1,92 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import { usePushSubscription } from '@/lib/usePushSubscription'
+import { toggleNotificacoes } from '@/modules/usuarios/usuarios.actions'
 
-export default function NotificationPermissionPopup() {
-  const [showPopup, setShowPopup] = useState(false)
-  const [dismissed, setDismissed] = useState(false)
+interface Props {
+  usuarioId?: number
+}
 
-  useEffect(() => {
-    if (!('serviceWorker' in navigator && 'PushManager' in window)) return
-    const isSecure = location.protocol === 'https:' || location.hostname === 'localhost'
-    if (!isSecure) return
+const STORAGE_KEY = 'notif_banner_dismissed'
 
-    const permission = Notification.permission
-    if (permission !== 'default') return
+function getInitialDismissed() {
+  if (typeof window === 'undefined') return true
+  return localStorage.getItem(STORAGE_KEY) === '1'
+}
 
-    const wasDismissed = localStorage.getItem('notif-permission-dismissed')
-    if (wasDismissed) return
+export default function NotificationPermissionPopup({ usuarioId }: Props) {
+  const { isSubscribed, isSupported, isLoading, permissionDenied, subscribe } = usePushSubscription()
+  const [activating, setActivating] = useState(false)
+  const [dismissed, setDismissed] = useState(getInitialDismissed)
 
-    const timer = setTimeout(() => setShowPopup(true), 8000)
-    return () => clearTimeout(timer)
-  }, [])
-
-  const handleAllow = async () => {
-    const result = await Notification.requestPermission()
-    setShowPopup(false)
-    if (result === 'granted') {
-      localStorage.setItem('notif-permission-dismissed', 'true')
-    } else {
-      localStorage.setItem('notif-permission-dismissed', 'true')
-    }
-  }
-
-  const handleDismiss = () => {
-    setShowPopup(false)
+  function handleDismiss() {
+    localStorage.setItem(STORAGE_KEY, '1')
     setDismissed(true)
-    localStorage.setItem('notif-permission-dismissed', 'true')
   }
 
-  if (dismissed || !showPopup) return null
+  if (!usuarioId || !isSupported || isLoading || isSubscribed || dismissed) return null
+
+  const handleAtivar = async () => {
+    setActivating(true)
+    try {
+      const result = await subscribe()
+      if (result.success) {
+        await toggleNotificacoes()
+      } else {
+        alert(result.error || 'Erro ao ativar notificações.')
+      }
+    } catch {
+      alert('Erro ao ativar notificações.')
+    }
+    setActivating(false)
+  }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/50" onClick={handleDismiss} />
-      <div
-        className="relative w-full max-w-sm rounded-2xl p-6 shadow-2xl animate-in"
-        style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}
+    <div
+      className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[290] flex items-center gap-3 px-5 py-3 rounded-2xl shadow-lg border"
+      style={{
+        background: 'var(--card-bg)',
+        borderColor: 'var(--card-border)',
+        color: 'var(--text-primary)',
+        maxWidth: '90vw',
+      }}
+    >
+      <button
+        onClick={handleDismiss}
+        className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full flex items-center justify-center text-[10px] border-none cursor-pointer"
+        style={{ background: 'var(--btn-secondary-bg)', color: 'var(--text-tertiary)' }}
       >
-        <button
-          onClick={handleDismiss}
-          className="absolute top-3 right-3 p-1 rounded-full transition-colors"
-          style={{ color: 'var(--text-tertiary)' }}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M18 6 6 18M6 6l12 12" />
-          </svg>
-        </button>
-
-        <div className="text-center">
-          <div className="text-4xl mb-3">🔔</div>
-          <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-            Ativar notificações
-          </h3>
-          <p className="text-sm mb-5" style={{ color: 'var(--text-secondary)' }}>
-            Receba alertas quando alguém comentar nos seus posts e fique por dentro das novidades.
-          </p>
-          <div className="flex gap-3">
-            <button
-              onClick={handleDismiss}
-              className="flex-1 px-4 py-2.5 rounded-lg text-sm transition-colors"
-              style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}
-            >
-              Depois
-            </button>
-            <button
-              onClick={handleAllow}
-              className="flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors"
-              style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
-            >
-              Ativar
-            </button>
-          </div>
-        </div>
+        ×
+      </button>
+      <div
+        className="flex items-center justify-center rounded-full flex-shrink-0"
+        style={{ width: '2.2rem', height: '2.2rem', background: permissionDenied ? '#fee2e2' : '#fef3c7' }}
+      >
+        <span className="text-sm" style={{ color: permissionDenied ? '#dc2626' : '#d97706' }}>
+          {permissionDenied ? '🔒' : '🔔'}
+        </span>
       </div>
+      <div className="flex flex-col min-w-0">
+        <span className="text-sm font-bold">
+          {permissionDenied ? 'Notificações bloqueadas' : 'Ative as notificações'}
+        </span>
+        <span className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
+          {permissionDenied
+            ? 'Clique no ícone 🔒 na barra de endereço e ative'
+            : 'Receba alertas quando alguém comentar nos seus posts'}
+        </span>
+      </div>
+      {!permissionDenied && (
+        <button
+          onClick={handleAtivar}
+          disabled={activating}
+          className="ml-2 px-4 py-1.5 rounded-xl text-sm font-bold border-none cursor-pointer whitespace-nowrap"
+          style={{ background: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
+        >
+          {activating ? '...' : 'Ativar'}
+        </button>
+      )}
     </div>
   )
 }

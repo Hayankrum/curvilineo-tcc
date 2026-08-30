@@ -3,6 +3,9 @@ import { Geist } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/lib/ThemeProvider";
 import Navbar from "@/components/Navbar";
+import InstallPWMPopup from "@/components/InstallPWMPopup";
+import NotificationPermissionPopup from "@/components/NotificationPermissionPopup";
+import { getUsuarioLogado } from "@/modules/usuarios/usuarios.actions";
 
 const geist = Geist({
   variable: "--font-geist-sans",
@@ -38,6 +41,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const usuario = await getUsuarioLogado()
+
   return (
     <html lang="pt-BR" className={`${geist.variable} h-full antialiased`} suppressHydrationWarning>
       <head>
@@ -85,6 +90,8 @@ export default async function RootLayout({
             {children}
           </main>
         </ThemeProvider>
+        <InstallPWMPopup />
+        <NotificationPermissionPopup usuarioId={usuario?.id} />
       </body>
     </html>
   );
