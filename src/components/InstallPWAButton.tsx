@@ -53,20 +53,22 @@ export default function InstallPWAButton() {
 
   const handleInstall = async () => {
     if (deferredPrompt) {
-      await deferredPrompt.prompt()
+      deferredPrompt.prompt()
       const { outcome } = await deferredPrompt.userChoice
-      if (outcome === 'accepted') setDeferredPrompt(null)
+      if (outcome === 'accepted') {
+        setDeferredPrompt(null)
+      }
     } else if (isIOS) {
       alert(
         'Para instalar no iPhone/iPad:\n\n' +
-        '1. Toque no botão Compartilhar ()\n' +
+        '1. Toque no botão Compartilhar\n' +
         '2. Role para baixo e toque em "Adicionar à Tela de Início"\n' +
         '3. Toque em "Adicionar" no canto superior direito'
       )
     } else {
       alert(
         'Para instalar:\n\n' +
-        'Chrome/Edge: Clique no ícone ⬇️ na barra de endereço\n' +
+        'Chrome/Edge: Clique no ícone de instalar na barra de endereço\n' +
         'Firefox: Clique nos 3 pontos → "Instalar"\n' +
         'Safari: Toque em "Compartilhar" → "Adicionar à Tela de Início"'
       )
@@ -79,7 +81,7 @@ export default function InstallPWAButton() {
       className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
       style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
     >
-      {deferredPrompt ? 'Instalar app' : 'Como instalar'}
+      {deferredPrompt ? 'Instalar agora' : 'Como instalar'}
     </button>
   )
 }

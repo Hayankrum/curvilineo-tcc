@@ -74,6 +74,13 @@ export default async function UsuarioDetailPage({ id }: Props) {
           >
             Configurações
           </Link>
+          <Link
+            href="/usuarios/sobre"
+            className="text-sm transition-colors hover:underline"
+            style={{ color: 'var(--text-secondary)' }}
+          >
+            Sobre
+          </Link>
         </div>
       )}
 

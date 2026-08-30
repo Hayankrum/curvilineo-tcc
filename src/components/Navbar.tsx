@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import SinoNotificacoes from '@/modules/notificacoes/SinoNotificacoes'
-import { primeiroNome } from '@/lib/utils'
+
 
 interface Usuario {
   id: number
@@ -50,13 +50,12 @@ export default function Navbar() {
               <SinoNotificacoes />
               <Link
                 href={`/usuarios/${usuario.id}`}
-                className="text-sm transition-colors flex items-center gap-2"
-                style={{ color: 'var(--text-secondary)' }}
+                className="transition-colors flex items-center"
+                title={usuario.nome}
               >
-                <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs" style={{ backgroundColor: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', color: 'var(--text-secondary)' }}>
+                <span className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium" style={{ backgroundColor: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', color: 'var(--text-secondary)' }}>
                   {usuario.nome.charAt(0).toUpperCase()}
                 </span>
-                {primeiroNome(usuario.nome)}
               </Link>
             </>
           ) : loaded ? (

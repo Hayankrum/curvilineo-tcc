@@ -52,3 +52,34 @@ next-env.d.ts
 
 certificates
 .neon
+
+# security - secrets and keys
+*.key
+*.p12
+*.pfx
+*.jks
+service-account*.json
+credentials*.json
+**/secrets/
+**/.secrets/
+
+# google api keys
+keys-google/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+Thumbs.db
+ehthumbs.db
+
+# logs
+*.log
+logs/
+
+# runtime
+.turbo/
