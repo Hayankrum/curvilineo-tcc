@@ -2,8 +2,17 @@ const CACHE_STATIC = 'static-v2'
 const CACHE_PAGES = 'pages-v2'
 const CACHE_API = 'api-v2'
 
-self.addEventListener('install', () => {
-  self.skipWaiting()
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_STATIC).then((cache) =>
+      cache.addAll([
+        '/',
+        '/offline',
+        '/icons/icon-192.png',
+        '/icons/icon-96.png',
+      ])
+    ).then(() => self.skipWaiting())
+  )
 })
 
 self.addEventListener('activate', (event) => {

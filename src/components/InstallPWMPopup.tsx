@@ -11,11 +11,18 @@ interface BeforeInstallPromptEvent extends Event {
 export default function InstallPWMPopup() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [showPopup, setShowPopup] = useState(false)
+  const [isIOS, setIsIOS] = useState(false)
   const subscribe = useCallback(() => () => {}, [])
-  const getSnapshot = useCallback(() => window.matchMedia('(display-mode: standalone)').matches, [])
+  const getSnapshot = useCallback(() => {
+    if (typeof window === 'undefined') return false
+    return window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true
+  }, [])
   const alreadyInstalled = useSyncExternalStore(subscribe, getSnapshot, () => false)
 
   useEffect(() => {
+    const ua = window.navigator.userAgent
+    setIsIOS(/iPad|iPhone|iPod/.test(ua) || (ua.includes('Mac') && 'ontouchend' in window))
+
     const wasDismissed = localStorage.getItem('pwa-install-dismissed')
     if (wasDismissed) return
 
@@ -48,12 +55,19 @@ export default function InstallPWMPopup() {
       const { outcome } = await deferredPrompt.userChoice
       if (outcome === 'accepted') setShowPopup(false)
       setDeferredPrompt(null)
+    } else if (isIOS) {
+      alert(
+        'Para instalar no iPhone/iPad:\n\n' +
+        '1. Toque no botão Compartilhar ()\n' +
+        '2. Role para baixo e toque em "Adicionar à Tela de Início"\n' +
+        '3. Toque em "Adicionar" no canto superior direito'
+      )
     } else {
       alert(
         'Para instalar:\n\n' +
         'Chrome/Edge: Clique no ícone ⬇️ na barra de endereço\n' +
-        'Safari (iPhone): Toque em "Compartilhar" → "Adicionar à Tela de Início"\n' +
-        'Firefox: Clique nos 3 pontos → "Instalar"'
+        'Firefox: Clique nos 3 pontos → "Instalar"\n' +
+        'Safari: Toque em "Compartilhar" → "Adicionar à Tela de Início"'
       )
     }
   }

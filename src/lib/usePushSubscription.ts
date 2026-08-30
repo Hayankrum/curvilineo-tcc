@@ -33,22 +33,17 @@ export function usePushSubscription() {
 
     const checkSubscription = async () => {
       try {
-        if (!navigator.serviceWorker.controller) {
-          if (!cancelled) {
-            setIsSubscribed(false)
-            setState((prev) => ({ ...prev, isLoading: false }))
-          }
-          return
-        }
         const registration = await Promise.race([
           navigator.serviceWorker.ready,
-          new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000)),
+          new Promise<never>((_, reject) => setTimeout(() => reject(new Error('SW ready timeout')), 5000)),
         ])
+
         const subscription = await registration.pushManager.getSubscription()
         if (!cancelled) {
           setIsSubscribed(!!subscription)
         }
-      } catch {
+      } catch (error) {
+        console.warn('[Push] Error checking subscription:', error)
         if (!cancelled) {
           setIsSubscribed(false)
         }
@@ -70,6 +65,9 @@ export function usePushSubscription() {
     let vapidKey: string | null = null
     try {
       const res = await fetch('/api/vapid-key')
+      if (!res.ok) {
+        return { success: false, error: 'Erro ao buscar chave VAPID. Verifique as variáveis de ambiente.' }
+      }
       const data = await res.json()
       vapidKey = data.publicKey || null
     } catch {
@@ -82,6 +80,25 @@ export function usePushSubscription() {
 
     try {
       const registration = await navigator.serviceWorker.ready
+
+      const existingSubscription = await registration.pushManager.getSubscription()
+      if (existingSubscription) {
+        const subscriptionJson = existingSubscription.toJSON()
+        const endpoint = subscriptionJson.endpoint
+        const keys = subscriptionJson.keys as { p256dh: string; auth: string }
+
+        const response = await fetch('/api/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ endpoint, keys }),
+        })
+
+        if (response.ok) {
+          setIsSubscribed(true)
+          return { success: true }
+        }
+      }
+
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(vapidKey),
@@ -107,7 +124,15 @@ export function usePushSubscription() {
       return { success: true }
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'desconhecido'
-      console.error('[Push] Subscribe error:', message)
+      console.error('[Push] Subscribe error:', message, error)
+
+      if (message.includes('push service error')) {
+        return {
+          success: false,
+          error: 'Erro ao registrar com o serviço de push. Verifique se o site está acessível via HTTPS e tente novamente.',
+        }
+      }
+
       return { success: false, error: `Erro ao ativar notificações: ${message}` }
     }
   }, [])
