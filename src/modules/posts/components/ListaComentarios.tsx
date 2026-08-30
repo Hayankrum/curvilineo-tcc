@@ -1,13 +1,13 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { deletarComentario } from '../comentarios.actions'
+import { deletarComentario, editarComentario } from '../comentarios.actions'
 import { useState } from 'react'
 
 interface Comentario {
   id: number
   texto: string
-  criadoEm: Date
+  criadoEm: Date | string
   autor: {
     id: number
     nome: string
@@ -22,11 +22,34 @@ interface ListaComentariosProps {
 export default function ListaComentarios({ comentarios, usuarioLogadoId }: ListaComentariosProps) {
   const router = useRouter()
   const [deletandoId, setDeletandoId] = useState<number | null>(null)
+  const [editandoId, setEditandoId] = useState<number | null>(null)
+  const [textoEditado, setTextoEditado] = useState('')
+  const [salvandoId, setSalvandoId] = useState<number | null>(null)
 
   const handleDeletar = async (id: number) => {
     setDeletandoId(id)
     await deletarComentario(id)
     setDeletandoId(null)
+    router.refresh()
+  }
+
+  const iniciarEdicao = (id: number, textoAtual: string) => {
+    setEditandoId(id)
+    setTextoEditado(textoAtual)
+  }
+
+  const cancelarEdicao = () => {
+    setEditandoId(null)
+    setTextoEditado('')
+  }
+
+  const salvarEdicao = async (id: number) => {
+    if (!textoEditado.trim()) return
+    setSalvandoId(id)
+    await editarComentario(id, textoEditado)
+    setSalvandoId(null)
+    setEditandoId(null)
+    setTextoEditado('')
     router.refresh()
   }
 
@@ -52,21 +75,58 @@ export default function ListaComentarios({ comentarios, usuarioLogadoId }: Lista
               </span>
             </div>
             {usuarioLogadoId === comentario.autor.id && (
-              <button
-                onClick={() => handleDeletar(comentario.id)}
-                disabled={deletandoId === comentario.id}
-                className="text-xs transition-colors hover:underline"
-                style={{ color: 'var(--text-tertiary)' }}
-              >
-                {deletandoId === comentario.id ? '...' : 'Excluir'}
-              </button>
+              <div className="flex items-center gap-2">
+                {editandoId === comentario.id ? (
+                  <>
+                    <button
+                      onClick={() => salvarEdicao(comentario.id)}
+                      disabled={salvandoId === comentario.id || !textoEditado.trim()}
+                      className="text-xs transition-colors hover:underline"
+                      style={{ color: 'var(--text-secondary)' }}
+                    >
+                      {salvandoId === comentario.id ? '...' : 'Salvar'}
+                    </button>
+                    <button
+                      onClick={cancelarEdicao}
+                      className="text-xs transition-colors hover:underline"
+                      style={{ color: 'var(--text-tertiary)' }}
+                    >
+                      Cancelar
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => iniciarEdicao(comentario.id, comentario.texto)}
+                      className="text-xs transition-colors hover:underline"
+                      style={{ color: 'var(--text-secondary)' }}
+                    >
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => handleDeletar(comentario.id)}
+                      disabled={deletandoId === comentario.id}
+                      className="text-xs transition-colors hover:underline"
+                      style={{ color: 'var(--text-tertiary)' }}
+                    >
+                      {deletandoId === comentario.id ? '...' : 'Excluir'}
+                    </button>
+                  </>
+                )}
+              </div>
             )}
           </div>
-          <div
-            className="prose prose-sm max-w-none mt-2 text-sm"
-            style={{ color: 'var(--text-primary)' }}
-            dangerouslySetInnerHTML={{ __html: comentario.texto }}
-          />
+          {editandoId === comentario.id ? (
+            <textarea
+              value={textoEditado}
+              onChange={(e) => setTextoEditado(e.target.value)}
+              rows={2}
+              className="w-full mt-2 text-sm rounded-lg px-3 py-2 focus:outline-none transition-colors resize-y"
+              style={{ backgroundColor: 'var(--input-bg)', border: '1px solid var(--input-border)', color: 'var(--text-primary)' }}
+            />
+          ) : (
+            <p className="mt-2 text-sm whitespace-pre-wrap" style={{ color: 'var(--text-primary)' }}>{comentario.texto}</p>
+          )}
         </div>
       ))}
     </div>

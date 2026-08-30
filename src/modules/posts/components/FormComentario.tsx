@@ -3,16 +3,13 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { criarComentario } from '../comentarios.actions'
-import dynamic from 'next/dynamic'
 
-const RichTextEditor = dynamic(() => import('@/components/rich-text/RichTextEditor'), { ssr: false })
 
 export default function FormComentario({ postId }: { postId: number }) {
   const router = useRouter()
   const [texto, setTexto] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
-  const [editorKey, setEditorKey] = useState(0)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -30,14 +27,20 @@ export default function FormComentario({ postId }: { postId: number }) {
     }
 
     setTexto('')
-    setEditorKey(prev => prev + 1)
     setIsSubmitting(false)
     router.refresh()
   }
 
   return (
     <form onSubmit={handleSubmit} className="mt-4">
-      <RichTextEditor key={editorKey} content={texto} onChange={setTexto} placeholder="Escreva um comentário..." />
+      <textarea
+        value={texto}
+        onChange={(e) => setTexto(e.target.value)}
+        rows={3}
+        placeholder="Escreva um comentário..."
+        className="w-full rounded-lg px-4 py-2 text-sm focus:outline-none transition-colors resize-y min-h-[80px]"
+        style={{ backgroundColor: 'var(--input-bg)', border: '1px solid var(--input-border)', color: 'var(--text-primary)' }}
+      />
       {error && <p className="text-xs mt-1" style={{ color: '#f87171' }}>{error}</p>}
       <button
         type="submit"

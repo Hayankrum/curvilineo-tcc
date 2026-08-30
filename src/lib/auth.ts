@@ -2,10 +2,12 @@ import NextAuth from 'next-auth'
 import Google from 'next-auth/providers/google'
 import { prisma } from './prisma'
 
+const isProd = process.env.NODE_ENV === 'production'
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  trustHost: true,
+  trustHost: isProd,
   secret: process.env.AUTH_SECRET,
-  debug: true,
+  debug: !isProd,
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID,

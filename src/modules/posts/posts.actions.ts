@@ -4,6 +4,13 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { getUsuarioLogado } from '@/modules/usuarios/usuarios.actions'
 
+const MAX_TITULO = 200
+const MAX_CONTEUDO = 10000
+
+function sanitizeInput(value: string): string {
+  return value.replace(/[<>]/g, '').trim()
+}
+
 async function obterPostDoUsuario(id: number) {
   const usuario = await getUsuarioLogado()
   if (!usuario) return { error: 'Você precisa estar logado' as const, post: null }
@@ -19,10 +26,21 @@ export async function criarPost(titulo: string, conteudo: string, latitude?: num
   const usuario = await getUsuarioLogado()
   if (!usuario) return { error: 'Você precisa estar logado para criar um post' }
 
+  const tituloClean = sanitizeInput(titulo)
+  const conteudoClean = sanitizeInput(conteudo)
+
+  if (!tituloClean || tituloClean.length < 3) return { error: 'Título deve ter pelo menos 3 caracteres' }
+  if (tituloClean.length > MAX_TITULO) return { error: `Título deve ter no máximo ${MAX_TITULO} caracteres` }
+  if (!conteudoClean || conteudoClean.length < 3) return { error: 'Conteúdo deve ter pelo menos 3 caracteres' }
+  if (conteudoClean.length > MAX_CONTEUDO) return { error: `Conteúdo deve ter no máximo ${MAX_CONTEUDO} caracteres` }
+
+  if (latitude != null && (latitude < -90 || latitude > 90)) return { error: 'Latitude inválida' }
+  if (longitude != null && (longitude < -180 || longitude > 180)) return { error: 'Longitude inválida' }
+
   await prisma.post.create({
     data: {
-      titulo,
-      conteudo,
+      titulo: tituloClean,
+      conteudo: conteudoClean,
       latitude: latitude ?? null,
       longitude: longitude ?? null,
       autorId: usuario.id,
@@ -45,11 +63,22 @@ export async function editarPost(id: number, titulo: string, conteudo: string, l
   const { error } = await obterPostDoUsuario(id)
   if (error) return { error }
 
+  const tituloClean = sanitizeInput(titulo)
+  const conteudoClean = sanitizeInput(conteudo)
+
+  if (!tituloClean || tituloClean.length < 3) return { error: 'Título deve ter pelo menos 3 caracteres' }
+  if (tituloClean.length > MAX_TITULO) return { error: `Título deve ter no máximo ${MAX_TITULO} caracteres` }
+  if (!conteudoClean || conteudoClean.length < 3) return { error: 'Conteúdo deve ter pelo menos 3 caracteres' }
+  if (conteudoClean.length > MAX_CONTEUDO) return { error: `Conteúdo deve ter no máximo ${MAX_CONTEUDO} caracteres` }
+
+  if (latitude != null && (latitude < -90 || latitude > 90)) return { error: 'Latitude inválida' }
+  if (longitude != null && (longitude < -180 || longitude > 180)) return { error: 'Longitude inválida' }
+
   await prisma.post.update({
     where: { id },
     data: {
-      titulo,
-      conteudo,
+      titulo: tituloClean,
+      conteudo: conteudoClean,
       latitude: latitude ?? null,
       longitude: longitude ?? null,
     }

@@ -17,6 +17,15 @@ interface PostMarker {
   criadoEm: string
 }
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
+}
+
 interface Props {
   posts: PostMarker[]
   dark?: boolean
@@ -120,8 +129,8 @@ export default function MapaGlobal({ posts, dark }: Props) {
       const marker = L.marker([post.latitude, post.longitude], { icon: createIcon() })
         .bindPopup(`
           <div style="min-width: 150px;">
-            <strong>${post.titulo}</strong><br/>
-            <small style="color: #71717a;">por ${post.autorNome}</small><br/>
+            <strong>${escapeHtml(post.titulo)}</strong><br/>
+            <small style="color: #71717a;">por ${escapeHtml(post.autorNome)}</small><br/>
             <small style="color: #71717a;">${new Date(post.criadoEm).toLocaleDateString('pt-BR')}</small><br/>
             <a href="/posts/${post.id}" style="color: #3b82f6; text-decoration: underline; font-size: 12px;">Ver post</a>
           </div>

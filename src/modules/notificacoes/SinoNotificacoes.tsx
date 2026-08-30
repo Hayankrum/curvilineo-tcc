@@ -1,26 +1,30 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 
 export default function SinoNotificacoes() {
   const [count, setCount] = useState(0)
 
-  useEffect(() => {
-    const fetchCount = async () => {
-      try {
-        const response = await fetch('/api/notifications/unread')
-        const data = await response.json()
-        setCount(data.count || 0)
-      } catch {
-        // ignore
-      }
+  const fetchCount = useCallback(async () => {
+    if (document.hidden) return
+    try {
+      const response = await fetch('/api/notifications/unread')
+      const data = await response.json()
+      setCount(data.count || 0)
+    } catch {
+      // ignore
     }
-
-    fetchCount()
-    const interval = setInterval(fetchCount, 30000)
-    return () => clearInterval(interval)
   }, [])
+
+  useEffect(() => {
+    const timer = setTimeout(fetchCount, 100)
+    const interval = setInterval(fetchCount, 60000)
+    return () => {
+      clearTimeout(timer)
+      clearInterval(interval)
+    }
+  }, [fetchCount])
 
   return (
     <Link

@@ -1,18 +1,19 @@
-import Link from 'next/link'
-import { prisma } from '@/lib/prisma'
-import { getUsuarioLogado } from '@/modules/usuarios/usuarios.actions'
-import { primeiroNome } from '@/lib/utils'
-import { truncateHtml } from '@/lib/html'
+'use client'
 
-export default async function PostListPage() {
-  const usuario = await getUsuarioLogado()
-  const posts = await prisma.post.findMany({
-    include: { autor: true },
-    orderBy: { criadoEm: 'desc' }
-  })
+import Link from 'next/link'
+import { usePosts, useUsuario } from '@/lib/useData'
+import { primeiroNome } from '@/lib/utils'
+import OfflineBanner from '@/components/OfflineBanner'
+
+export default function PostListPage() {
+  const { posts: rawPosts, loading, fromCache } = usePosts()
+  const { usuario } = useUsuario()
+  const posts = Array.isArray(rawPosts) ? rawPosts : []
 
   return (
     <div>
+      <OfflineBanner fromCache={fromCache} />
+
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>Posts</h1>
         {usuario && (
@@ -26,12 +27,16 @@ export default async function PostListPage() {
         )}
       </div>
 
-      {posts.length === 0 && (
+      {loading && (
+        <p style={{ color: 'var(--text-tertiary)' }}>Carregando...</p>
+      )}
+
+      {!loading && posts.length === 0 && (
         <p style={{ color: 'var(--text-tertiary)' }}>Nenhum post ainda.</p>
       )}
 
       <div className="flex flex-col gap-4">
-        {posts.map(post => (
+        {posts.map((post) => (
           <div key={post.id} className="rounded-lg p-5" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
             <h2 className="font-medium text-lg mb-1" style={{ color: 'var(--text-primary)' }}>{post.titulo}</h2>
             <p className="text-xs mb-3" style={{ color: 'var(--text-tertiary)' }}>
@@ -40,7 +45,7 @@ export default async function PostListPage() {
                 {primeiroNome(post.autor.nome)}
               </Link>
             </p>
-            <p className="text-sm mb-4 line-clamp-2" style={{ color: 'var(--text-secondary)' }}>{truncateHtml(post.conteudo, 150)}</p>
+            <p className="text-sm mb-4 line-clamp-2" style={{ color: 'var(--text-secondary)' }}>{post.conteudo.length > 150 ? post.conteudo.slice(0, 150) + '...' : post.conteudo}</p>
             <Link
               href={`/posts/${post.id}`}
               className="text-sm transition-colors hover:underline"

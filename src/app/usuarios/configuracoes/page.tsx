@@ -8,6 +8,7 @@ import { toggleNotificacoes } from '@/modules/usuarios/usuarios.actions'
 import { useTheme } from '@/lib/ThemeProvider'
 import BotaoDeletarPerfil from '@/modules/usuarios/components/BotaoDeletarPerfil'
 import BotaoLogout from '@/modules/usuarios/components/BotaoLogout'
+import InstallPWAButton from '@/components/InstallPWAButton'
 
 interface UserInfo {
   id: number
@@ -21,11 +22,18 @@ export default function ConfiguracoesPage() {
   const [user, setUser] = useState<UserInfo | null>(null)
 
   useEffect(() => {
+    let cancelled = false
     fetch('/api/me')
       .then((res) => res.json())
-      .then((data) => setUser(data))
-      .catch(() => router.push('/usuarios/login'))
-  }, [router])
+      .then((data) => {
+        if (!cancelled) setUser(data)
+      })
+      .catch(() => {
+        if (!cancelled) router.push('/usuarios/login')
+      })
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleToggleNotificacoes = async () => {
     if (isSubscribed) {
@@ -67,6 +75,19 @@ export default function ConfiguracoesPage() {
       <h1 className="text-2xl font-semibold mb-8" style={{ color: 'var(--text-primary)' }}>Configurações</h1>
 
       <div className="flex flex-col gap-6">
+        <section className="rounded-lg p-5" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
+          <h2 className="font-medium mb-4" style={{ color: 'var(--text-primary)' }}>Aplicativo</h2>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Instalar PWA</p>
+              <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
+                Adicione à tela inicial para acesso rápido
+              </p>
+            </div>
+            <InstallPWAButton />
+          </div>
+        </section>
+
         <section className="rounded-lg p-5" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
           <h2 className="font-medium mb-4" style={{ color: 'var(--text-primary)' }}>Aparência</h2>
           <div className="flex items-center justify-between">

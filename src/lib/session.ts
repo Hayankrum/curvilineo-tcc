@@ -7,11 +7,13 @@ const SESSION_COOKIE = 'sessionToken'
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7 // 7 dias
 
 async function isSecureConnection(): Promise<boolean> {
+  if (process.env.NODE_ENV === 'production') {
+    return process.env.PLATFORM === 'vercel' || process.env.FORCE_HTTPS === 'true'
+  }
   const h = await headers()
-  const host = h.get('host') ?? ''
   const proto = h.get('x-forwarded-proto')
-  if (proto === 'https') return true
-  if (proto === 'http') return false
+  if (proto) return proto === 'https'
+  const host = h.get('host') ?? ''
   return !host.startsWith('localhost') && !host.startsWith('127.')
 }
 

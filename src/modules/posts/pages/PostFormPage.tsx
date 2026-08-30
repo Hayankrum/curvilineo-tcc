@@ -4,9 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { criarPost, editarPost } from '../posts.actions'
 import MapaSelecaoClient from '@/modules/mapa/components/MapaSelecaoClient'
-import dynamic from 'next/dynamic'
 
-const RichTextEditor = dynamic(() => import('@/components/rich-text/RichTextEditor'), { ssr: false })
 
 interface Post {
   id: number
@@ -94,7 +92,14 @@ export default function PostFormPage({ post, error }: Props) {
 
         <div className="flex flex-col gap-1">
           <label className="text-sm" style={{ color: 'var(--text-secondary)' }}>Conteúdo</label>
-          <RichTextEditor content={conteudo} onChange={setConteudo} />
+          <textarea
+            value={conteudo}
+            onChange={(e) => setConteudo(e.target.value)}
+            rows={6}
+            placeholder="Escreva o conteúdo..."
+            className="rounded-lg px-4 py-2 text-sm focus:outline-none transition-colors resize-y"
+            style={{ backgroundColor: 'var(--input-bg)', border: '1px solid var(--input-border)', color: 'var(--text-primary)' }}
+          />
         </div>
 
         <div className="flex flex-col gap-2">

@@ -1,36 +1,44 @@
+'use client'
+
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
-import { prisma } from '@/lib/prisma'
+import { usePost, useUsuario } from '@/lib/useData'
+import { primeiroNome } from '@/lib/utils'
+import OfflineBanner from '@/components/OfflineBanner'
 import BotaoDeletar from '../components/BotaoDeletar'
 import FormComentario from '../components/FormComentario'
 import ListaComentarios from '../components/ListaComentarios'
-import { getUsuarioLogado } from '@/modules/usuarios/usuarios.actions'
-import { primeiroNome } from '@/lib/utils'
 import MapaPosteClient from '@/modules/mapa/components/MapaPosteClient'
 
-interface Props {
-  id: number
-}
+export default function PostDetailPage({ id }: { id: number }) {
+  const { post, loading, fromCache } = usePost(id)
+  const { usuario } = useUsuario()
 
-export default async function PostDetailPage({ id }: Props) {
-  const post = await prisma.post.findUnique({
-    where: { id },
-    include: {
-      autor: true,
-      comentarios: {
-        include: { autor: true },
-        orderBy: { criadoEm: 'desc' },
-      },
-    },
-  })
+  if (loading) {
+    return (
+      <div className="max-w-xl">
+        <p style={{ color: 'var(--text-tertiary)' }}>Carregando...</p>
+      </div>
+    )
+  }
 
-  if (!post) notFound()
+  if (!post) {
+    return (
+      <div className="max-w-xl">
+        <OfflineBanner fromCache={fromCache} />
+        <p style={{ color: 'var(--text-tertiary)' }}>Post não encontrado.</p>
+        <Link href="/posts" className="text-sm mt-4 inline-block hover:underline" style={{ color: 'var(--text-tertiary)' }}>
+          ← Voltar
+        </Link>
+      </div>
+    )
+  }
 
-  const usuario = await getUsuarioLogado()
   const ehAutor = usuario?.id === post.autorId
 
   return (
     <div className="max-w-xl">
+      <OfflineBanner fromCache={fromCache} />
+
       <Link
         href="/posts"
         className="text-sm transition-colors mb-6 inline-block hover:underline"
@@ -45,11 +53,7 @@ export default async function PostDetailPage({ id }: Props) {
           {primeiroNome(post.autor.nome)}
         </Link>
       </p>
-      <div
-        className="prose prose-sm max-w-none mb-6"
-        style={{ color: 'var(--text-secondary)' }}
-        dangerouslySetInnerHTML={{ __html: post.conteudo }}
-      />
+      <p className="text-sm whitespace-pre-wrap mb-6" style={{ color: 'var(--text-secondary)' }}>{post.conteudo}</p>
 
       {post.latitude && post.longitude && (
         <div className="mb-8">

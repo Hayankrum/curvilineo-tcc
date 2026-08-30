@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { getUsuarioLogado } from '@/modules/usuarios/usuarios.actions'
 import { primeiroNome } from '@/lib/utils'
-import { truncateHtml } from '@/lib/html'
+
 
 interface Props {
   id: number
@@ -87,7 +87,7 @@ export default async function UsuarioDetailPage({ id }: Props) {
         {usuario.posts.map(post => (
           <div key={post.id} className="rounded-lg p-5" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
             <h3 className="font-medium text-lg mb-1" style={{ color: 'var(--text-primary)' }}>{post.titulo}</h3>
-            <p className="text-sm mb-4 line-clamp-2" style={{ color: 'var(--text-secondary)' }}>{truncateHtml(post.conteudo, 150)}</p>
+            <p className="text-sm mb-4 line-clamp-2" style={{ color: 'var(--text-secondary)' }}>{post.conteudo.length > 150 ? post.conteudo.slice(0, 150) + '...' : post.conteudo}</p>
             <Link
               href={`/posts/${post.id}`}
               className="text-sm transition-colors hover:underline"
