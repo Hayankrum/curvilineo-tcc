@@ -2,16 +2,39 @@
 
 export default function OfflinePage() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-      <div className="text-6xl mb-6">📡</div>
-      <h1 className="text-2xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>Você está offline</h1>
-      <p className="mb-6 max-w-md" style={{ color: 'var(--text-secondary)' }}>
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: '60vh',
+      textAlign: 'center',
+      padding: '24px',
+      fontFamily: 'system-ui, -apple-system, sans-serif',
+      backgroundColor: '#09090b',
+      color: '#fafafa',
+    }}>
+      <div style={{ fontSize: '48px', marginBottom: '24px' }}>📡</div>
+      <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '16px', color: '#fafafa' }}>
+        Você está offline
+      </h1>
+      <p style={{ marginBottom: '24px', maxWidth: '400px', color: '#a1a1aa', lineHeight: '1.5' }}>
         Esta página ainda não foi salva para uso offline. Navegue para páginas já visitadas enquanto sua conexão é restaurada.
       </p>
       <button
         onClick={() => window.location.reload()}
-        className="border px-6 py-3 rounded-lg transition-colors"
-        style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)', borderColor: 'var(--border-color)' }}
+        style={{
+          padding: '12px 24px',
+          borderRadius: '8px',
+          border: '1px solid #3f3f46',
+          backgroundColor: '#27272a',
+          color: '#fafafa',
+          cursor: 'pointer',
+          fontSize: '14px',
+          transition: 'background-color 0.2s',
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3f3f46'}
+        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#27272a'}
       >
         Tentar Novamente
       </button>

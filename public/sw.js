@@ -1,6 +1,6 @@
-const CACHE_STATIC = 'static-v2'
-const CACHE_PAGES = 'pages-v2'
-const CACHE_API = 'api-v2'
+const CACHE_STATIC = 'static-v3'
+const CACHE_PAGES = 'pages-v3'
+const CACHE_API = 'api-v3'
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -10,6 +10,7 @@ self.addEventListener('install', (event) => {
         '/offline',
         '/icons/icon-192.png',
         '/icons/icon-96.png',
+        '/manifest.json',
       ])
     ).then(() => self.skipWaiting())
   )
@@ -47,7 +48,7 @@ async function networkFirstWithCache(request) {
   }
 }
 
-// Cache first para assets estáticos (JS, CSS, icons)
+// Cache first para assets estáticos (JS, CSS, icons, fonts)
 async function cacheFirst(request) {
   const cached = await caches.match(request)
   if (cached) return cached
@@ -60,7 +61,8 @@ async function cacheFirst(request) {
     }
     return response
   } catch {
-    return new Response('', { status: 503 })
+    // Para fontes e CSS, retornar vazio em vez de erro
+    return new Response('', { status: 503, statusText: 'Offline' })
   }
 }
 
