@@ -2,16 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react'
 
-function getVapidKey() {
-  if (typeof window === 'undefined') return null
-  const key = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
-  if (!key) {
-    console.error('[Push] NEXT_PUBLIC_VAPID_PUBLIC_KEY não configurada')
-    return null
-  }
-  return key
-}
-
 function urlBase64ToUint8Array(base64String: string) {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
@@ -65,7 +55,15 @@ export function usePushSubscription() {
   }, [state.isSupported])
 
   const subscribe = useCallback(async () => {
-    const vapidKey = getVapidKey()
+    let vapidKey: string | null = null
+    try {
+      const res = await fetch('/api/vapid-key')
+      const data = await res.json()
+      vapidKey = data.publicKey || null
+    } catch {
+      vapidKey = null
+    }
+
     if (!vapidKey) {
       return { success: false, error: 'Chave VAPID não configurada. Verifique as variáveis de ambiente.' }
     }
