@@ -17,7 +17,7 @@ const BCRYPT_SALT = 10
 export class NextAuthProvider implements AuthProvider {
   async isSecureConnection(): Promise<boolean> {
     if (process.env.NODE_ENV === 'production') {
-      return process.env.PLATFORM === 'vercel' || process.env.FORCE_HTTPS === 'true'
+      return process.env.VERCEL === '1' || process.env.FORCE_HTTPS === 'true'
     }
     const h = await headers()
     const proto = h.get('x-forwarded-proto')
