@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useSyncExternalStore } from 'react'
 
 interface BeforeInstallPromptEvent extends Event {
@@ -11,11 +11,9 @@ interface BeforeInstallPromptEvent extends Event {
 export default function InstallPWMPopup() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [showPopup, setShowPopup] = useState(false)
-  const alreadyInstalled = useSyncExternalStore(
-    () => () => {},
-    () => window.matchMedia('(display-mode: standalone)').matches,
-    () => false,
-  )
+  const subscribe = useCallback(() => () => {}, [])
+  const getSnapshot = useCallback(() => window.matchMedia('(display-mode: standalone)').matches, [])
+  const alreadyInstalled = useSyncExternalStore(subscribe, getSnapshot, () => false)
 
   useEffect(() => {
     const wasDismissed = localStorage.getItem('pwa-install-dismissed')

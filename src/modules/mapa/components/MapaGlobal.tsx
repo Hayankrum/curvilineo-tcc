@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import 'leaflet-fullscreen/dist/leaflet.fullscreen.css'
@@ -40,11 +40,11 @@ export default function MapaGlobal({ posts, dark }: Props) {
 
   const autores = [...new Set(posts.map(p => p.autorNome))].sort()
 
-  const postsFiltrados = posts.filter(post => {
+  const postsFiltrados = useMemo(() => posts.filter(post => {
     const matchAutor = !filtroAutor || post.autorNome === filtroAutor
     const matchBusca = !busca || post.titulo.toLowerCase().includes(busca.toLowerCase())
     return matchAutor && matchBusca
-  })
+  }), [posts, filtroAutor, busca])
 
   useEffect(() => {
     if (!mapRef.current) return

@@ -43,6 +43,7 @@ model Usuario {
   sessoes            Sessao[]
   inscricoes         InscricaoPush[]
   notificacoes       Notificacao[]
+  medias             Media[]
 }
 
 model Sessao {
@@ -76,4 +77,18 @@ model Notificacao {
   enviadaEm  DateTime?
   usuarioId  Int
   usuario    Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+}
+
+model Media {
+  id          String   @id @default(cuid())
+  ownerId     Int
+  filename    String
+  originalName String
+  mimeType    String
+  size        Int
+  storageKey  String   @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  owner       Usuario  @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 }

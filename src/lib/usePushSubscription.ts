@@ -33,13 +33,25 @@ export function usePushSubscription() {
 
     const checkSubscription = async () => {
       try {
-        const registration = await navigator.serviceWorker.ready
+        if (!navigator.serviceWorker.controller) {
+          if (!cancelled) {
+            setIsSubscribed(false)
+            setState((prev) => ({ ...prev, isLoading: false }))
+          }
+          return
+        }
+        const registration = await Promise.race([
+          navigator.serviceWorker.ready,
+          new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000)),
+        ])
         const subscription = await registration.pushManager.getSubscription()
         if (!cancelled) {
           setIsSubscribed(!!subscription)
         }
-      } catch (error) {
-        console.error('[Push] Error checking subscription:', error)
+      } catch {
+        if (!cancelled) {
+          setIsSubscribed(false)
+        }
       } finally {
         if (!cancelled) {
           setState((prev) => ({ ...prev, isLoading: false }))
@@ -93,9 +105,10 @@ export function usePushSubscription() {
 
       setIsSubscribed(true)
       return { success: true }
-    } catch (error: any) {
-      console.error('[Push] Subscribe error:', error?.message || error)
-      return { success: false, error: `Erro ao ativar notificações: ${error?.message || 'desconhecido'}` }
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'desconhecido'
+      console.error('[Push] Subscribe error:', message)
+      return { success: false, error: `Erro ao ativar notificações: ${message}` }
     }
   }, [])
 

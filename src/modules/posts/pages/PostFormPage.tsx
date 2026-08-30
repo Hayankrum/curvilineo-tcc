@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { criarPost, editarPost } from '../posts.actions'
 import MapaSelecaoClient from '@/modules/mapa/components/MapaSelecaoClient'
@@ -55,10 +55,10 @@ export default function PostFormPage({ post, error }: Props) {
     }
   }
 
-  function handleLocationSelect(lat: number, lng: number) {
+  const handleLocationSelect = useCallback((lat: number, lng: number) => {
     setLatitude(lat)
     setLongitude(lng)
-  }
+  }, [])
 
   function clearLocation() {
     setLatitude(null)

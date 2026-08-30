@@ -8,7 +8,7 @@ const cspDirectives = [
   "style-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com",
   "img-src 'self' data: blob: https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com https://server.arcgisonline.com",
   "font-src 'self' https://fonts.gstatic.com",
-  "connect-src 'self' https://fcm.googleapis.com https://fcm_notification.googleapis.com",
+  "connect-src 'self' https://fcm.googleapis.com https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com https://server.arcgisonline.com",
   "worker-src 'self'",
   "frame-src 'none'",
   "object-src 'none'",
@@ -48,8 +48,6 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   serverExternalPackages: [
     '@prisma/client/runtime/client',
-    '@neondatabase/serverless',
-    '@prisma/adapter-neon',
   ],
   logging: {
     fetches: {
