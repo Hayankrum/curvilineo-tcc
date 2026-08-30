@@ -6,9 +6,9 @@
   <title>Offline - Meu App</title>
   <style>
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background-color: #09090b;
-      color: #fafafa;
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-primary, #09090b);
+      color: var(--text-primary, #fafafa);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -17,18 +17,20 @@
       padding: 20px;
     }
     .container { text-align: center; max-width: 400px; }
-    .icon { font-size: 64px; margin-bottom: 20px; }
-    h1 { font-size: 24px; margin-bottom: 10px; }
-    p { color: #a1a1aa; margin-bottom: 20px; line-height: 1.5; }
+    .icon { font-size: 48px; margin-bottom: 24px; }
+    h1 { font-size: 24px; font-weight: bold; margin-bottom: 16px; color: var(--text-primary, #fafafa); }
+    p { color: var(--text-secondary, #a1a1aa); margin-bottom: 24px; line-height: 1.5; max-width: 400px; }
     button {
-      background-color: #27272a;
-      color: #ffffff;
-      border: 1px solid #3f3f46;
-      padding: 10px 20px;
-      border-radius: 6px;
+      background-color: var(--btn-secondary-bg, #27272a);
+      color: var(--text-primary, #fafafa);
+      border: 1px solid var(--border-color, #3f3f46);
+      padding: 12px 24px;
+      border-radius: 8px;
       cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.2s;
     }
-    button:hover { background-color: #3f3f46; }
+    button:hover { background-color: var(--btn-secondary-hover, #3f3f46); }
   </style>
 </head>
 <body>
