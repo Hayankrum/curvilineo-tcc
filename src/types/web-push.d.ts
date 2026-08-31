@@ -33,5 +33,10 @@ declare module 'web-push' {
   }
 
   export { setVapidDetails, sendNotification, generateVAPIDKeys }
-  export default { setVapidDetails, sendNotification, generateVAPIDKeys }
+  const webpush: {
+    setVapidDetails: typeof setVapidDetails
+    sendNotification: typeof sendNotification
+    generateVAPIDKeys: typeof generateVAPIDKeys
+  }
+  export default webpush
 }
