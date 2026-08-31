@@ -8,8 +8,8 @@ self.addEventListener('install', (event) => {
       cache.addAll([
         '/',
         '/offline',
-        '/icons/icon-192.png',
-        '/icons/icon-96.png',
+        '/icons/icon.svg',
+        '/icons/icon.svg',
         '/manifest.json',
       ])
     ).then(() => self.skipWaiting())
@@ -130,8 +130,8 @@ self.addEventListener('push', (event) => {
 
   const options = {
     body: data.body || data.mensagem,
-    icon: '/icons/icon-192.png',
-    badge: '/icons/icon-96.png',
+    icon: '/icons/icon.svg',
+    badge: '/icons/icon.svg',
     vibrate: [100, 50, 100],
     data: { url: data.url || '/' },
     actions: [

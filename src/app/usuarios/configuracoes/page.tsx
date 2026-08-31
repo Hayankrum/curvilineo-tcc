@@ -177,8 +177,8 @@ export default function ConfiguracoesPage() {
                     onClick={() => handlePreferenciaChange('notificarComentarios', !preferencias.notificarComentarios)}
                   >
                     <span
-                      className="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
-                      style={{ transform: preferencias.notificarComentarios ? 'translateX(22px)' : 'translateX(2px)' }}
+                      className="inline-block h-4 w-4 transform rounded-full transition-transform"
+                      style={{ backgroundColor: 'var(--btn-primary-text)', transform: preferencias.notificarComentarios ? 'translateX(22px)' : 'translateX(2px)' }}
                     />
                   </div>
                 </label>
@@ -195,8 +195,8 @@ export default function ConfiguracoesPage() {
                     onClick={() => handlePreferenciaChange('notificarSistema', !preferencias.notificarSistema)}
                   >
                     <span
-                      className="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
-                      style={{ transform: preferencias.notificarSistema ? 'translateX(22px)' : 'translateX(2px)' }}
+                      className="inline-block h-4 w-4 transform rounded-full transition-transform"
+                      style={{ backgroundColor: 'var(--btn-primary-text)', transform: preferencias.notificarSistema ? 'translateX(22px)' : 'translateX(2px)' }}
                     />
                   </div>
                 </label>

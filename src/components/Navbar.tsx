@@ -27,8 +27,9 @@ export default function Navbar() {
   return (
     <nav className="border-b px-6 py-4" style={{ borderColor: 'var(--border-color)' }}>
       <div className="max-w-3xl mx-auto flex items-center gap-6">
-        <Link href="/" className="font-semibold" style={{ color: 'var(--text-primary)' }}>
-          Meu App
+        <Link href="/" className="flex items-center" title="Meu App">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/icons/icon.svg" alt="Meu App" className="h-7 w-auto" />
         </Link>
         <Link href="/posts" className="transition-colors" style={{ color: 'var(--text-secondary)' }} title="Posts">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

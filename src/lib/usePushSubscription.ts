@@ -135,7 +135,7 @@ export function usePushSubscription() {
       return { success: true }
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'desconhecido'
-      console.error('[Push] Subscribe error:', message, error)
+      console.warn('[Push] Subscribe error:', message)
 
       if (message.includes('push service not available') || message.includes('Push service')) {
         return {
@@ -176,7 +176,7 @@ export function usePushSubscription() {
       setIsSubscribed(false)
       return { success: true }
     } catch (error) {
-      console.error('[Push] Unsubscribe error:', error)
+      console.warn('[Push] Unsubscribe error:', error)
       return { success: false, error: 'Erro ao desativar notificações' }
     }
   }, [])

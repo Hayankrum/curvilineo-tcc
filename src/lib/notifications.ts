@@ -46,7 +46,7 @@ export async function criarNotificacao({ usuarioId, titulo, mensagem, url, tipo 
           title: titulo,
           body: mensagem,
           url: url || '/',
-          icon: '/icons/icon-192.png',
+          icon: '/icons/icon.svg',
         })
 
         await Promise.allSettled(
