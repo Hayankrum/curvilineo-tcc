@@ -29,6 +29,10 @@ export async function POST(request: Request) {
       }
     }
 
+    await prisma.inscricaoPush.deleteMany({
+      where: { usuarioId: usuario.id },
+    })
+
     await prisma.inscricaoPush.create({
       data: {
         endpoint,

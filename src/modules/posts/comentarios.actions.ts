@@ -3,7 +3,7 @@
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { getUsuarioLogado } from '@/modules/usuarios/usuarios.actions'
-import webpush from 'web-push'
+import { criarNotificacao } from '@/lib/notifications'
 
 export async function criarComentario(postId: number, texto: string) {
   const usuario = await getUsuarioLogado()
@@ -26,7 +26,8 @@ export async function criarComentario(postId: number, texto: string) {
   })
 
   if (post.autorId !== usuario.id && post.autor.notificacoesAtivas) {
-    await enviarNotificacao(post.autorId, {
+    await criarNotificacao({
+      usuarioId: post.autorId,
       titulo: `${usuario.nome} comentou no seu post`,
       mensagem: texto.trim().slice(0, 100),
       url: `/posts/${postId}`,
@@ -67,61 +68,4 @@ export async function deletarComentario(id: number) {
   await prisma.comentario.delete({ where: { id } })
   revalidatePath(`/posts/${comentario.postId}`)
   return { success: true }
-}
-
-async function enviarNotificacao(
-  usuarioId: number,
-  dados: { titulo: string; mensagem: string; url: string }
-) {
-  try {
-    await prisma.notificacao.create({
-      data: {
-        titulo: dados.titulo,
-        mensagem: dados.mensagem,
-        url: dados.url,
-        usuarioId,
-      },
-    })
-
-    const vapidPublicKey = process.env.VAPID_PUBLIC_KEY
-    const vapidPrivateKey = process.env.VAPID_PRIVATE_KEY
-    const vapidEmail = process.env.VAPID_EMAIL
-
-    if (!vapidPublicKey || !vapidPrivateKey || !vapidEmail) return
-
-    webpush.setVapidDetails(vapidEmail, vapidPublicKey, vapidPrivateKey)
-
-    const inscricoes = await prisma.inscricaoPush.findMany({
-      where: { usuarioId },
-    })
-
-    if (inscricoes.length === 0) return
-
-    const payload = JSON.stringify({
-      title: dados.titulo,
-      body: dados.mensagem,
-      url: dados.url,
-    })
-
-    await Promise.allSettled(
-      inscricoes.map(async (inscricao) => {
-        try {
-          await webpush.sendNotification(
-            {
-              endpoint: inscricao.endpoint,
-              keys: { p256dh: inscricao.p256dh, auth: inscricao.auth },
-            },
-            payload
-          )
-        } catch (error: unknown) {
-          const statusCode = (error as { statusCode?: number }).statusCode
-          if (statusCode === 410 || statusCode === 404) {
-            await prisma.inscricaoPush.delete({ where: { id: inscricao.id } })
-          }
-        }
-      })
-    )
-  } catch (error) {
-    console.error('[Notificação] Error:', error)
-  }
 }

@@ -79,27 +79,12 @@ export function usePushSubscription() {
       return { success: false, error: 'Chave VAPID não configurada. Verifique as variáveis de ambiente.' }
     }
 
+    if ('Notification' in window && Notification.permission === 'denied') {
+      return { success: false, error: 'Permissão negada. Ative nas configurações do navegador.' }
+    }
+
     try {
       const registration = await navigator.serviceWorker.ready
-
-      const existingSubscription = await registration.pushManager.getSubscription()
-      if (existingSubscription) {
-        const subscriptionJson = existingSubscription.toJSON()
-        const endpoint = subscriptionJson.endpoint
-        const keys = subscriptionJson.keys as { p256dh: string; auth: string }
-
-        const response = await fetch('/api/subscribe', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ endpoint, keys }),
-        })
-
-        if (response.ok) {
-          setIsSubscribed(true)
-          return { success: true }
-        }
-      }
-
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(vapidKey),

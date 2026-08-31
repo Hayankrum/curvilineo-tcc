@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/lib/ThemeProvider";
 import Navbar from "@/components/Navbar";
 import InstallPWMPopup from "@/components/InstallPWMPopup";
 import NotificationPermissionPopup from "@/components/NotificationPermissionPopup";
+import ServiceWorkerRegister from "@/modules/layout/ServiceWorkerRegister";
 import { getUsuarioLogado } from "@/modules/usuarios/usuarios.actions";
 
 const geist = Geist({
@@ -65,26 +66,10 @@ export default async function RootLayout({
             `,
           }}
         />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              if ('serviceWorker' in navigator) {
-                window.addEventListener('load', function() {
-                  navigator.serviceWorker.register('/sw.js')
-                    .then(function(registration) {
-                      console.log('SW registered:', registration.scope);
-                    })
-                    .catch(function(err) {
-                      console.log('SW registration failed:', err);
-                    });
-                });
-              }
-            `,
-          }}
-        />
       </head>
       <body className="min-h-full flex flex-col">
         <ThemeProvider>
+          <ServiceWorkerRegister />
           <Navbar />
           <main className="flex-1 max-w-3xl mx-auto w-full px-6 py-10">
             {children}
