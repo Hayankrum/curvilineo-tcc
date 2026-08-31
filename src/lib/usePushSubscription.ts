@@ -84,7 +84,32 @@ export function usePushSubscription() {
     }
 
     try {
-      const registration = await navigator.serviceWorker.ready
+      let registration = await navigator.serviceWorker.ready
+
+      if (!registration.active) {
+        await new Promise<void>((resolve) => {
+          const sw = registration.installing || registration.waiting
+          if (sw) {
+            sw.addEventListener('statechange', () => {
+              if (sw.state === 'activated') resolve()
+            })
+          } else {
+            resolve()
+          }
+        })
+        registration = await navigator.serviceWorker.ready
+      }
+
+      if (!registration.pushManager) {
+        return { success: false, error: 'Push Manager não disponível neste navegador.' }
+      }
+
+      const existingSubscription = await registration.pushManager.getSubscription()
+      if (existingSubscription) {
+        setIsSubscribed(true)
+        return { success: true }
+      }
+
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(vapidKey),
@@ -111,6 +136,13 @@ export function usePushSubscription() {
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'desconhecido'
       console.error('[Push] Subscribe error:', message, error)
+
+      if (message.includes('push service not available') || message.includes('Push service')) {
+        return {
+          success: false,
+          error: 'Serviço de push não disponível. Verifique se:\n1. O navegador suporta notificações push\n2. Você está acessando via HTTPS (ou localhost)\n3. No Linux, instale o pacote libnotify ou use Chrome/Edge',
+        }
+      }
 
       if (message.includes('push service error')) {
         return {

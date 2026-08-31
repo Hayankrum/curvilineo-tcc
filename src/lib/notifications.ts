@@ -31,7 +31,8 @@ export async function criarNotificacao({ usuarioId, titulo, mensagem, url, tipo 
 
     if (inscricoes.length > 0) {
       try {
-        const webpush = (await import('web-push')).default
+        const webPushModule = await import('web-push')
+        const webpush = webPushModule.default ?? webPushModule
 
         const vapidPublicKey = process.env.VAPID_PUBLIC_KEY
         const vapidPrivateKey = process.env.VAPID_PRIVATE_KEY
@@ -68,8 +69,8 @@ export async function criarNotificacao({ usuarioId, titulo, mensagem, url, tipo 
             }
           })
         )
-      } catch {
-        // web-push not configured or error
+      } catch (error) {
+        console.error('[Notificação] Erro ao enviar push:', error)
       }
     }
 

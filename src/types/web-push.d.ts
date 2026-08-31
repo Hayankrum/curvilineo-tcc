@@ -33,4 +33,5 @@ declare module 'web-push' {
   }
 
   export { setVapidDetails, sendNotification, generateVAPIDKeys }
+  export default { setVapidDetails, sendNotification, generateVAPIDKeys }
 }
