@@ -31,6 +31,7 @@ export async function criarComentario(postId: number, texto: string) {
       titulo: `${usuario.nome} comentou no seu post`,
       mensagem: texto.trim().slice(0, 100),
       url: `/posts/${postId}`,
+      tipo: 'comentario',
     })
   }
 

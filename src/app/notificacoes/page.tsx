@@ -39,14 +39,14 @@ export default function NotificacoesPage() {
       if (!result.success) {
         alert(result.error)
       } else {
-        await toggleNotificacoes()
+        await toggleNotificacoes(false)
       }
     } else {
       const result = await subscribe()
       if (!result.success) {
         alert(result.error || 'Erro ao ativar notificações.')
       } else {
-        await toggleNotificacoes()
+        await toggleNotificacoes(true)
       }
     }
   }

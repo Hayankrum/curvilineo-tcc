@@ -32,7 +32,7 @@ export default function NotificationPermissionPopup({ usuarioId }: Props) {
     try {
       const result = await subscribe()
       if (result.success) {
-        await toggleNotificacoes()
+        await toggleNotificacoes(true)
       } else {
         alert(result.error || 'Erro ao ativar notificações.')
       }

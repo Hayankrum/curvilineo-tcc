@@ -5,6 +5,8 @@ export interface AuthUser {
   bio?: string | null
   fotoUrl?: string | null
   notificacoesAtivas: boolean
+  notificarComentarios: boolean
+  notificarSistema: boolean
   criadoEm: Date
 }
 

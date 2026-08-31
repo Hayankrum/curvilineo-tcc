@@ -30,20 +30,22 @@ model Comentario {
 }
 
 model Usuario {
-  id                 Int              @id @default(autoincrement())
-  nome               String
-  email              String           @unique
-  senha              String
-  bio                String?
-  fotoUrl            String?
-  notificacoesAtivas Boolean          @default(true)
-  criadoEm           DateTime         @default(now())
-  posts              Post[]
-  comentarios        Comentario[]
-  sessoes            Sessao[]
-  inscricoes         InscricaoPush[]
-  notificacoes       Notificacao[]
-  medias             Media[]
+  id                   Int              @id @default(autoincrement())
+  nome                 String
+  email                String           @unique
+  senha                String
+  bio                  String?
+  fotoUrl              String?
+  notificacoesAtivas   Boolean          @default(true)
+  notificarComentarios Boolean          @default(true)
+  notificarSistema     Boolean          @default(true)
+  criadoEm             DateTime         @default(now())
+  posts                Post[]
+  comentarios          Comentario[]
+  sessoes              Sessao[]
+  inscricoes           InscricaoPush[]
+  notificacoes         Notificacao[]
+  medias               Media[]
 }
 
 model Sessao {

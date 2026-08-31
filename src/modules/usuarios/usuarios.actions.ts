@@ -138,7 +138,7 @@ export async function alterarSenha(id: number, senhaAtual: string, novaSenha: st
 
 // ---------- NOTIFICAÇÕES ----------
 
-export async function toggleNotificacoes() {
+export async function toggleNotificacoes(enabled: boolean) {
   const usuarioLogado = await obterSessao()
   if (!usuarioLogado) return { error: 'Não autorizado' }
 
@@ -147,7 +147,22 @@ export async function toggleNotificacoes() {
 
   await prisma.usuario.update({
     where: { id: usuarioLogado.id },
-    data: { notificacoesAtivas: !usuario.notificacoesAtivas },
+    data: { notificacoesAtivas: enabled },
+  })
+
+  return { success: true }
+}
+
+export async function atualizarPreferenciasNotificacao(preferencias: {
+  notificarComentarios?: boolean
+  notificarSistema?: boolean
+}) {
+  const usuarioLogado = await obterSessao()
+  if (!usuarioLogado) return { error: 'Não autorizado' }
+
+  await prisma.usuario.update({
+    where: { id: usuarioLogado.id },
+    data: preferencias,
   })
 
   return { success: true }
