@@ -104,16 +104,14 @@ export function usePushSubscription() {
         return { success: false, error: 'Push Manager não disponível neste navegador.' }
       }
 
-      const existingSubscription = await registration.pushManager.getSubscription()
-      if (existingSubscription) {
-        setIsSubscribed(true)
-        return { success: true }
-      }
+      let subscription = await registration.pushManager.getSubscription()
 
-      const subscription = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(vapidKey),
-      })
+      if (!subscription) {
+        subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(vapidKey),
+        })
+      }
 
       const subscriptionJson = subscription.toJSON()
       const endpoint = subscriptionJson.endpoint
