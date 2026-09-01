@@ -5,7 +5,7 @@ export async function POST(request: Request) {
   try {
     const { endpoint } = await request.json()
 
-    if (!endpoint) {
+    if (!endpoint || typeof endpoint !== 'string') {
       return NextResponse.json({ registered: false })
     }
 
@@ -15,7 +15,8 @@ export async function POST(request: Request) {
     })
 
     return NextResponse.json({ registered: !!inscricao })
-  } catch {
+  } catch (error) {
+    console.error('[Check] Error:', error)
     return NextResponse.json({ registered: false })
   }
 }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { usePushSubscription } from '@/lib/usePushSubscription'
 import { toggleNotificacoes } from '@/modules/usuarios/usuarios.actions'
 
@@ -15,9 +16,11 @@ interface NotificacaoHistorico {
 }
 
 export default function NotificacoesPage() {
+  const router = useRouter()
   const { isSubscribed, isSupported, isLoading, subscribe, unsubscribe } = usePushSubscription()
   const [historico, setHistorico] = useState<NotificacaoHistorico[]>([])
   const [loadingHistorico, setLoadingHistorico] = useState(true)
+  const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
   const fetchHistorico = () => {
     fetch('/api/notifications/history')
@@ -33,20 +36,27 @@ export default function NotificacoesPage() {
     fetchHistorico()
   }, [])
 
+  const showStatus = (type: 'success' | 'error', text: string) => {
+    setStatusMessage({ type, text })
+    setTimeout(() => setStatusMessage(null), 5000)
+  }
+
   const handleToggle = async () => {
     if (isSubscribed) {
       const result = await unsubscribe()
       if (!result.success) {
-        alert(result.error)
+        showStatus('error', result.error || 'Erro ao desativar')
       } else {
         await toggleNotificacoes(false)
+        showStatus('success', 'Notificações desativadas')
       }
     } else {
       const result = await subscribe()
       if (!result.success) {
-        alert(result.error || 'Erro ao ativar notificações.')
+        showStatus('error', result.error || 'Erro ao ativar notificações.')
       } else {
         await toggleNotificacoes(true)
+        showStatus('success', 'Notificações ativadas!')
       }
     }
   }
@@ -96,6 +106,18 @@ export default function NotificacoesPage() {
   return (
     <div className="max-w-xl">
       <h1 className="text-2xl font-semibold mb-6" style={{ color: 'var(--text-primary)' }}>Notificações</h1>
+
+      {statusMessage && (
+        <div
+          className="mb-4 p-3 rounded-lg text-sm"
+          style={{
+            backgroundColor: statusMessage.type === 'success' ? '#dcfce7' : '#fee2e2',
+            color: statusMessage.type === 'success' ? '#16a34a' : '#dc2626',
+          }}
+        >
+          {statusMessage.text}
+        </div>
+      )}
 
       <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
         <div className="flex items-center justify-between">
@@ -150,7 +172,7 @@ export default function NotificacoesPage() {
                 style={{ backgroundColor: 'var(--card-bg)', border: `1px solid ${notificacao.lida ? 'var(--card-border)' : 'var(--border-color)'}` }}
                 onClick={() => {
                   if (!notificacao.lida) marcarComoLida(notificacao.id)
-                  if (notificacao.url) window.location.href = notificacao.url
+                  if (notificacao.url) router.push(notificacao.url)
                 }}
               >
                 <div className="flex items-start justify-between">

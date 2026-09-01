@@ -1,22 +1,26 @@
-const CACHE_STATIC = 'static-v3'
-const CACHE_PAGES = 'pages-v3'
-const CACHE_API = 'api-v3'
+const CACHE_STATIC = 'static-v4'
+const CACHE_PAGES = 'pages-v4'
+const CACHE_API = 'api-v4'
 
 self.addEventListener('install', (event) => {
+  console.log('[SW] Installing...')
   event.waitUntil(
     caches.open(CACHE_STATIC).then((cache) =>
       cache.addAll([
         '/',
         '/offline',
         '/icons/icon.svg',
-        '/icons/icon.svg',
         '/manifest.json',
       ])
-    ).then(() => self.skipWaiting())
+    ).then(() => {
+      console.log('[SW] Installed, skipping waiting')
+      return self.skipWaiting()
+    })
   )
 })
 
 self.addEventListener('activate', (event) => {
+  console.log('[SW] Activating...')
   event.waitUntil(
     caches.keys().then((keys) =>
       Promise.all(
@@ -24,7 +28,10 @@ self.addEventListener('activate', (event) => {
           .filter((k) => ![CACHE_STATIC, CACHE_PAGES, CACHE_API].includes(k))
           .map((k) => caches.delete(k))
       )
-    ).then(() => self.clients.claim())
+    ).then(() => {
+      console.log('[SW] Activated, claiming clients')
+      return self.clients.claim()
+    })
   )
 })
 
@@ -61,7 +68,6 @@ async function cacheFirst(request) {
     }
     return response
   } catch {
-    // Para fontes e CSS, retornar vazio em vez de erro
     return new Response('', { status: 503, statusText: 'Offline' })
   }
 }
@@ -79,12 +85,10 @@ async function navigationHandler(request) {
       return response
     })
     .catch(() => {
-      // Offline e não tem cache → retorna página offline leve
       if (cached) return cached
       return caches.match('/offline')
     })
 
-  // Retorna cache imediatamente se existe, senão espera a rede
   return cached || fetchPromise
 }
 
@@ -131,16 +135,32 @@ self.addEventListener('fetch', (event) => {
 
 // Push notifications
 self.addEventListener('push', (event) => {
-  if (!event.data) return
+  console.log('[SW] Push received')
 
-  const data = event.data.json()
+  if (!event.data) {
+    console.warn('[SW] Push event without data')
+    return
+  }
+
+  let data
+  try {
+    data = event.data.json()
+  } catch (err) {
+    console.error('[SW] Failed to parse push data:', err)
+    return
+  }
+
+  console.log('[SW] Push data:', data)
 
   const options = {
     body: data.body || data.mensagem,
-    icon: '/icons/icon.svg',
-    badge: '/icons/icon.svg',
+    icon: data.icon || '/icons/icon.svg',
+    badge: data.badge || '/icons/icon.svg',
     vibrate: [100, 50, 100],
     data: { url: data.url || '/' },
+    tag: data.tag || 'default',
+    renotify: true,
+    requireInteraction: false,
     actions: [
       { action: 'open', title: 'Abrir' },
       { action: 'dismiss', title: 'Dispensar' },
@@ -148,27 +168,108 @@ self.addEventListener('push', (event) => {
   }
 
   event.waitUntil(
-    self.registration.showNotification(data.title, options)
+    self.registration.showNotification(data.title || 'Notificação', options)
+      .then(() => console.log('[SW] Notification shown'))
+      .catch((err) => console.error('[SW] Failed to show notification:', err))
   )
 })
 
 self.addEventListener('notificationclick', (event) => {
+  console.log('[SW] Notification clicked, action:', event.action)
   event.notification.close()
+
   if (event.action === 'dismiss') return
 
   const urlToOpen = event.notification.data?.url || '/'
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+      // Check if there's already a window open with the URL
       for (const client of windowClients) {
         if (client.url === urlToOpen && 'focus' in client) {
+          console.log('[SW] Focusing existing window')
           return client.focus()
         }
       }
+
+      // Open new window
       if (clients.openWindow) {
+        console.log('[SW] Opening new window:', urlToOpen)
         return clients.openWindow(urlToOpen)
       }
     })
+  )
+})
+
+// Handle subscription changes (important for cross-browser compatibility)
+// This fires when the push subscription is invalidated by the browser
+self.addEventListener('pushsubscriptionchange', (event) => {
+  console.log('[SW] Push subscription changed')
+
+  event.waitUntil(
+    (async () => {
+      try {
+        // Get the new subscription
+        const registration = await self.registration
+        let subscription = await registration.pushManager.getSubscription()
+
+        // If subscription was deleted, try to resubscribe
+        if (!subscription) {
+          console.log('[SW] Subscription lost, attempting to resubscribe...')
+
+          // Get VAPID key from server
+          const vapidRes = await fetch('/api/vapid-key')
+          if (!vapidRes.ok) {
+            console.error('[SW] Failed to get VAPID key for resubscription')
+            return
+          }
+          const { publicKey } = await vapidRes.json()
+
+          if (!publicKey) {
+            console.error('[SW] No VAPID key received')
+            return
+          }
+
+          // Convert VAPID key
+          const padding = '='.repeat((4 - (publicKey.length % 4)) % 4)
+          const base64 = (publicKey + padding).replace(/-/g, '+').replace(/_/g, '/')
+          const rawData = atob(base64)
+          const appServerKey = new Uint8Array(rawData.length)
+          for (let i = 0; i < rawData.length; ++i) {
+            appServerKey[i] = rawData.charCodeAt(i)
+          }
+
+          // Resubscribe
+          subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: appServerKey,
+          })
+
+          console.log('[SW] Resubscribed successfully')
+        }
+
+        // Send updated subscription to server
+        if (subscription) {
+          const subscriptionJson = subscription.toJSON()
+          const res = await fetch('/api/subscribe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              endpoint: subscriptionJson.endpoint,
+              keys: subscriptionJson.keys,
+            }),
+          })
+
+          if (res.ok) {
+            console.log('[SW] Subscription updated on server')
+          } else {
+            console.error('[SW] Failed to update subscription on server')
+          }
+        }
+      } catch (err) {
+        console.error('[SW] Error handling pushsubscriptionchange:', err)
+      }
+    })()
   )
 })
 

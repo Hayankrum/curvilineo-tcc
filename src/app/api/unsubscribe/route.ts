@@ -6,22 +6,27 @@ export async function POST(request: Request) {
   try {
     const usuario = await obterSessao()
     if (!usuario) {
+      console.log('[Unsubscribe] Unauthorized attempt')
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
     }
 
     const { endpoint } = await request.json()
 
-    if (!endpoint) {
+    if (!endpoint || typeof endpoint !== 'string') {
+      console.log('[Unsubscribe] Invalid endpoint')
       return NextResponse.json({ error: 'Endpoint inválido' }, { status: 400 })
     }
 
-    await prisma.inscricaoPush.deleteMany({
+    console.log('[Unsubscribe] User', usuario.id, 'unsubscribing endpoint:', endpoint.substring(0, 50) + '...')
+
+    const result = await prisma.inscricaoPush.deleteMany({
       where: {
         endpoint,
         usuarioId: usuario.id,
       },
     })
 
+    console.log('[Unsubscribe] Deleted', result.count, 'subscription(s)')
     return NextResponse.json({ message: 'Desinscrito com sucesso' })
   } catch (error) {
     console.error('[Unsubscribe] Error:', error)

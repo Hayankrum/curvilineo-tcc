@@ -21,6 +21,7 @@ export default function ConfiguracoesPage() {
   const router = useRouter()
   const { isSubscribed, isSubscribing, isSupported, isLoading, subscribe, unsubscribe } = usePushSubscription()
   const [toggling, setToggling] = useState(false)
+  const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const { theme, toggleTheme } = useTheme()
   const [user, setUser] = useState<UserInfo | null>(null)
   const [preferencias, setPreferencias] = useState({
@@ -48,23 +49,31 @@ export default function ConfiguracoesPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const showStatus = (type: 'success' | 'error', text: string) => {
+    setStatusMessage({ type, text })
+    setTimeout(() => setStatusMessage(null), 5000)
+  }
+
   const handleToggleNotificacoes = async () => {
     if (toggling || isSubscribing) return
     setToggling(true)
+    setStatusMessage(null)
     try {
       if (isSubscribed) {
         const result = await unsubscribe()
         if (!result.success) {
-          alert(result.error)
+          showStatus('error', result.error || 'Erro ao desativar')
         } else {
           await toggleNotificacoes(false)
+          showStatus('success', 'Notificações desativadas')
         }
       } else {
         const result = await subscribe()
         if (!result.success) {
-          alert(result.error || 'Erro ao ativar notificações.')
+          showStatus('error', result.error || 'Erro ao ativar notificações.')
         } else {
           await toggleNotificacoes(true)
+          showStatus('success', 'Notificações ativadas com sucesso!')
         }
       }
     } finally {
@@ -77,7 +86,7 @@ export default function ConfiguracoesPage() {
     const result = await atualizarPreferenciasNotificacao({ [campo]: valor })
     if (result.error) {
       setPreferencias((prev) => ({ ...prev, [campo]: !valor }))
-      alert(result.error)
+      showStatus('error', result.error)
     }
   }
 
@@ -101,6 +110,18 @@ export default function ConfiguracoesPage() {
       </Link>
 
       <h1 className="text-2xl font-semibold mb-8" style={{ color: 'var(--text-primary)' }}>Configurações</h1>
+
+      {statusMessage && (
+        <div
+          className="mb-4 p-3 rounded-lg text-sm"
+          style={{
+            backgroundColor: statusMessage.type === 'success' ? '#dcfce7' : '#fee2e2',
+            color: statusMessage.type === 'success' ? '#16a34a' : '#dc2626',
+          }}
+        >
+          {statusMessage.text}
+        </div>
+      )}
 
       <div className="flex flex-col gap-6">
         <section className="rounded-lg p-5" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
