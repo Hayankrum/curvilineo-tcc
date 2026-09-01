@@ -163,6 +163,7 @@ export class NextAuthProvider implements AuthProvider {
     nome: string
     bio?: string | null
     fotoUrl?: string | null
+    aceitouTermos: boolean
     notificacoesAtivas: boolean
     notificarComentarios: boolean
     notificarSistema: boolean
@@ -175,6 +176,7 @@ export class NextAuthProvider implements AuthProvider {
         nome: usuario.nome,
         bio: usuario.bio,
         fotoUrl: usuario.fotoUrl,
+        aceitouTermos: usuario.aceitouTermos,
         notificacoesAtivas: usuario.notificacoesAtivas,
         notificarComentarios: usuario.notificarComentarios,
         notificarSistema: usuario.notificarSistema,

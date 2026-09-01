@@ -66,9 +66,10 @@ export async function deletarUsuario(id: number, senha: string) {
 
 // ---------- REGISTRO ----------
 
-export async function registrar(nome: string, email: string, senha: string, confirmarSenha: string) {
+export async function registrar(nome: string, email: string, senha: string, confirmarSenha: string, aceitouTermos: boolean) {
   if (nome.length > MAX_NOME) return { error: `Nome deve ter no máximo ${MAX_NOME} caracteres` }
   if (senha !== confirmarSenha) return { error: 'As senhas não conferem' }
+  if (!aceitouTermos) return { error: 'Você deve aceitar os Termos de Uso e Compromisso' }
 
   const erroSenha = validarSenha(senha)
   if (erroSenha) return { error: erroSenha }
@@ -78,7 +79,7 @@ export async function registrar(nome: string, email: string, senha: string, conf
   if (usuarioExistente) return { error: 'Esse email já está cadastrado' }
 
   const senhaHash = await bcrypt.hash(senha, BCRYPT_SALT)
-  const usuario = await prisma.usuario.create({ data: { nome, email, senha: senhaHash } })
+  const usuario = await prisma.usuario.create({ data: { nome, email, senha: senhaHash, aceitouTermos } })
 
   await criarSessao(usuario.id)
   redirect('/')
@@ -166,6 +167,21 @@ export async function atualizarPreferenciasNotificacao(preferencias: {
   })
 
   return { success: true }
+}
+
+// ---------- TERMOS ----------
+
+export async function aceitarTermos() {
+  const usuarioLogado = await obterSessao()
+  if (!usuarioLogado) return { error: 'Não autorizado' }
+
+  await prisma.usuario.update({
+    where: { id: usuarioLogado.id },
+    data: { aceitouTermos: true },
+  })
+
+  revalidatePath('/')
+  return { success: 'Termos aceitos com sucesso' }
 }
 
 // ---------- HELPERS ----------

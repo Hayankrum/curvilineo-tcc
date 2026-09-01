@@ -4,6 +4,7 @@ export interface AuthUser {
   nome: string
   bio?: string | null
   fotoUrl?: string | null
+  aceitouTermos: boolean
   notificacoesAtivas: boolean
   notificarComentarios: boolean
   notificarSistema: boolean

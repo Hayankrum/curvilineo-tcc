@@ -10,7 +10,8 @@ async function registrarAction(_prev: { error?: string } | null, formData: FormD
   const email = formData.get('email') as string
   const senha = formData.get('senha') as string
   const confirmarSenha = formData.get('confirmarSenha') as string
-  return await registrar(nome, email, senha, confirmarSenha)
+  const aceitouTermos = formData.get('aceitouTermos') === 'on'
+  return await registrar(nome, email, senha, confirmarSenha, aceitouTermos)
 }
 
 export default function RegistroPage() {
@@ -52,6 +53,22 @@ export default function RegistroPage() {
         <CampoSenha name="senha" label="Senha" minLength={8} />
 
         <CampoSenha name="confirmarSenha" label="Confirmar senha" minLength={8} placeholder="Repita a senha" />
+
+        <div className="flex items-start gap-3">
+          <input
+            type="checkbox"
+            name="aceitouTermos"
+            id="aceitouTermos"
+            required
+            className="mt-1 rounded"
+          />
+          <label htmlFor="aceitouTermos" className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+            Li e aceito os{' '}
+            <Link href="/termos" target="_blank" className="hover:underline" style={{ color: 'var(--text-primary)' }}>
+              Termos de Uso e Compromisso
+            </Link>
+          </label>
+        </div>
 
         <button
           type="submit"

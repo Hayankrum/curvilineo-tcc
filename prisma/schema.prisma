@@ -36,6 +36,7 @@ model Usuario {
   senha                String
   bio                  String?
   fotoUrl              String?
+  aceitouTermos        Boolean          @default(false)
   notificacoesAtivas   Boolean          @default(true)
   notificarComentarios Boolean          @default(true)
   notificarSistema     Boolean          @default(true)

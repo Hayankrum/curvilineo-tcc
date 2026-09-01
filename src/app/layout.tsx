@@ -7,6 +7,7 @@ import InstallPWMPopup from "@/components/InstallPWMPopup";
 import NotificationPermissionPopup from "@/components/NotificationPermissionPopup";
 import ServiceWorkerRegister from "@/modules/layout/ServiceWorkerRegister";
 import { getUsuarioLogado } from "@/modules/usuarios/usuarios.actions";
+import TermosChecker from "@/components/TermosChecker";
 
 const geist = Geist({
   variable: "--font-geist-sans",
@@ -71,9 +72,11 @@ export default async function RootLayout({
         <ThemeProvider>
           <ServiceWorkerRegister />
           <Navbar />
-          <main className="flex-1 max-w-3xl mx-auto w-full px-6 py-10">
-            {children}
-          </main>
+          <TermosChecker usuario={usuario}>
+            <main className="flex-1 max-w-3xl mx-auto w-full px-6 py-10">
+              {children}
+            </main>
+          </TermosChecker>
         </ThemeProvider>
         <InstallPWMPopup />
         <NotificationPermissionPopup usuarioId={usuario?.id} />
