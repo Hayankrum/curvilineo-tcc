@@ -2,20 +2,23 @@
 
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
+import QRCode from 'qrcode'
 import InstallPWAButton from '@/components/InstallPWAButton'
 
 function ShareSection() {
-  const [url, setUrl] = useState('')
+  const [shareData, setShareData] = useState({ url: '', qrSvg: '' })
   const [copied, setCopied] = useState(false)
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
-    setUrl(window.location.origin)
+    const origin = window.location.origin
+    QRCode.toString(origin, { type: 'svg', margin: 2, width: 150 }, (err, svg) => {
+      setShareData({ url: origin, qrSvg: err ? '' : svg })
+    })
   }, [])
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(url)
+      await navigator.clipboard.writeText(shareData.url)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch {
@@ -29,7 +32,7 @@ function ShareSection() {
         await navigator.share({
           title: 'Meu App',
           text: 'Confira o Meu App!',
-          url,
+          url: shareData.url,
         })
       } catch {
         // usuário cancelou
@@ -39,7 +42,7 @@ function ShareSection() {
     }
   }
 
-  if (!url) return null
+  if (!shareData.url) return null
 
   return (
     <section className="rounded-lg p-5" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
@@ -50,14 +53,11 @@ function ShareSection() {
 
       <div className="flex flex-col items-center gap-4">
         {/* QR Code */}
-        <div className="p-3 rounded-lg" style={{ backgroundColor: 'white' }}>
-          <img
-            src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(url)}`}
-            alt="QR Code do aplicativo"
-            width={150}
-            height={150}
-          />
-        </div>
+        <div
+          className="p-3 rounded-lg"
+          style={{ backgroundColor: 'white' }}
+          dangerouslySetInnerHTML={{ __html: shareData.qrSvg }}
+        />
 
         {/* URL */}
         <div className="w-full">
@@ -66,7 +66,7 @@ function ShareSection() {
             <input
               type="text"
               readOnly
-              value={url}
+              value={shareData.url}
               className="flex-1 px-3 py-2 rounded-md text-xs border truncate"
               style={{
                 backgroundColor: 'var(--bg-tertiary)',
