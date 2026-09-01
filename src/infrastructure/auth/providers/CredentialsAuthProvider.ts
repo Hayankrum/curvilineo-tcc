@@ -12,10 +12,10 @@ import type {
 const SESSION_COOKIE = 'sessionToken'
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7 // 7 days
 const BCRYPT_SALT = 10
-const JWT_SECRET = process.env.AUTH_SECRET
-if (!JWT_SECRET) {
+if (!process.env.AUTH_SECRET) {
   throw new Error('AUTH_SECRET não definido. Configure a variável de ambiente AUTH_SECRET.')
 }
+const JWT_SECRET = process.env.AUTH_SECRET
 
 /**
  * Example CredentialsAuthProvider - JWT-based authentication
@@ -61,7 +61,7 @@ export class CredentialsAuthProvider implements AuthProvider {
     if (!token) return null
 
     try {
-      const payload = jwt.verify(token, JWT_SECRET) as { userId: number }
+      const payload = jwt.verify(token, JWT_SECRET) as unknown as { userId: number }
       const usuario = await prisma.usuario.findUnique({
         where: { id: payload.userId },
       })
