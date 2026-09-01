@@ -12,7 +12,10 @@ import type {
 const SESSION_COOKIE = 'sessionToken'
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7 // 7 days
 const BCRYPT_SALT = 10
-const JWT_SECRET = process.env.AUTH_SECRET || 'fallback-secret'
+const JWT_SECRET = process.env.AUTH_SECRET
+if (!JWT_SECRET) {
+  throw new Error('AUTH_SECRET não definido. Configure a variável de ambiente AUTH_SECRET.')
+}
 
 /**
  * Example CredentialsAuthProvider - JWT-based authentication

@@ -1,9 +1,16 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { obterSessao } from '@/lib/session'
+import { rateLimit, getRateLimitKey } from '@/lib/rateLimit'
 
 export async function POST(request: Request) {
   try {
+    const rlKey = getRateLimitKey(request, 'subscribe')
+    const rl = rateLimit(rlKey, { windowMs: 60_000, max: 10 })
+    if (!rl.allowed) {
+      return NextResponse.json({ error: 'Muitas requisições' }, { status: 429 })
+    }
+
     const usuario = await obterSessao()
     if (!usuario) {
       console.log('[Subscribe] Unauthorized attempt')

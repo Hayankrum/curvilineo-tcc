@@ -1,7 +1,5 @@
 'use client'
 
-import { useEffect } from 'react'
-
 export default function Error({
   error,
   reset,
@@ -9,23 +7,32 @@ export default function Error({
   error: Error & { digest?: string }
   reset: () => void
 }) {
-  useEffect(() => {
-    console.error(error)
-  }, [error])
-
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-      <div className="text-6xl mb-6">⚠️</div>
-      <h1 className="text-2xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>Algo deu errado</h1>
-      <p className="mb-6 max-w-md" style={{ color: 'var(--text-secondary)' }}>
-        Ocorreu um erro inesperado. Por favor, tente novamente.
+    <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-6">
+      <div className="text-5xl mb-6">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ color: 'var(--text-tertiary)' }}>
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      </div>
+      <h2 className="text-xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>
+        Algo deu errado
+      </h2>
+      <p className="text-sm mb-6 max-w-md" style={{ color: 'var(--text-tertiary)' }}>
+        Ocorreu um erro inesperado. Tente recarregar a pagina.
       </p>
+      {error.digest && (
+        <p className="text-xs mb-4 font-mono" style={{ color: 'var(--text-tertiary)' }}>
+          Error ID: {error.digest}
+        </p>
+      )}
       <button
         onClick={() => reset()}
-        className="border px-6 py-3 rounded-lg transition-colors"
-        style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)', borderColor: 'var(--border-color)' }}
+        className="px-5 py-2.5 rounded-lg text-sm font-medium transition-colors"
+        style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
       >
-        Tentar Novamente
+        Tentar novamente
       </button>
     </div>
   )

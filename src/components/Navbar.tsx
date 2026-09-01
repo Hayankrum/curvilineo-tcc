@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import SinoNotificacoes from '@/modules/notificacoes/SinoNotificacoes'
 
-
 interface Usuario {
   id: number
   nome: string
@@ -44,21 +43,25 @@ export default function Navbar() {
             <line x1="16" y1="6" x2="16" y2="22"/>
           </svg>
         </Link>
-
         <div className="ml-auto flex items-center gap-4">
+          <Link href="/testes" className="transition-colors" style={{ color: 'var(--text-secondary)' }} title="Testes">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <path d="m9 15 2 2 4-4"/>
+            </svg>
+          </Link>
+          {loaded && usuario && <SinoNotificacoes />}
           {loaded && usuario ? (
-            <>
-              <SinoNotificacoes />
-              <Link
-                href={`/usuarios/${usuario.id}`}
-                className="transition-colors flex items-center"
-                title={usuario.nome}
-              >
-                <span className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium" style={{ backgroundColor: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', color: 'var(--text-secondary)' }}>
-                  {usuario.nome.charAt(0).toUpperCase()}
-                </span>
-              </Link>
-            </>
+            <Link
+              href={`/usuarios/${usuario.id}`}
+              className="transition-colors flex items-center"
+              title={usuario.nome}
+            >
+              <span className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium" style={{ backgroundColor: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', color: 'var(--text-secondary)' }}>
+                {usuario.nome.charAt(0).toUpperCase()}
+              </span>
+            </Link>
           ) : loaded ? (
             <Link href="/usuarios/login" className="text-sm transition-colors" style={{ color: 'var(--text-secondary)' }}>
               Entrar
