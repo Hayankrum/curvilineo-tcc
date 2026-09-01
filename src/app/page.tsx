@@ -9,7 +9,16 @@ export default async function Home() {
   return (
     <HeroMinimal>
       <h1 className="text-3xl md:text-4xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
-        {usuario ? `Bem-vindo, ${primeiroNome(usuario.nome)}` : 'Bem-vindo ao Meu App'}
+        {usuario ? (
+          <>
+            <span className="block">Bem-vindo,</span>
+            <span className="block text-2xl md:text-3xl font-medium mt-1 overflow-hidden text-ellipsis whitespace-nowrap max-w-full">
+              {primeiroNome(usuario.nome)}
+            </span>
+          </>
+        ) : (
+          'Bem-vindo ao Meu App'
+        )}
       </h1>
 
       <p className="leading-relaxed mb-8 max-w-md" style={{ color: 'var(--text-secondary)' }}>

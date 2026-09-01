@@ -4,6 +4,103 @@ import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import InstallPWAButton from '@/components/InstallPWAButton'
 
+function ShareSection() {
+  const [url, setUrl] = useState('')
+  const [copied, setCopied] = useState(false)
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => {
+    setUrl(window.location.origin)
+  }, [])
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(url)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      // fallback
+    }
+  }
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Meu App',
+          text: 'Confira o Meu App!',
+          url,
+        })
+      } catch {
+        // usuário cancelou
+      }
+    } else {
+      handleCopy()
+    }
+  }
+
+  if (!url) return null
+
+  return (
+    <section className="rounded-lg p-5" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
+      <h2 className="font-medium mb-3" style={{ color: 'var(--text-primary)' }}>Compartilhar</h2>
+      <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
+        Compartilhe o aplicativo com amigos e colegas.
+      </p>
+
+      <div className="flex flex-col items-center gap-4">
+        {/* QR Code */}
+        <div className="p-3 rounded-lg" style={{ backgroundColor: 'white' }}>
+          <img
+            src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(url)}`}
+            alt="QR Code do aplicativo"
+            width={150}
+            height={150}
+          />
+        </div>
+
+        {/* URL */}
+        <div className="w-full">
+          <p className="text-xs mb-1" style={{ color: 'var(--text-tertiary)' }}>Link do aplicativo:</p>
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              readOnly
+              value={url}
+              className="flex-1 px-3 py-2 rounded-md text-xs border truncate"
+              style={{
+                backgroundColor: 'var(--bg-tertiary)',
+                borderColor: 'var(--card-border)',
+                color: 'var(--text-primary)',
+              }}
+            />
+            <button
+              onClick={handleCopy}
+              className="px-3 py-2 rounded-md text-xs font-medium transition-colors min-h-[44px]"
+              style={{
+                backgroundColor: copied ? 'var(--btn-primary-bg)' : 'var(--btn-secondary-bg)',
+                color: copied ? 'var(--btn-primary-text)' : 'var(--text-primary)',
+              }}
+            >
+              {copied ? '✓ Copiado' : 'Copiar'}
+            </button>
+          </div>
+        </div>
+
+        {/* Botão Compartilhar */}
+        <button
+          onClick={handleShare}
+          className="w-full font-medium rounded-lg px-6 py-3 text-sm transition-colors min-h-[44px] flex items-center justify-center gap-2"
+          style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
+        >
+          <span>📤</span>
+          <span>Compartilhar</span>
+        </button>
+      </div>
+    </section>
+  )
+}
+
 interface UserInfo {
   id: number
 }
@@ -115,6 +212,8 @@ export default function SobrePage() {
             </div>
           </div>
         </section>
+
+        <ShareSection />
       </div>
     </div>
   )
