@@ -15,10 +15,6 @@ export default function ServiceWorkerRegister() {
           if (newWorker) {
             newWorker.addEventListener('statechange', () => {
               console.log('SW state change:', newWorker.state)
-              if (newWorker.state === 'activated' && !sessionStorage.getItem('sw-reloaded')) {
-                sessionStorage.setItem('sw-reloaded', '1')
-                window.location.reload()
-              }
             })
           }
         })

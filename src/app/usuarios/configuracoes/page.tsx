@@ -19,7 +19,8 @@ interface UserInfo {
 
 export default function ConfiguracoesPage() {
   const router = useRouter()
-  const { isSubscribed, isSupported, isLoading, subscribe, unsubscribe } = usePushSubscription()
+  const { isSubscribed, isSubscribing, isSupported, isLoading, subscribe, unsubscribe } = usePushSubscription()
+  const [toggling, setToggling] = useState(false)
   const { theme, toggleTheme } = useTheme()
   const [user, setUser] = useState<UserInfo | null>(null)
   const [preferencias, setPreferencias] = useState({
@@ -48,20 +49,26 @@ export default function ConfiguracoesPage() {
   }, [])
 
   const handleToggleNotificacoes = async () => {
-    if (isSubscribed) {
-      const result = await unsubscribe()
-      if (!result.success) {
-        alert(result.error)
+    if (toggling || isSubscribing) return
+    setToggling(true)
+    try {
+      if (isSubscribed) {
+        const result = await unsubscribe()
+        if (!result.success) {
+          alert(result.error)
+        } else {
+          await toggleNotificacoes(false)
+        }
       } else {
-        await toggleNotificacoes(false)
+        const result = await subscribe()
+        if (!result.success) {
+          alert(result.error || 'Erro ao ativar notificações.')
+        } else {
+          await toggleNotificacoes(true)
+        }
       }
-    } else {
-      const result = await subscribe()
-      if (!result.success) {
-        alert(result.error || 'Erro ao ativar notificações.')
-      } else {
-        await toggleNotificacoes(true)
-      }
+    } finally {
+      setToggling(false)
     }
   }
 
@@ -140,10 +147,11 @@ export default function ConfiguracoesPage() {
               </div>
               <button
                 onClick={handleToggleNotificacoes}
-                className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                disabled={toggling || isSubscribing}
+                className="px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 style={isSubscribed ? { backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' } : { backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
               >
-                {isLoading ? '...' : isSubscribed ? 'Desativar' : 'Ativar'}
+                {isLoading || toggling || isSubscribing ? '...' : isSubscribed ? 'Desativar' : 'Ativar'}
               </button>
             </div>
           ) : (

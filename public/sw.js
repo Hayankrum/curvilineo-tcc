@@ -94,7 +94,14 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(request.url)
 
-  // API routes → network first
+  // Subscription-related API routes → network only (never cache)
+  const NO_CACHE_API = ['/api/subscribe', '/api/unsubscribe', '/api/vapid-key']
+  if (NO_CACHE_API.some((p) => url.pathname.startsWith(p))) {
+    event.respondWith(fetch(request))
+    return
+  }
+
+  // Other API routes → network first
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(networkFirstWithCache(request))
     return

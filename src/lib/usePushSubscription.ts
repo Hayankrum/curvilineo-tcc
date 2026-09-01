@@ -26,6 +26,7 @@ function getInitialState() {
 export function usePushSubscription() {
   const [state, setState] = useState(getInitialState)
   const [isSubscribed, setIsSubscribed] = useState(false)
+  const [isSubscribing, setIsSubscribing] = useState(false)
 
   useEffect(() => {
     if (!state.isSupported) return
@@ -40,8 +41,30 @@ export function usePushSubscription() {
         ])
 
         const subscription = await registration.pushManager.getSubscription()
-        if (!cancelled) {
-          setIsSubscribed(!!subscription)
+        if (cancelled) return
+
+        if (subscription) {
+          const endpoint = subscription.endpoint
+          try {
+            const res = await fetch('/api/subscribe/check', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ endpoint }),
+            })
+            const data = await res.json()
+            if (cancelled) return
+
+            if (!data.registered) {
+              await subscription.unsubscribe().catch(() => {})
+              setIsSubscribed(false)
+            } else {
+              setIsSubscribed(true)
+            }
+          } catch {
+            if (!cancelled) setIsSubscribed(true)
+          }
+        } else {
+          setIsSubscribed(false)
         }
       } catch (error) {
         console.warn('[Push] Error checking subscription:', error)
@@ -63,6 +86,9 @@ export function usePushSubscription() {
   }, [state.isSupported])
 
   const subscribe = useCallback(async () => {
+    if (isSubscribing) return { success: false, error: 'Aguarde...' }
+    setIsSubscribing(true)
+
     let vapidKey: string | null = null
     try {
       const res = await fetch('/api/vapid-key')
@@ -84,6 +110,16 @@ export function usePushSubscription() {
     }
 
     try {
+      if ('Notification' in window && Notification.permission === 'default') {
+        const permission = await Notification.requestPermission()
+        if (permission !== 'granted') {
+          if (permission === 'denied') {
+            setState((prev) => ({ ...prev, permissionDenied: true }))
+          }
+          return { success: false, error: 'Você precisa permitir notificações para ativar.' }
+        }
+      }
+
       let registration = await navigator.serviceWorker.ready
 
       if (!registration.active) {
@@ -106,12 +142,17 @@ export function usePushSubscription() {
 
       let subscription = await registration.pushManager.getSubscription()
 
-      if (!subscription) {
-        subscription = await registration.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: urlBase64ToUint8Array(vapidKey),
-        })
+      if (subscription) {
+        try {
+          await subscription.unsubscribe()
+        } catch {}
+        subscription = null
       }
+
+      subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(vapidKey),
+      })
 
       const subscriptionJson = subscription.toJSON()
       const endpoint = subscriptionJson.endpoint
@@ -125,7 +166,7 @@ export function usePushSubscription() {
 
       if (!response.ok) {
         const data = await response.json()
-        await subscription.unsubscribe()
+        await subscription.unsubscribe().catch(() => {})
         return { success: false, error: data.error || 'Erro ao salvar inscrição' }
       }
 
@@ -150,10 +191,12 @@ export function usePushSubscription() {
       }
 
       return { success: false, error: `Erro ao ativar notificações: ${message}` }
+    } finally {
+      setIsSubscribing(false)
     }
-  }, [])
+  }, [isSubscribing])
 
-  const unsubscribe = useCallback(async () => {
+  const unsubscribe = useCallback(async (): Promise<{ success: boolean; error?: string }> => {
     try {
       const registration = await navigator.serviceWorker.ready
       const subscription = await registration.pushManager.getSubscription()
@@ -175,12 +218,14 @@ export function usePushSubscription() {
       return { success: true }
     } catch (error) {
       console.warn('[Push] Unsubscribe error:', error)
-      return { success: false, error: 'Erro ao desativar notificações' }
+      setIsSubscribed(false)
+      return { success: true }
     }
   }, [])
 
   return {
     isSubscribed,
+    isSubscribing,
     isSupported: state.isSupported,
     isLoading: state.isLoading,
     permissionDenied: state.permissionDenied,

@@ -16,8 +16,7 @@ function getInitialDismissed() {
 }
 
 export default function NotificationPermissionPopup({ usuarioId }: Props) {
-  const { isSubscribed, isSupported, isLoading, permissionDenied, subscribe } = usePushSubscription()
-  const [activating, setActivating] = useState(false)
+  const { isSubscribed, isSubscribing, isSupported, isLoading, permissionDenied, subscribe } = usePushSubscription()
   const [dismissed, setDismissed] = useState(getInitialDismissed)
 
   function handleDismiss() {
@@ -28,18 +27,12 @@ export default function NotificationPermissionPopup({ usuarioId }: Props) {
   if (!usuarioId || !isSupported || isLoading || isSubscribed || dismissed) return null
 
   const handleAtivar = async () => {
-    setActivating(true)
-    try {
-      const result = await subscribe()
-      if (result.success) {
-        await toggleNotificacoes(true)
-      } else {
-        alert(result.error || 'Erro ao ativar notificações.')
-      }
-    } catch {
-      alert('Erro ao ativar notificações.')
+    const result = await subscribe()
+    if (result.success) {
+      await toggleNotificacoes(true)
+    } else {
+      alert(result.error || 'Erro ao ativar notificações.')
     }
-    setActivating(false)
   }
 
   return (
@@ -80,11 +73,11 @@ export default function NotificationPermissionPopup({ usuarioId }: Props) {
       {!permissionDenied && (
         <button
           onClick={handleAtivar}
-          disabled={activating}
-          className="ml-2 px-4 py-1.5 rounded-xl text-sm font-bold border-none cursor-pointer whitespace-nowrap"
+          disabled={isSubscribing}
+          className="ml-2 px-4 py-1.5 rounded-xl text-sm font-bold border-none cursor-pointer whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
           style={{ background: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
         >
-          {activating ? '...' : 'Ativar'}
+          {isSubscribing ? '...' : 'Ativar'}
         </button>
       )}
     </div>
