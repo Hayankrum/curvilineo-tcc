@@ -19,10 +19,24 @@ export default function SinoNotificacoes() {
 
   useEffect(() => {
     const timer = setTimeout(fetchCount, 100)
-    const interval = setInterval(fetchCount, 60000)
+
+    const onNotificationUpdate = () => fetchCount()
+    const onStorageChange = (e: StorageEvent) => {
+      if (e.key === 'notifications:updated') fetchCount()
+    }
+    const onVisibilityChange = () => {
+      if (!document.hidden) fetchCount()
+    }
+
+    window.addEventListener('notifications:updated', onNotificationUpdate)
+    window.addEventListener('storage', onStorageChange)
+    document.addEventListener('visibilitychange', onVisibilityChange)
+
     return () => {
       clearTimeout(timer)
-      clearInterval(interval)
+      window.removeEventListener('notifications:updated', onNotificationUpdate)
+      window.removeEventListener('storage', onStorageChange)
+      document.removeEventListener('visibilitychange', onVisibilityChange)
     }
   }, [fetchCount])
 

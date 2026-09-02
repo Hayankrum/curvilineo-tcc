@@ -117,7 +117,7 @@ export function usePosts() {
 
 // ---------- usePost (detalhe) ----------
 
-export function usePost(id: number) {
+export function usePost(id: number, refreshKey = 0) {
   const [post, setPost] = useState<PostCompleto | null>(null)
   const [loading, setLoading] = useState(true)
   const [fromCache, setFromCache] = useState(false)
@@ -157,7 +157,7 @@ export function usePost(id: number) {
 
     run()
     return () => { cancelled = true }
-  }, [id])
+  }, [id, refreshKey])
 
   useEffect(() => {
     if (isOnline) syncPendingMutations()

@@ -1,12 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { criarComentario } from '../comentarios.actions'
 
 
-export default function FormComentario({ postId }: { postId: number }) {
-  const router = useRouter()
+export default function FormComentario({ postId, onSuccess }: { postId: number; onSuccess?: () => void }) {
   const [texto, setTexto] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
@@ -28,7 +26,7 @@ export default function FormComentario({ postId }: { postId: number }) {
 
     setTexto('')
     setIsSubmitting(false)
-    router.refresh()
+    onSuccess?.()
   }
 
   return (

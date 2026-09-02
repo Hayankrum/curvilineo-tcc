@@ -61,6 +61,11 @@ export default function NotificacoesPage() {
     }
   }
 
+  const notificarAtualizacao = () => {
+    window.dispatchEvent(new Event('notifications:updated'))
+    localStorage.setItem('notifications:updated', String(Date.now()))
+  }
+
   const marcarComoLida = async (id: number) => {
     await fetch('/api/notifications/read', {
       method: 'POST',
@@ -70,6 +75,7 @@ export default function NotificacoesPage() {
     setHistorico((prev) =>
       prev.map((n) => (n.id === id ? { ...n, lida: true } : n))
     )
+    notificarAtualizacao()
   }
 
   const marcarTodasComoLidas = async () => {
@@ -81,6 +87,7 @@ export default function NotificacoesPage() {
     setHistorico((prev) =>
       prev.map((n) => ({ ...n, lida: true }))
     )
+    notificarAtualizacao()
   }
 
   if (isLoading) {
@@ -196,16 +203,30 @@ export default function NotificacoesPage() {
                     })}
                   </span>
                 </div>
-                {notificacao.url && (
-                  <Link
-                    href={notificacao.url}
-                    className="text-xs transition-colors mt-2 inline-block hover:underline"
-                    style={{ color: 'var(--text-tertiary)' }}
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    Ver →
-                  </Link>
-                )}
+                <div className="flex items-center gap-3 mt-2">
+                  {notificacao.url && (
+                    <Link
+                      href={notificacao.url}
+                      className="text-xs transition-colors inline-block hover:underline"
+                      style={{ color: 'var(--text-tertiary)' }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      Ver →
+                    </Link>
+                  )}
+                  {!notificacao.lida && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        marcarComoLida(notificacao.id)
+                      }}
+                      className="text-xs transition-colors hover:underline"
+                      style={{ color: 'var(--text-tertiary)' }}
+                    >
+                      Marcar como lida
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
           </div>

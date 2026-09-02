@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useState } from 'react'
 import { usePost, useUsuario } from '@/lib/useData'
 import { primeiroNome } from '@/lib/utils'
 import OfflineBanner from '@/components/OfflineBanner'
@@ -10,7 +11,8 @@ import ListaComentarios from '../components/ListaComentarios'
 import MapaPosteClient from '@/modules/mapa/components/MapaPosteClient'
 
 export default function PostDetailPage({ id }: { id: number }) {
-  const { post, loading, fromCache } = usePost(id)
+  const [refreshKey, setRefreshKey] = useState(0)
+  const { post, loading, fromCache } = usePost(id, refreshKey)
   const { usuario } = useUsuario()
 
   if (loading) {
@@ -46,7 +48,7 @@ export default function PostDetailPage({ id }: { id: number }) {
       >
         ← Voltar
       </Link>
-      <h1 className="text-2xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>{post.titulo}</h1>
+      <h1 className="text-2xl font-semibold mb-2 break-words" style={{ color: 'var(--text-primary)' }}>{post.titulo}</h1>
       <p className="text-sm mb-6" style={{ color: 'var(--text-tertiary)' }}>
         por{' '}
         <Link href={`/usuarios/${post.autor.id}`} className="transition-colors hover:underline">
@@ -81,7 +83,7 @@ export default function PostDetailPage({ id }: { id: number }) {
           usuarioLogadoId={usuario?.id}
         />
         {usuario ? (
-          <FormComentario postId={post.id} />
+          <FormComentario postId={post.id} onSuccess={() => setRefreshKey((k) => k + 1)} />
         ) : (
           <p className="text-sm mt-4" style={{ color: 'var(--text-tertiary)' }}>
             <Link href="/usuarios/login" className="hover:underline" style={{ color: 'var(--text-primary)' }}>
