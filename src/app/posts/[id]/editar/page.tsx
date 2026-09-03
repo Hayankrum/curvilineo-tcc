@@ -3,6 +3,8 @@ import { prisma } from '@/lib/prisma'
 import PostFormPage from '@/modules/posts/pages/PostFormPage'
 import { getUsuarioLogado } from '@/modules/usuarios/usuarios.actions'
 
+export const dynamic = 'force-dynamic'
+
 interface Props {
   params: Promise<{ id: string }>
 }
