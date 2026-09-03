@@ -197,3 +197,4 @@ export default function MapaGlobal({ posts, dark }: Props) {
     </div>
   )
 }
+
