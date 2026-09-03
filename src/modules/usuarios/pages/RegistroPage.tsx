@@ -63,10 +63,7 @@ export default function RegistroPage() {
             className="mt-1 rounded"
           />
           <label htmlFor="aceitouTermos" className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-            Li e aceito os{' '}
-            <Link href="/termos" target="_blank" className="hover:underline" style={{ color: 'var(--text-primary)' }}>
-              Termos de Uso e Compromisso
-            </Link>
+            Li e aceito os Termos de Uso e Compromisso
           </label>
         </div>
 

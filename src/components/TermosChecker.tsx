@@ -1,7 +1,7 @@
 'use client'
 
-import { useRouter, usePathname } from 'next/navigation'
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react'
+import TermosModal from './TermosModal'
 
 interface TermosCheckerProps {
   children: React.ReactNode
@@ -11,21 +11,19 @@ interface TermosCheckerProps {
   } | null
 }
 
-const PUBLIC_ROUTES = ['/usuarios/login', '/usuarios/registro', '/termos', '/usuarios/logout']
-
 export default function TermosChecker({ children, usuario }: TermosCheckerProps) {
-  const router = useRouter()
-  const pathname = usePathname()
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    if (usuario && !usuario.aceitouTermos && !PUBLIC_ROUTES.includes(pathname)) {
-      router.push('/termos')
-    }
-  }, [usuario, pathname, router])
+    setMounted(true)
+  }, [])
 
-  if (usuario && !usuario.aceitouTermos && !PUBLIC_ROUTES.includes(pathname)) {
-    return null
-  }
+  const precisaAceitar = mounted && usuario && !usuario.aceitouTermos
 
-  return <>{children}</>
+  return (
+    <>
+      <TermosModal isOpen={!!precisaAceitar} />
+      {precisaAceitar ? null : <>{children}</>}
+    </>
+  )
 }
