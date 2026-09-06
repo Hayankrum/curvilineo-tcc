@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import { useUsuario } from '@/lib/useData'
 import { useState, useEffect } from 'react'
 import { obterQuestionario, podeResponder, publicarQuestionario, encerrarQuestionario, arquivarQuestionario, deletarQuestionario, duplicarQuestionario } from '../questionarios.actions'
-import BotaoCompartilhar from '../components/BotaoCompartilhar'
 
 interface Opcao {
   id: number
@@ -71,8 +70,22 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
   const [podeResp, setPodeResp] = useState<{ pode: boolean; razao?: string; jaRespondeu?: boolean; anonimo?: boolean }>({ pode: false })
   const [loading, setLoading] = useState(true)
   const [processando, setProcessando] = useState(false)
+  const [qrCode, setQrCode] = useState<string | null>(null)
+  const [copiado, setCopiado] = useState(false)
 
   const isAutor = usuario && questionario && usuario.id === questionario.autor.id
+
+  const shareUrl = typeof window !== 'undefined'
+    ? `${window.location.origin}/questionarios/${questionarioId}/responder`
+    : ''
+
+  useEffect(() => {
+    if (!shareUrl) return
+    import('qrcode').then((QRCode) => {
+      QRCode.toDataURL(shareUrl, { width: 160, margin: 2, color: { dark: '#18181b', light: '#ffffff' } })
+        .then((dataUrl) => setQrCode(dataUrl))
+    })
+  }, [shareUrl])
 
   useEffect(() => {
     Promise.all([
@@ -245,9 +258,6 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
               Ver resultados
             </Link>
           )}
-          {questionario.status === 'publicado' && (
-            <BotaoCompartilhar questionarioId={questionario.id} titulo={questionario.titulo} />
-          )}
           <button
             onClick={handleDuplicar}
             disabled={processando}
@@ -256,6 +266,39 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
           >
             Duplicar como rascunho
           </button>
+        </div>
+      )}
+
+      {isAutor && questionario.status === 'publicado' && (
+        <div
+          className="rounded-lg p-4"
+          style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}
+        >
+          <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-primary)' }}>Compartilhar</p>
+          <div className="flex items-start gap-4">
+            {qrCode ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={qrCode} alt="QR Code" className="w-24 h-24 rounded shrink-0" />
+            ) : (
+              <div className="w-24 h-24 rounded flex items-center justify-center shrink-0" style={{ backgroundColor: 'var(--input-bg)' }}>
+                <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>Gerando...</p>
+              </div>
+            )}
+            <div className="flex flex-col gap-2 flex-1 min-w-0">
+              <p className="text-xs break-all" style={{ color: 'var(--text-tertiary)' }}>{shareUrl}</p>
+              <button
+                onClick={async () => {
+                  try { await navigator.clipboard.writeText(shareUrl) } catch { /* ignore */ }
+                  setCopiado(true)
+                  setTimeout(() => setCopiado(false), 2000)
+                }}
+                className="text-xs font-medium rounded-lg px-3 py-1.5 transition-colors w-fit"
+                style={{ backgroundColor: copiado ? '#22c55e' : 'var(--btn-primary-bg)', color: '#fff' }}
+              >
+                {copiado ? 'Copiado!' : 'Copiar link'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
