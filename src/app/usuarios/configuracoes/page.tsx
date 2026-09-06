@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { usePushSubscription } from '@/lib/usePushSubscription'
-import { toggleNotificacoes, atualizarPreferenciasNotificacao } from '@/modules/usuarios/usuarios.actions'
+import { toggleNotificacoes, atualizarPreferenciasNotificacao, entrarAdmin, sairAdmin } from '@/modules/usuarios/usuarios.actions'
 import { useTheme } from '@/lib/ThemeProvider'
 import BotaoDeletarPerfil from '@/modules/usuarios/components/BotaoDeletarPerfil'
 import BotaoLogout from '@/modules/usuarios/components/BotaoLogout'
@@ -13,6 +13,7 @@ import InstallPWAButton from '@/components/InstallPWAButton'
 interface UserInfo {
   id: number
   temSenha: boolean
+  isAdmin: boolean
   notificarComentarios: boolean
   notificarSistema: boolean
   notificarQuestionarios: boolean
@@ -30,6 +31,9 @@ export default function ConfiguracoesPage() {
     notificarSistema: true,
     notificarQuestionarios: true,
   })
+  const [codigoAdmin, setCodigoAdmin] = useState('')
+  const [codigoSairAdmin, setCodigoSairAdmin] = useState('')
+  const [adminLoading, setAdminLoading] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -91,6 +95,34 @@ export default function ConfiguracoesPage() {
       setPreferencias((prev) => ({ ...prev, [campo]: !valor }))
       showStatus('error', result.error)
     }
+  }
+
+  const handleEntrarAdmin = async () => {
+    if (!codigoAdmin.trim()) return
+    setAdminLoading(true)
+    const result = await entrarAdmin(codigoAdmin)
+    if (result.error) {
+      showStatus('error', result.error)
+    } else {
+      setUser((prev) => prev ? { ...prev, isAdmin: true } : prev)
+      setCodigoAdmin('')
+      showStatus('success', result.success!)
+    }
+    setAdminLoading(false)
+  }
+
+  const handleSairAdmin = async () => {
+    if (!codigoSairAdmin.trim()) return
+    setAdminLoading(true)
+    const result = await sairAdmin(codigoSairAdmin)
+    if (result.error) {
+      showStatus('error', result.error)
+    } else {
+      setUser((prev) => prev ? { ...prev, isAdmin: false } : prev)
+      setCodigoSairAdmin('')
+      showStatus('success', result.success!)
+    }
+    setAdminLoading(false)
   }
 
   if (!user) {
@@ -250,6 +282,62 @@ export default function ConfiguracoesPage() {
                     />
                   </div>
                 </label>
+              </div>
+            </div>
+          )}
+        </section>
+
+        <section className="rounded-lg p-5" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
+          <h2 className="font-medium mb-4" style={{ color: 'var(--text-primary)' }}>Admin</h2>
+          {user.isAdmin ? (
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <span className="w-2 h-2 rounded-full bg-green-500" />
+                <span className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>Modo admin ativo</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="password"
+                  value={codigoSairAdmin}
+                  onChange={(e) => setCodigoSairAdmin(e.target.value)}
+                  placeholder="Código para sair do admin"
+                  className="flex-1 px-3 py-2 rounded-lg text-sm outline-none"
+                  style={{ backgroundColor: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', color: 'var(--text-primary)' }}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSairAdmin()}
+                />
+                <button
+                  onClick={handleSairAdmin}
+                  disabled={adminLoading || !codigoSairAdmin.trim()}
+                  className="px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{ backgroundColor: '#dc2626', color: '#fff' }}
+                >
+                  {adminLoading ? '...' : 'Sair'}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <p className="text-sm mb-3" style={{ color: 'var(--text-secondary)' }}>
+                Insira o código de administrador para ativar o modo admin
+              </p>
+              <div className="flex items-center gap-2">
+                <input
+                  type="password"
+                  value={codigoAdmin}
+                  onChange={(e) => setCodigoAdmin(e.target.value)}
+                  placeholder="Código de admin"
+                  className="flex-1 px-3 py-2 rounded-lg text-sm outline-none"
+                  style={{ backgroundColor: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', color: 'var(--text-primary)' }}
+                  onKeyDown={(e) => e.key === 'Enter' && handleEntrarAdmin()}
+                />
+                <button
+                  onClick={handleEntrarAdmin}
+                  disabled={adminLoading || !codigoAdmin.trim()}
+                  className="px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
+                >
+                  {adminLoading ? '...' : 'Ativar'}
+                </button>
               </div>
             </div>
           )}

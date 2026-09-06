@@ -4,10 +4,12 @@ export interface AuthUser {
   nome: string
   bio?: string | null
   fotoUrl?: string | null
+  tipoUsuario: string
   aceitouTermos: boolean
   notificacoesAtivas: boolean
   notificarComentarios: boolean
   notificarSistema: boolean
+  isAdmin: boolean
   criadoEm: Date
 }
 

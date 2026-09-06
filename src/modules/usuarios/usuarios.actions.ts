@@ -185,6 +185,42 @@ export async function aceitarTermos() {
   return { success: 'Termos aceitos com sucesso' }
 }
 
+// ---------- ADMIN ----------
+
+export async function entrarAdmin(codigo: string) {
+  const usuarioLogado = await obterSessao()
+  if (!usuarioLogado) return { error: 'Não autorizado' }
+
+  const adminCode = process.env.ADMIN_LOGIN_CODE
+  if (!adminCode) return { error: 'Código de admin não configurado' }
+
+  if (codigo !== adminCode) return { error: 'Código incorreto' }
+
+  await prisma.usuario.update({
+    where: { id: usuarioLogado.id },
+    data: { isAdmin: true },
+  })
+
+  return { success: 'Modo admin ativado' }
+}
+
+export async function sairAdmin(codigo: string) {
+  const usuarioLogado = await obterSessao()
+  if (!usuarioLogado) return { error: 'Não autorizado' }
+
+  const adminLogoutCode = process.env.ADMIN_LOGOUT_CODE
+  if (!adminLogoutCode) return { error: 'Código de saída não configurado' }
+
+  if (codigo !== adminLogoutCode) return { error: 'Código incorreto' }
+
+  await prisma.usuario.update({
+    where: { id: usuarioLogado.id },
+    data: { isAdmin: false },
+  })
+
+  return { success: 'Modo admin desativado' }
+}
+
 // ---------- HELPERS ----------
 
 export async function getUsuarioLogado() {

@@ -132,10 +132,12 @@ export class CredentialsAuthProvider implements AuthProvider {
     nome: string
     bio?: string | null
     fotoUrl?: string | null
+    tipoUsuario: string
     aceitouTermos: boolean
     notificacoesAtivas: boolean
     notificarComentarios: boolean
     notificarSistema: boolean
+    isAdmin: boolean
     criadoEm: Date
   }): AuthSession {
     return {
@@ -145,10 +147,12 @@ export class CredentialsAuthProvider implements AuthProvider {
         nome: usuario.nome,
         bio: usuario.bio,
         fotoUrl: usuario.fotoUrl,
+        tipoUsuario: usuario.tipoUsuario,
         aceitouTermos: usuario.aceitouTermos,
         notificacoesAtivas: usuario.notificacoesAtivas,
         notificarComentarios: usuario.notificarComentarios,
         notificarSistema: usuario.notificarSistema,
+        isAdmin: usuario.isAdmin,
         criadoEm: usuario.criadoEm,
       },
     }

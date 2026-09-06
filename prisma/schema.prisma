@@ -36,11 +36,13 @@ model Usuario {
   senha                String
   bio                  String?
   fotoUrl              String?
+  tipoUsuario          String           @default("discente")
   aceitouTermos        Boolean          @default(false)
   notificacoesAtivas   Boolean          @default(true)
   notificarComentarios Boolean          @default(true)
   notificarSistema     Boolean          @default(true)
   notificarQuestionarios Boolean        @default(true)
+  isAdmin              Boolean          @default(false)
   criadoEm             DateTime         @default(now())
   posts                Post[]
   comentarios          Comentario[]
@@ -50,6 +52,7 @@ model Usuario {
   medias               Media[]
   questionarios        Questionario[]
   respostasQuestionario Resposta[]
+  inscricoesCurso      Inscricao[]
 }
 
 model Sessao {
@@ -174,4 +177,37 @@ model ValorResposta {
 
   @@index([respostaId])
   @@index([perguntaId])
+}
+
+model Curso {
+  id          Int      @id @default(autoincrement())
+  nome        String
+  descricao   String?
+  duracao     Int?
+  criadoEm    DateTime @default(now())
+  turmas      Turma[]
+}
+
+model Turma {
+  id          Int      @id @default(autoincrement())
+  nome        String
+  dataInicio  DateTime
+  dataFim     DateTime
+  cursoId     Int
+  curso       Curso    @relation(fields: [cursoId], references: [id], onDelete: Cascade)
+  inscricoes  Inscricao[]
+  criadoEm    DateTime @default(now())
+}
+
+model Inscricao {
+  id          Int      @id @default(autoincrement())
+  usuarioId   Int
+  usuario     Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  turmaId     Int
+  turma       Turma    @relation(fields: [turmaId], references: [id], onDelete: Cascade)
+  tipoUsuario String   @default("discente")
+  dataInscricao DateTime @default(now())
+  status      String   @default("ativa")
+
+  @@unique([usuarioId, turmaId])
 }
