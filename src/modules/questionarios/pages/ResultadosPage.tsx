@@ -68,14 +68,8 @@ export default function ResultadosPage({ questionarioId }: Props) {
       return
     }
 
-    const controller = new AbortController()
-    async function load() {
-      await carregarResultados()
-      if (!controller.signal.aborted) setLoading(false)
-    }
-    load()
-    return () => controller.abort()
-  }, [questionarioId, usuario, loadingUsuario]) // eslint-disable-line react-hooks/exhaustive-deps
+    carregarResultados().then(() => setLoading(false))
+  }, [questionarioId, usuario, loadingUsuario]) // removido router
 
   async function handleFiltrar(filtros: { dataInicio: string; dataFim: string }) {
     setFiltrando(true)
@@ -94,7 +88,7 @@ export default function ResultadosPage({ questionarioId }: Props) {
         <button
           onClick={() => router.push('/questionarios')}
           className="text-sm font-medium rounded-lg px-4 py-2 transition-colors"
-          style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--btn-secondary-text)' }}
+          style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}
         >
           Voltar
         </button>
@@ -109,7 +103,7 @@ export default function ResultadosPage({ questionarioId }: Props) {
         <button
           onClick={() => router.push('/questionarios')}
           className="text-sm font-medium rounded-lg px-4 py-2 transition-colors"
-          style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--btn-secondary-text)' }}
+          style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}
         >
           Voltar
         </button>
@@ -117,36 +111,32 @@ export default function ResultadosPage({ questionarioId }: Props) {
     )
   }
 
-  const cor = dados.questionario.corTema || '#6366f1'
-
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: cor }} />
-            <h1 className="text-2xl font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
-              {dados.questionario.titulo}
-            </h1>
-          </div>
-          <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>
-            Resultados · {dados.totalRespostas} {dados.totalRespostas === 1 ? 'resposta' : 'respostas'}
-          </p>
+      <Link
+        href={`/questionarios/${questionarioId}`}
+        className="text-sm transition-colors mb-2 inline-block hover:underline"
+        style={{ color: 'var(--text-tertiary)' }}
+      >
+        ← Voltar
+      </Link>
+
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+            Resultados: {dados.questionario.titulo}
+          </h1>
+          {dados.questionario.descricao && (
+            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+              {dados.questionario.descricao}
+            </p>
+          )}
         </div>
-        <div className="flex gap-2 shrink-0">
-          <Link
-            href={`/questionarios/${questionarioId}`}
-            className="text-sm font-medium rounded-lg px-3 py-2 transition-colors"
-            style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--btn-secondary-text)' }}
-          >
-            ← Voltar
-          </Link>
-          <ExportarCSV
-            titulo={dados.questionario.titulo}
-            resultados={dados.resultados}
-            totalRespostas={dados.totalRespostas}
-          />
-        </div>
+        <ExportarCSV
+          titulo={dados.questionario.titulo}
+          resultados={dados.resultados}
+          totalRespostas={dados.totalRespostas}
+        />
       </div>
 
       <FiltroResultados onFiltrar={handleFiltrar} loading={filtrando} />
@@ -154,7 +144,6 @@ export default function ResultadosPage({ questionarioId }: Props) {
       <ResultadosBasicos
         totalRespostas={dados.totalRespostas}
         resultados={dados.resultados}
-        corTema={cor}
       />
     </div>
   )

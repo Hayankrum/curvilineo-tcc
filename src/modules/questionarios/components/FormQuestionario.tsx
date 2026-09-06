@@ -439,9 +439,11 @@ export default function FormQuestionario({ questionario }: Props) {
         resultado = await criarQuestionario(titulo, descricao, perguntas, encerraEmDate, false, corTema)
       }
 
-      if (resultado?.error) {
-        setErro(resultado.error)
+      if ('error' in resultado && resultado.error) {
+        setErro(resultado.error as string)
         setSalvando(false)
+      } else if ('questionario' in resultado && resultado.questionario) {
+        router.push(`/questionarios/${(resultado.questionario as { id: number }).id}`)
       }
     } catch {
       setErro('Erro ao salvar questionário')
@@ -504,41 +506,27 @@ export default function FormQuestionario({ questionario }: Props) {
 
       <div className="flex flex-col gap-1">
         <label className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
-          Cor do tema
+          Cor do tema (opcional)
         </label>
         <div className="flex items-center gap-3">
           <input
             type="color"
             value={corTema}
             onChange={(e) => setCorTema(e.target.value)}
-            className="w-10 h-10 rounded-lg cursor-pointer border-0 p-0"
-            style={{ backgroundColor: corTema }}
+            className="w-10 h-10 rounded cursor-pointer"
           />
-          <div className="flex gap-1.5">
-            {['#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f97316', '#22c55e', '#0ea5e9', '#64748b'].map((c) => (
-              <button
-                key={c}
-                type="button"
-                onClick={() => setCorTema(c)}
-                className="w-6 h-6 rounded-full transition-transform"
-                style={{
-                  backgroundColor: c,
-                  transform: corTema === c ? 'scale(1.2)' : 'scale(1)',
-                  outline: corTema === c ? '2px solid var(--text-primary)' : 'none',
-                  outlineOffset: '2px',
-                }}
-              />
-            ))}
-          </div>
           <input
             type="text"
             value={corTema}
             onChange={(e) => setCorTema(e.target.value)}
             placeholder="#6366f1"
-            className="w-24 rounded-lg px-3 py-1.5 text-xs font-mono focus:outline-none transition-colors"
+            className="flex-1 rounded-lg px-4 py-2 text-sm focus:outline-none transition-colors"
             style={{ backgroundColor: 'var(--input-bg)', border: '1px solid var(--input-border)', color: 'var(--text-primary)' }}
           />
         </div>
+        <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
+          Cor utilizada nos botões e destaques do questionário.
+        </p>
       </div>
 
       <div className="flex flex-col gap-4">

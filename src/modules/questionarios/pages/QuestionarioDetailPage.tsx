@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useUsuario } from '@/lib/useData'
 import { useState, useEffect } from 'react'
 import { obterQuestionario, podeResponder, publicarQuestionario, encerrarQuestionario, arquivarQuestionario, deletarQuestionario, duplicarQuestionario } from '../questionarios.actions'
+import BotaoCompartilhar from '../components/BotaoCompartilhar'
 
 interface Opcao {
   id: number
@@ -70,25 +71,8 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
   const [podeResp, setPodeResp] = useState<{ pode: boolean; razao?: string; jaRespondeu?: boolean; anonimo?: boolean }>({ pode: false })
   const [loading, setLoading] = useState(true)
   const [processando, setProcessando] = useState(false)
-  const [qrCode, setQrCode] = useState<string | null>(null)
-  const [copiado, setCopiado] = useState(false)
 
   const isAutor = usuario && questionario && usuario.id === questionario.autor.id
-
-  const shareUrl = typeof window !== 'undefined'
-    ? `${window.location.origin}/questionarios/${questionarioId}/responder`
-    : ''
-
-  useEffect(() => {
-    if (!shareUrl) return
-    import('qrcode').then((QRCode) => {
-      QRCode.toDataURL(shareUrl, {
-        width: 200,
-        margin: 2,
-        color: { dark: '#18181b', light: '#ffffff' },
-      }).then((dataUrl) => setQrCode(dataUrl))
-    })
-  }, [shareUrl])
 
   useEffect(() => {
     Promise.all([
@@ -150,29 +134,18 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
         router.push('/questionarios')
         router.refresh()
       } else {
-        const updated = await obterQuestionario(questionarioId)
+        const [updated, podeRespAtualizado] = await Promise.all([
+          obterQuestionario(questionarioId),
+          podeResponder(questionarioId),
+        ])
         if (updated && 'questionario' in updated && updated.questionario) {
           setQuestionario(updated.questionario as unknown as QuestionarioData)
         }
+        setPodeResp(podeRespAtualizado as { pode: boolean; razao?: string })
       }
     } finally {
       setProcessando(false)
     }
-  }
-
-  async function copiarLink() {
-    try {
-      await navigator.clipboard.writeText(shareUrl)
-    } catch {
-      const input = document.createElement('input')
-      input.value = shareUrl
-      document.body.appendChild(input)
-      input.select()
-      document.execCommand('copy')
-      document.body.removeChild(input)
-    }
-    setCopiado(true)
-    setTimeout(() => setCopiado(false), 2000)
   }
 
   if (loading) {
@@ -183,67 +156,37 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
     return <p style={{ color: 'var(--text-tertiary)' }}>Questionário não encontrado.</p>
   }
 
-  const cor = questionario.corTema || '#6366f1'
   const encerraData = questionario.encerraEm ? new Date(questionario.encerraEm) : null
-  const encerraExpirado = encerraData ? encerraData < new Date() : false
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Header */}
-      <div className="flex flex-col gap-3">
-        <div className="flex items-center gap-2 flex-wrap">
-          <span
-            className="w-3 h-3 rounded-full shrink-0"
-            style={{ backgroundColor: cor }}
-          />
-          <h1 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-            {questionario.titulo}
-          </h1>
-        </div>
+      <Link
+        href="/questionarios"
+        className="text-sm transition-colors mb-2 inline-block hover:underline"
+        style={{ color: 'var(--text-tertiary)' }}
+      >
+        ← Voltar
+      </Link>
+
+      <div>
+        <h1 className="text-2xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>{questionario.titulo}</h1>
         {questionario.descricao && (
-          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{questionario.descricao}</p>
+          <p className="text-sm mb-3" style={{ color: 'var(--text-secondary)' }}>{questionario.descricao}</p>
         )}
+        <div className="flex items-center gap-4 text-xs" style={{ color: 'var(--text-tertiary)' }}>
+          <span
+            className="px-2 py-0.5 rounded-full font-medium"
+            style={{ backgroundColor: `${STATUS_COLORS[questionario.status]}20`, color: STATUS_COLORS[questionario.status] }}
+          >
+            {STATUS_LABELS[questionario.status]}
+          </span>
+          <span>por {questionario.autor.nome}</span>
+          <span>{questionario.totalRespostas} {questionario.totalRespostas === 1 ? 'resposta' : 'respostas'}</span>
+          {questionario.anonimo && <span>Anônimo</span>}
+          {encerraData && <span>Encerra {encerraData.toLocaleDateString('pt-BR')}</span>}
+        </div>
       </div>
 
-      {/* Info badges */}
-      <div className="flex flex-wrap gap-2">
-        <span
-          className="px-3 py-1 rounded-full text-xs font-medium"
-          style={{ backgroundColor: `${STATUS_COLORS[questionario.status]}20`, color: STATUS_COLORS[questionario.status] }}
-        >
-          {STATUS_LABELS[questionario.status]}
-        </span>
-        <span
-          className="px-3 py-1 rounded-full text-xs font-medium"
-          style={{ backgroundColor: `${cor}20`, color: cor }}
-        >
-          {questionario.totalRespostas} {questionario.totalRespostas === 1 ? 'resposta' : 'respostas'}
-        </span>
-        {questionario.anonimo && (
-          <span
-            className="px-3 py-1 rounded-full text-xs font-medium"
-            style={{ backgroundColor: '#a855f720', color: '#a855f7' }}
-          >
-            Anônimo
-          </span>
-        )}
-        {encerraData && (
-          <span
-            className="px-3 py-1 rounded-full text-xs font-medium"
-            style={{
-              backgroundColor: encerraExpirado ? '#dc262620' : '#f59e0b20',
-              color: encerraExpirado ? '#dc2626' : '#f59e0b',
-            }}
-          >
-            {encerraExpirado ? 'Expirado' : `Encerra ${encerraData.toLocaleDateString('pt-BR')}`}
-          </span>
-        )}
-        <span className="px-3 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: 'var(--card-bg)', color: 'var(--text-tertiary)' }}>
-          por {questionario.autor.nome}
-        </span>
-      </div>
-
-      {/* Ações do autor */}
       {isAutor && (
         <div className="flex flex-wrap gap-2">
           {questionario.status === 'rascunho' && (
@@ -251,7 +194,7 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
               <Link
                 href={`/questionarios/${questionario.id}/editar`}
                 className="text-sm font-medium rounded-lg px-4 py-2 transition-colors"
-                style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--btn-secondary-text)' }}
+                style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}
               >
                 Editar
               </Link>
@@ -288,7 +231,7 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
               onClick={() => handleStatusAction('arquivar')}
               disabled={processando}
               className="text-sm font-medium rounded-lg px-4 py-2 transition-colors disabled:opacity-50"
-              style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--btn-secondary-text)' }}
+              style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}
             >
               Arquivar
             </button>
@@ -297,28 +240,30 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
             <Link
               href={`/questionarios/${questionario.id}/resultados`}
               className="text-sm font-medium rounded-lg px-4 py-2 transition-colors"
-              style={{ backgroundColor: cor, color: '#fff' }}
+              style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}
             >
               Ver resultados
             </Link>
+          )}
+          {questionario.status === 'publicado' && (
+            <BotaoCompartilhar questionarioId={questionario.id} titulo={questionario.titulo} />
           )}
           <button
             onClick={handleDuplicar}
             disabled={processando}
             className="text-sm font-medium rounded-lg px-4 py-2 transition-colors disabled:opacity-50"
-            style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--btn-secondary-text)' }}
+            style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}
           >
             Duplicar como rascunho
           </button>
         </div>
       )}
 
-      {/* Ação responder */}
       {podeResp.pode && (
         <Link
           href={`/questionarios/${questionario.id}/responder`}
           className="font-medium rounded-lg px-4 py-2 text-sm transition-colors w-fit"
-          style={{ backgroundColor: cor, color: '#fff' }}
+          style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
         >
           Responder questionário
         </Link>
@@ -328,7 +273,7 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
         <Link
           href={`/questionarios/${questionario.id}/editar-resposta`}
           className="font-medium rounded-lg px-4 py-2 text-sm transition-colors w-fit"
-          style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--btn-secondary-text)' }}
+          style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}
         >
           Editar minha resposta
         </Link>
@@ -340,67 +285,16 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
         </p>
       )}
 
-      {/* Compartilhar - inline */}
-      {isAutor && questionario.status === 'publicado' && (
-        <div
-          className="rounded-lg p-4 flex flex-col gap-3"
-          style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}
-        >
-          <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-            Compartilhar questionário
-          </p>
-          <div className="flex items-start gap-4">
-            {qrCode ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={qrCode} alt="QR Code" className="w-28 h-28 rounded-lg shrink-0" />
-            ) : (
-              <div className="w-28 h-28 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: 'var(--input-bg)' }}>
-                <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>Gerando...</p>
-              </div>
-            )}
-            <div className="flex flex-col gap-2 flex-1 min-w-0">
-              <p className="text-xs break-all" style={{ color: 'var(--text-tertiary)' }}>
-                {shareUrl}
-              </p>
-              <button
-                onClick={copiarLink}
-                className="text-xs font-medium rounded-lg px-3 py-1.5 transition-colors w-fit"
-                style={{
-                  backgroundColor: copiado ? '#22c55e' : cor,
-                  color: '#fff',
-                }}
-              >
-                {copiado ? 'Copiado!' : 'Copiar link'}
-              </button>
-              {'share' in navigator && (
-                <button
-                  onClick={() => navigator.share({ title: questionario.titulo, text: `Responda: ${questionario.titulo}`, url: shareUrl })}
-                  className="text-xs font-medium rounded-lg px-3 py-1.5 transition-colors w-fit"
-                  style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--btn-secondary-text)' }}
-                >
-                  Compartilhar via...
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Perguntas */}
-      <div className="flex flex-col gap-3">
-        <h2 className="text-lg font-medium" style={{ color: 'var(--text-primary)' }}>
-          Perguntas ({questionario.perguntas.length})
-        </h2>
+      <div className="flex flex-col gap-4">
+        <h2 className="text-lg font-medium" style={{ color: 'var(--text-primary)' }}>Perguntas</h2>
         {questionario.perguntas.map((pergunta, idx) => (
           <div
             key={pergunta.id}
             className="rounded-lg p-4 flex flex-col gap-2"
-            style={{ backgroundColor: 'var(--card-bg)', borderLeft: `3px solid ${cor}` }}
+            style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}
           >
             <div className="flex items-start gap-2">
-              <span className="text-sm font-medium shrink-0" style={{ color: cor }}>
-                {idx + 1}.
-              </span>
+              <span className="text-sm font-medium" style={{ color: 'var(--text-tertiary)' }}>{idx + 1}.</span>
               <div className="flex-1">
                 <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
                   {pergunta.texto}
@@ -417,15 +311,14 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
                   </p>
                 )}
                 {(pergunta.tipo === 'escolha_unica' || pergunta.tipo === 'multipla_escolha') && (
-                  <div className="flex flex-wrap gap-1.5 mt-2">
+                  <div className="flex flex-wrap gap-2 mt-2">
                     {pergunta.opcoes.map((opcao) => (
                       <span
                         key={opcao.id}
-                        className="text-xs px-2 py-0.5 rounded-full"
+                        className="text-xs px-2 py-1 rounded"
                         style={{
-                          backgroundColor: opcao.correta ? `${cor}20` : 'var(--input-bg)',
-                          color: opcao.correta ? cor : 'var(--text-secondary)',
-                          border: opcao.correta ? `1px solid ${cor}40` : '1px solid transparent',
+                          backgroundColor: 'var(--input-bg)',
+                          color: opcao.correta ? '#22c55e' : 'var(--text-secondary)',
                         }}
                       >
                         {opcao.correta && '✓ '}{opcao.texto}

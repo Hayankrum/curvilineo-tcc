@@ -81,58 +81,47 @@ export default function QuestionarioListPage() {
         <p style={{ color: 'var(--text-tertiary)' }}>Nenhum questionário criado ainda.</p>
       )}
 
-      <div className="flex flex-col gap-3">
-        {questionarios.map((q) => {
-          const cor = q.corTema || '#6366f1'
-          const encerraData = q.encerraEm ? new Date(q.encerraEm) : null
-          const encerraExpirado = encerraData ? encerraData < new Date() : false
-
-          return (
-            <Link
-              key={q.id}
-              href={`/questionarios/${q.id}`}
-              className="rounded-lg p-4 flex gap-4 transition-colors hover:opacity-95"
-              style={{ backgroundColor: 'var(--card-bg)', borderLeft: `4px solid ${cor}` }}
-            >
-              <div className="flex-1 min-w-0">
-                <h2 className="font-medium text-sm truncate" style={{ color: 'var(--text-primary)' }}>{q.titulo}</h2>
+      <div className="flex flex-col gap-4">
+        {questionarios.map((q) => (
+          <div key={q.id} className="rounded-lg p-5" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <h2 className="font-medium text-lg mb-1" style={{ color: 'var(--text-primary)' }}>{q.titulo}</h2>
                 {q.descricao && (
-                  <p className="text-xs mt-0.5 line-clamp-1" style={{ color: 'var(--text-secondary)' }}>{q.descricao}</p>
+                  <p className="text-sm mb-2 line-clamp-2" style={{ color: 'var(--text-secondary)' }}>{q.descricao}</p>
                 )}
-                <div className="flex items-center gap-2 mt-2 flex-wrap">
+                <div className="flex items-center gap-4 text-xs" style={{ color: 'var(--text-tertiary)' }}>
                   <span
-                    className="px-2 py-0.5 rounded-full text-[10px] font-medium"
+                    className="px-2 py-0.5 rounded-full font-medium"
                     style={{ backgroundColor: `${STATUS_COLORS[q.status]}20`, color: STATUS_COLORS[q.status] }}
                   >
                     {STATUS_LABELS[q.status]}
                   </span>
-                  {q.anonimo && (
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-medium" style={{ backgroundColor: '#a855f720', color: '#a855f7' }}>
-                      Anônimo
-                    </span>
-                  )}
-                  {encerraData && (
-                    <span
-                      className="px-2 py-0.5 rounded-full text-[10px] font-medium"
-                      style={{
-                        backgroundColor: encerraExpirado ? '#dc262620' : '#f59e0b20',
-                        color: encerraExpirado ? '#dc2626' : '#f59e0b',
-                      }}
-                    >
-                      {encerraExpirado ? 'Expirado' : encerraData.toLocaleDateString('pt-BR')}
-                    </span>
-                  )}
-                  <span className="text-[10px]" style={{ color: 'var(--text-tertiary)' }}>
-                    {q.totalPerguntas} perguntas · {q.totalRespostas} respostas
-                  </span>
+                  <span>{q.totalPerguntas} {q.totalPerguntas === 1 ? 'pergunta' : 'perguntas'}</span>
+                  <span>{q.totalRespostas} {q.totalRespostas === 1 ? 'resposta' : 'respostas'}</span>
                 </div>
               </div>
-              <div className="flex items-center shrink-0">
-                <span className="text-lg" style={{ color: 'var(--text-tertiary)' }}>→</span>
+              <div className="flex gap-2 ml-4">
+                <Link
+                  href={`/questionarios/${q.id}`}
+                  className="text-sm px-3 py-1.5 rounded-lg transition-colors"
+                  style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}
+                >
+                  Ver
+                </Link>
+                {q.status === 'rascunho' && (
+                  <Link
+                    href={`/questionarios/${q.id}/editar`}
+                    className="text-sm px-3 py-1.5 rounded-lg transition-colors"
+                    style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}
+                  >
+                    Editar
+                  </Link>
+                )}
               </div>
-            </Link>
-          )
-        })}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   )

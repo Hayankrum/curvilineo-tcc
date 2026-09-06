@@ -26,12 +26,9 @@ interface ResultadoPergunta {
 interface Props {
   totalRespostas: number
   resultados: ResultadoPergunta[]
-  corTema?: string
 }
 
-export default function ResultadosBasicos({ totalRespostas, resultados, corTema }: Props) {
-  const cor = corTema || '#6366f1'
-
+export default function ResultadosBasicos({ totalRespostas, resultados }: Props) {
   if (totalRespostas === 0) {
     return (
       <div className="text-center py-8">
@@ -41,12 +38,18 @@ export default function ResultadosBasicos({ totalRespostas, resultados, corTema 
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6">
+      <div className="rounded-lg p-4" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
+        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+          Total de respostas: <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>{totalRespostas}</span>
+        </p>
+      </div>
+
       {resultados.map((r) => (
         <div
           key={r.perguntaId}
           className="rounded-lg p-4 flex flex-col gap-3"
-          style={{ backgroundColor: 'var(--card-bg)', borderLeft: `3px solid ${cor}` }}
+          style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}
         >
           <div className="flex items-start justify-between">
             <p className="text-sm font-medium flex-1" style={{ color: 'var(--text-primary)' }}>
@@ -70,7 +73,7 @@ export default function ResultadosBasicos({ totalRespostas, resultados, corTema 
                       className="h-full rounded transition-all"
                       style={{
                         width: `${d.percentual}%`,
-                        backgroundColor: d.correta ? '#22c55e' : cor,
+                        backgroundColor: d.correta ? '#22c55e' : 'var(--btn-primary-bg)',
                         minWidth: d.count > 0 ? '2px' : '0',
                       }}
                     />
@@ -100,7 +103,7 @@ export default function ResultadosBasicos({ totalRespostas, resultados, corTema 
                   className="absolute left-0 top-0 h-full rounded transition-all"
                   style={{
                     width: `${((r.media - (r.min || 0)) / ((r.max || 10) - (r.min || 0))) * 100}%`,
-                    backgroundColor: cor,
+                    backgroundColor: 'var(--btn-primary-bg)',
                   }}
                 />
               </div>
