@@ -17,6 +17,10 @@ export default function GerenciarCursos({ isAdmin }: GerenciarCursosProps) {
   const [nomeCurso, setNomeCurso] = useState('')
   const [descricaoCurso, setDescricaoCurso] = useState('')
   const [duracaoCurso, setDuracaoCurso] = useState('')
+  const [dataInicioCurso, setDataInicioCurso] = useState('')
+  const [dataFimCurso, setDataFimCurso] = useState('')
+  const [anosDisponiveisCurso, setAnosDisponiveisCurso] = useState<number[]>([])
+  const [novoAno, setNovoAno] = useState('')
 
   const [nomeTurma, setNomeTurma] = useState('')
   const [dataInicio, setDataInicio] = useState('')
@@ -51,7 +55,10 @@ export default function GerenciarCursos({ isAdmin }: GerenciarCursosProps) {
       const resultado = await criarCurso(
         nomeCurso,
         descricaoCurso || undefined,
-        duracaoCurso ? parseInt(duracaoCurso) : undefined
+        duracaoCurso ? parseInt(duracaoCurso) : undefined,
+        dataInicioCurso || null,
+        dataFimCurso || null,
+        anosDisponiveisCurso
       )
 
       if (resultado.error) {
@@ -61,6 +68,9 @@ export default function GerenciarCursos({ isAdmin }: GerenciarCursosProps) {
         setNomeCurso('')
         setDescricaoCurso('')
         setDuracaoCurso('')
+        setDataInicioCurso('')
+        setDataFimCurso('')
+        setAnosDisponiveisCurso([])
         setMostrarFormCurso(false)
         await carregarCursos()
       }
@@ -283,6 +293,189 @@ export default function GerenciarCursos({ isAdmin }: GerenciarCursosProps) {
                 }}
               />
             </div>
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: '1rem'
+            }}>
+              <div>
+                <label style={{ 
+                  display: 'block', 
+                  marginBottom: '0.5rem',
+                  color: 'var(--text-primary)',
+                  fontWeight: 500
+                }}>
+                  Data de Início do Curso
+                </label>
+                <input
+                  type="date"
+                  value={dataInicioCurso}
+                  onChange={(e) => setDataInicioCurso(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    borderRadius: '8px',
+                    border: '1px solid var(--input-border)',
+                    backgroundColor: 'var(--input-bg)',
+                    color: 'var(--text-primary)',
+                    fontSize: '1rem'
+                  }}
+                />
+                <p style={{ 
+                  margin: '0.25rem 0 0 0',
+                  fontSize: '0.75rem',
+                  color: 'var(--text-secondary)'
+                }}>
+                  Deixe vazio se o curso ainda está ativo
+                </p>
+              </div>
+              <div>
+                <label style={{ 
+                  display: 'block', 
+                  marginBottom: '0.5rem',
+                  color: 'var(--text-primary)',
+                  fontWeight: 500
+                }}>
+                  Data de Fim do Curso
+                </label>
+                <input
+                  type="date"
+                  value={dataFimCurso}
+                  onChange={(e) => setDataFimCurso(e.target.value)}
+                  min={dataInicioCurso}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    borderRadius: '8px',
+                    border: '1px solid var(--input-border)',
+                    backgroundColor: 'var(--input-bg)',
+                    color: 'var(--text-primary)',
+                    fontSize: '1rem'
+                  }}
+                />
+                <p style={{ 
+                  margin: '0.25rem 0 0 0',
+                  fontSize: '0.75rem',
+                  color: 'var(--text-secondary)'
+                }}>
+                  Deixe vazio se o curso ainda está ativo
+                </p>
+              </div>
+            </div>
+            <div>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '0.5rem',
+                color: 'var(--text-primary)',
+                fontWeight: 500
+              }}>
+                Anos Disponíveis para Inscrição
+              </label>
+              <p style={{
+                margin: '0 0 0.5rem 0',
+                fontSize: '0.85rem',
+                color: 'var(--text-secondary)'
+              }}>
+                Configure os anos em que os alunos poderão se inscrever neste curso.
+              </p>
+              <div style={{
+                display: 'flex',
+                gap: '0.5rem',
+                marginBottom: '0.5rem',
+                flexWrap: 'wrap'
+              }}>
+                <input
+                  type="number"
+                  value={novoAno}
+                  onChange={(e) => setNovoAno(e.target.value)}
+                  placeholder="Ex: 2024"
+                  min="2000"
+                  max="2100"
+                  style={{
+                    width: '120px',
+                    padding: '0.5rem',
+                    borderRadius: '8px',
+                    border: '1px solid var(--input-border)',
+                    backgroundColor: 'var(--input-bg)',
+                    color: 'var(--text-primary)',
+                    fontSize: '0.9rem'
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const ano = parseInt(novoAno)
+                    if (ano && !anosDisponiveisCurso.includes(ano)) {
+                      setAnosDisponiveisCurso([...anosDisponiveisCurso, ano].sort((a, b) => b - a))
+                      setNovoAno('')
+                    }
+                  }}
+                  disabled={!novoAno || anosDisponiveisCurso.includes(parseInt(novoAno))}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    backgroundColor: 'var(--btn-secondary-bg)',
+                    color: 'var(--btn-secondary-text)',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '0.85rem',
+                    cursor: novoAno && !anosDisponiveisCurso.includes(parseInt(novoAno)) ? 'pointer' : 'not-allowed'
+                  }}
+                >
+                  Adicionar
+                </button>
+              </div>
+              {anosDisponiveisCurso.length > 0 && (
+                <div style={{
+                  display: 'flex',
+                  gap: '0.5rem',
+                  flexWrap: 'wrap'
+                }}>
+                  {anosDisponiveisCurso.map((ano) => (
+                    <span
+                      key={ano}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        padding: '0.5rem 0.75rem',
+                        backgroundColor: 'var(--btn-primary-bg)',
+                        color: 'var(--btn-primary-text)',
+                        borderRadius: '20px',
+                        fontSize: '0.85rem'
+                      }}
+                    >
+                      {ano}
+                      <button
+                        type="button"
+                        onClick={() => setAnosDisponiveisCurso(anosDisponiveisCurso.filter(a => a !== ano))}
+                        style={{
+                          backgroundColor: 'transparent',
+                          color: 'inherit',
+                          border: 'none',
+                          cursor: 'pointer',
+                          padding: 0,
+                          fontSize: '1rem',
+                          lineHeight: 1,
+                          opacity: 0.7
+                        }}
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+              {anosDisponiveisCurso.length === 0 && (
+                <p style={{
+                  margin: 0,
+                  fontSize: '0.85rem',
+                  color: 'var(--text-secondary)',
+                  fontStyle: 'italic'
+                }}>
+                  Nenhum ano configurado. Adicione anos para permitir inscrições.
+                </p>
+              )}
+            </div>
             <button
               type="submit"
               disabled={enviando || !nomeCurso.trim()}
@@ -496,6 +689,26 @@ export default function GerenciarCursos({ isAdmin }: GerenciarCursosProps) {
                       {curso.descricao}
                     </p>
                   )}
+                  <div style={{
+                    display: 'flex',
+                    gap: '1rem',
+                    marginTop: '0.5rem',
+                    fontSize: '0.8rem',
+                    color: 'var(--text-secondary)'
+                  }}>
+                    {curso.dataInicio && (
+                      <span>
+                        📅 Início: {formatarData(curso.dataInicio)}
+                      </span>
+                    )}
+                    {curso.dataFim ? (
+                      <span>
+                        📅 Fim: {formatarData(curso.dataFim)}
+                      </span>
+                    ) : curso.dataInicio ? (
+                      <span style={{ color: '#059669' }}>🟢 Ativo</span>
+                    ) : null}
+                  </div>
                 </div>
                 {curso.duracao && (
                   <span style={{

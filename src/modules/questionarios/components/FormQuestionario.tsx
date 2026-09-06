@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   DndContext,
@@ -20,6 +20,7 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { criarQuestionario, editarQuestionario } from '../questionarios.actions'
+import { listarSalasDoUsuario, type SalaComInfo } from '@/modules/salas/salas.actions'
 import ImportarJson from './ImportarJson'
 import PreviewQuestionario from './PreviewQuestionario'
 import CondicoesPergunta from './CondicoesPergunta'
@@ -54,6 +55,7 @@ interface QuestionarioExistente {
   corTema?: string
   usuariosEsperados?: number | null
   anonimo?: boolean
+  turmaId?: number | null
   perguntas: {
     id: number
     texto: string
@@ -322,8 +324,25 @@ export default function FormQuestionario({ questionario }: Props) {
   const [corTema, setCorTema] = useState(questionario?.corTema || '#6366f1')
   const [usuariosEsperados, setUsuariosEsperados] = useState<string>(questionario?.usuariosEsperados?.toString() || '')
   const [anonimo, setAnonimo] = useState(questionario?.anonimo ?? false)
+  const [turmaId, setTurmaId] = useState<number | null>(questionario?.turmaId ?? null)
+  const [salas, setSalas] = useState<SalaComInfo[]>([])
+  const [carregandoSalas, setCarregandoSalas] = useState(true)
 
   const isEdicao = !!questionario
+
+  useEffect(() => {
+    async function carregarSalas() {
+      try {
+        const dados = await listarSalasDoUsuario()
+        setSalas(dados)
+      } catch (error) {
+        console.error('Erro ao carregar salas:', error)
+      } finally {
+        setCarregandoSalas(false)
+      }
+    }
+    carregarSalas()
+  }, [])
 
   function adicionarPergunta() {
     setPerguntas([
@@ -440,9 +459,9 @@ export default function FormQuestionario({ questionario }: Props) {
     try {
       let resultado
       if (isEdicao) {
-        resultado = await editarQuestionario(questionario.id, titulo, descricao, perguntas, encerraEmDate, anonimo, corTema, usuariosEsperadosNum)
+        resultado = await editarQuestionario(questionario.id, titulo, descricao, perguntas, encerraEmDate, anonimo, corTema, usuariosEsperadosNum, turmaId)
       } else {
-        resultado = await criarQuestionario(titulo, descricao, perguntas, encerraEmDate, anonimo, corTema, usuariosEsperadosNum)
+        resultado = await criarQuestionario(titulo, descricao, perguntas, encerraEmDate, anonimo, corTema, usuariosEsperadosNum, turmaId)
       }
 
       if ('error' in resultado && resultado.error) {
@@ -507,6 +526,34 @@ export default function FormQuestionario({ questionario }: Props) {
         />
         <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
           Se definido, o questionário encerrará automaticamente nesta data.
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <label className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
+          Vincular a uma sala (opcional)
+        </label>
+        {carregandoSalas ? (
+          <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
+            Carregando salas disponíveis...
+          </p>
+        ) : (
+          <select
+            value={turmaId || ''}
+            onChange={(e) => setTurmaId(e.target.value ? Number(e.target.value) : null)}
+            className="rounded-lg px-4 py-2 text-sm focus:outline-none transition-colors"
+            style={{ backgroundColor: 'var(--input-bg)', border: '1px solid var(--input-border)', color: 'var(--text-primary)' }}
+          >
+            <option value="">Nenhuma sala (questionário público)</option>
+            {salas.map((sala) => (
+              <option key={sala.id} value={sala.id}>
+                {sala.curso.nome} - {sala.nome}
+              </option>
+            ))}
+          </select>
+        )}
+        <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
+          Se vinculado, apenas membros da sala poderão responder.
         </p>
       </div>
 

@@ -12,6 +12,7 @@ export default function SelecaoCurso({ onSelect, selectedTurmaId }: SelecaoCurso
   const [cursos, setCursos] = useState<CursosDisponiveis[]>([])
   const [cursoSelecionado, setCursoSelecionado] = useState<number | null>(null)
   const [turmaSelecionada, setTurmaSelecionada] = useState<number | null>(selectedTurmaId)
+  const [anoSelecionado, setAnoSelecionado] = useState<number | null>(null)
   const [carregando, setCarregando] = useState(true)
 
   useEffect(() => {
@@ -36,12 +37,21 @@ export default function SelecaoCurso({ onSelect, selectedTurmaId }: SelecaoCurso
       if (curso) {
         setCursoSelecionado(curso.id)
         setTurmaSelecionada(selectedTurmaId)
+        const turma = curso.turmas.find(t => t.id === selectedTurmaId)
+        if (turma) {
+          setAnoSelecionado(new Date(turma.dataInicio).getFullYear())
+        }
       }
     }
   }, [selectedTurmaId, cursos])
 
   const cursoAtual = cursos.find(c => c.id === cursoSelecionado)
-  const turmasDisponiveis = cursoAtual?.turmas || []
+  const anosDisponiveis = cursoAtual?.anosDisponiveis || []
+  const turmasFiltradas = cursoAtual?.turmas.filter(turma => {
+    if (!anoSelecionado) return true
+    const anoTurma = new Date(turma.dataInicio).getFullYear()
+    return anoTurma === anoSelecionado
+  }) || []
 
   const formatarData = (data: Date) => {
     return new Date(data).toLocaleDateString('pt-BR', {
@@ -54,6 +64,14 @@ export default function SelecaoCurso({ onSelect, selectedTurmaId }: SelecaoCurso
   const handleCursoChange = (cursoId: string) => {
     const id = cursoId ? parseInt(cursoId) : null
     setCursoSelecionado(id)
+    setTurmaSelecionada(null)
+    setAnoSelecionado(null)
+    onSelect(null)
+  }
+
+  const handleAnoChange = (ano: string) => {
+    const valor = ano ? parseInt(ano) : null
+    setAnoSelecionado(valor)
     setTurmaSelecionada(null)
     onSelect(null)
   }
@@ -128,6 +146,44 @@ export default function SelecaoCurso({ onSelect, selectedTurmaId }: SelecaoCurso
         </select>
       </div>
 
+      {cursoSelecionado && anosDisponiveis.length > 0 && (
+        <div>
+          <label 
+            htmlFor="ano" 
+            style={{ 
+              display: 'block', 
+              marginBottom: '0.5rem',
+              color: 'var(--text-primary)',
+              fontWeight: 500
+            }}
+          >
+            Selecione o Ano
+          </label>
+          <select
+            id="ano"
+            value={anoSelecionado || ''}
+            onChange={(e) => handleAnoChange(e.target.value)}
+            style={{
+              width: '100%',
+              padding: '0.75rem',
+              borderRadius: '8px',
+              border: '1px solid var(--input-border)',
+              backgroundColor: 'var(--input-bg)',
+              color: 'var(--text-primary)',
+              fontSize: '1rem',
+              cursor: 'pointer'
+            }}
+          >
+            <option value="">Todos os anos</option>
+            {anosDisponiveis.map((ano) => (
+              <option key={ano} value={ano}>
+                {ano}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
       {cursoSelecionado && (
         <div>
           <label 
@@ -157,7 +213,7 @@ export default function SelecaoCurso({ onSelect, selectedTurmaId }: SelecaoCurso
             }}
           >
             <option value="">Selecione uma turma...</option>
-            {turmasDisponiveis.map((turma) => (
+            {turmasFiltradas.map((turma) => (
               <option key={turma.id} value={turma.id}>
                 {turma.nome} ({formatarData(turma.dataInicio)} - {formatarData(turma.dataFim)})
               </option>
@@ -193,7 +249,7 @@ export default function SelecaoCurso({ onSelect, selectedTurmaId }: SelecaoCurso
             color: 'var(--text-secondary)',
             fontSize: '0.85rem'
           }}>
-            Turma: {turmasDisponiveis.find(t => t.id === turmaSelecionada)?.nome}
+            Turma: {turmasFiltradas.find(t => t.id === turmaSelecionada)?.nome}
           </p>
         </div>
       )}

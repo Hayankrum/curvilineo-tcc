@@ -53,6 +53,7 @@ model Usuario {
   questionarios        Questionario[]
   respostasQuestionario Resposta[]
   inscricoesCurso      Inscricao[]
+  turmasResponsavel    Turma[]
 }
 
 model Sessao {
@@ -115,11 +116,14 @@ model Questionario {
   usuariosEsperados Int?
   autorId      Int
   autor        Usuario     @relation(fields: [autorId], references: [id], onDelete: Cascade)
+  turmaId      Int?
+  turma        Turma?      @relation(fields: [turmaId], references: [id], onDelete: SetNull)
   perguntas    Pergunta[]
   respostas    Resposta[]
 
   @@index([autorId])
   @@index([status])
+  @@index([turmaId])
 }
 
 model Pergunta {
@@ -180,23 +184,31 @@ model ValorResposta {
 }
 
 model Curso {
-  id          Int      @id @default(autoincrement())
-  nome        String
-  descricao   String?
-  duracao     Int?
-  criadoEm    DateTime @default(now())
-  turmas      Turma[]
+  id              Int      @id @default(autoincrement())
+  nome            String
+  descricao       String?
+  duracao         Int?
+  dataInicio      DateTime?
+  dataFim         DateTime?
+  anosDisponiveis Json?    @default("[]")
+  criadoEm        DateTime @default(now())
+  turmas          Turma[]
 }
 
 model Turma {
-  id          Int      @id @default(autoincrement())
-  nome        String
-  dataInicio  DateTime
-  dataFim     DateTime
-  cursoId     Int
-  curso       Curso    @relation(fields: [cursoId], references: [id], onDelete: Cascade)
-  inscricoes  Inscricao[]
-  criadoEm    DateTime @default(now())
+  id             Int             @id @default(autoincrement())
+  nome           String
+  dataInicio     DateTime
+  dataFim        DateTime
+  cursoId        Int
+  curso          Curso           @relation(fields: [cursoId], references: [id], onDelete: Cascade)
+  inscricoes     Inscricao[]
+  questionarios  Questionario[]
+  responsavelId  Int?
+  responsavel    Usuario?        @relation(fields: [responsavelId], references: [id], onDelete: SetNull)
+  criadoEm       DateTime        @default(now())
+
+  @@index([responsavelId])
 }
 
 model Inscricao {

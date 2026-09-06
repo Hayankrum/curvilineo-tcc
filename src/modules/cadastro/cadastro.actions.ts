@@ -9,6 +9,10 @@ export interface CursosDisponiveis {
   nome: string
   descricao: string | null
   duracao: number | null
+  dataInicio: Date | null
+  dataFim: Date | null
+  anosDisponiveis: number[]
+  criadoEm: Date
   turmas: {
     id: number
     nome: string
@@ -18,7 +22,7 @@ export interface CursosDisponiveis {
 }
 
 export async function listarCursos(): Promise<CursosDisponiveis[]> {
-  return await prisma.curso.findMany({
+  const cursos = await prisma.curso.findMany({
     include: {
       turmas: {
         orderBy: { dataInicio: 'asc' }
@@ -26,9 +30,21 @@ export async function listarCursos(): Promise<CursosDisponiveis[]> {
     },
     orderBy: { nome: 'asc' }
   })
+
+  return cursos.map(c => ({
+    ...c,
+    anosDisponiveis: (Array.isArray(c.anosDisponiveis) ? c.anosDisponiveis : []) as number[]
+  }))
 }
 
-export async function criarCurso(nome: string, descricao?: string, duracao?: number) {
+export async function criarCurso(
+  nome: string,
+  descricao?: string,
+  duracao?: number,
+  dataInicio?: string | null,
+  dataFim?: string | null,
+  anosDisponiveis?: number[]
+) {
   const usuario = await obterSessao()
   if (!usuario) return { error: 'Não autenticado' }
   if (!usuario.isAdmin) return { error: 'Sem permissão' }
@@ -41,11 +57,15 @@ export async function criarCurso(nome: string, descricao?: string, duracao?: num
     data: {
       nome: nome.trim(),
       descricao: descricao?.trim() || null,
-      duracao: duracao || null
+      duracao: duracao || null,
+      dataInicio: dataInicio ? new Date(dataInicio) : null,
+      dataFim: dataFim ? new Date(dataFim) : null,
+      anosDisponiveis: JSON.parse(JSON.stringify(anosDisponiveis || []))
     }
   })
 
   revalidatePath('/cadastro')
+  revalidatePath('/admin/cursos')
   return { success: 'Curso criado com sucesso' }
 }
 
@@ -103,7 +123,15 @@ export async function inscreverUsuario(
 
   const turma = await prisma.turma.findUnique({
     where: { id: turmaId },
-    include: { curso: true }
+    include: {
+      curso: {
+        select: {
+          id: true,
+          nome: true,
+          anosDisponiveis: true
+        }
+      }
+    }
   })
   if (!turma) return { error: 'Turma não encontrada' }
 
@@ -113,6 +141,15 @@ export async function inscreverUsuario(
   }
   if (agora > turma.dataFim) {
     return { error: 'Inscrições já foram encerradas para esta turma' }
+  }
+
+  const anoAtual = agora.getFullYear()
+  const anosDisponiveis = (Array.isArray(turma.curso.anosDisponiveis) ? turma.curso.anosDisponiveis : []) as number[]
+
+  if (anosDisponiveis && anosDisponiveis.length > 0) {
+    if (!anosDisponiveis.includes(anoAtual)) {
+      return { error: `Inscrições não estão disponíveis para o ano de ${anoAtual}. Anos disponíveis: ${anosDisponiveis.join(', ')}` }
+    }
   }
 
   const inscricaoExistente = await prisma.inscricao.findUnique({
@@ -143,6 +180,7 @@ export async function inscreverUsuario(
 
   revalidatePath('/cadastro')
   revalidatePath('/usuarios/configuracoes')
+  revalidatePath('/salas')
   return { success: 'Inscrição realizada com sucesso' }
 }
 

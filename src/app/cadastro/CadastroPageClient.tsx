@@ -147,21 +147,38 @@ export default function CadastroPageClient({
               Minhas Inscrições
             </button>
             {isAdmin && (
-              <button
-                onClick={() => setAbaAtiva('gerenciar')}
-                style={{
-                  padding: '0.75rem 1.5rem',
-                  backgroundColor: abaAtiva === 'gerenciar' ? 'var(--btn-primary-bg)' : 'transparent',
-                  color: abaAtiva === 'gerenciar' ? 'var(--btn-primary-text)' : 'var(--text-secondary)',
-                  border: `1px solid ${abaAtiva === 'gerenciar' ? 'var(--btn-primary-bg)' : 'var(--input-border)'}`,
-                  borderRadius: '8px',
-                  fontWeight: 500,
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease'
-                }}
-              >
-                Gerenciar Cursos
-              </button>
+              <>
+                <button
+                  onClick={() => setAbaAtiva('gerenciar')}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    backgroundColor: abaAtiva === 'gerenciar' ? 'var(--btn-primary-bg)' : 'transparent',
+                    color: abaAtiva === 'gerenciar' ? 'var(--btn-primary-text)' : 'var(--text-secondary)',
+                    border: `1px solid ${abaAtiva === 'gerenciar' ? 'var(--btn-primary-bg)' : 'var(--input-border)'}`,
+                    borderRadius: '8px',
+                    fontWeight: 500,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  Gerenciar Cursos
+                </button>
+                <a
+                  href="/admin"
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    backgroundColor: 'transparent',
+                    color: 'var(--text-secondary)',
+                    border: '1px solid var(--input-border)',
+                    borderRadius: '8px',
+                    fontWeight: 500,
+                    textDecoration: 'none',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  Painel Admin
+                </a>
+              </>
             )}
           </nav>
         )}
