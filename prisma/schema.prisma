@@ -47,6 +47,8 @@ model Usuario {
   inscricoes           InscricaoPush[]
   notificacoes         Notificacao[]
   medias               Media[]
+  questionarios        Questionario[]
+  respostasQuestionario Resposta[]
 }
 
 model Sessao {
@@ -94,4 +96,79 @@ model Media {
   updatedAt   DateTime @updatedAt
 
   owner       Usuario  @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+}
+
+model Questionario {
+  id           Int         @id @default(autoincrement())
+  titulo       String
+  descricao    String?
+  status       String      @default("rascunho")
+  anonimo      Boolean     @default(false)
+  corTema      String?     @default("#6366f1")
+  criadoEm     DateTime    @default(now())
+  atualizadoEm DateTime    @updatedAt
+  encerraEm    DateTime?
+  autorId      Int
+  autor        Usuario     @relation(fields: [autorId], references: [id], onDelete: Cascade)
+  perguntas    Pergunta[]
+  respostas    Resposta[]
+
+  @@index([autorId])
+  @@index([status])
+}
+
+model Pergunta {
+  id             Int           @id @default(autoincrement())
+  texto          String
+  tipo           String
+  obrigatoria    Boolean       @default(false)
+  ordem          Int
+  configEscala   Json?
+  condicoes      Json?
+  questionarioId Int
+  questionario   Questionario  @relation(fields: [questionarioId], references: [id], onDelete: Cascade)
+  opcoes         Opcao[]
+  valores        ValorResposta[]
+
+  @@index([questionarioId])
+}
+
+model Opcao {
+  id         Int             @id @default(autoincrement())
+  texto      String
+  ordem      Int
+  correta    Boolean         @default(false)
+  perguntaId Int
+  pergunta   Pergunta        @relation(fields: [perguntaId], references: [id], onDelete: Cascade)
+  valores    ValorResposta[]
+
+  @@index([perguntaId])
+}
+
+model Resposta {
+  id             Int            @id @default(autoincrement())
+  usuarioId      Int
+  usuario        Usuario        @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  questionarioId Int
+  questionario   Questionario   @relation(fields: [questionarioId], references: [id], onDelete: Cascade)
+  criadoEm       DateTime       @default(now())
+  valores        ValorResposta[]
+
+  @@unique([usuarioId, questionarioId])
+  @@index([questionarioId])
+}
+
+model ValorResposta {
+  id            Int      @id @default(autoincrement())
+  respostaId    Int
+  resposta      Resposta @relation(fields: [respostaId], references: [id], onDelete: Cascade)
+  perguntaId    Int
+  pergunta      Pergunta @relation(fields: [perguntaId], references: [id], onDelete: Cascade)
+  texto         String?
+  opcaoId       Int?
+  opcao         Opcao?   @relation(fields: [opcaoId], references: [id])
+  valorNumerico Int?
+
+  @@index([respostaId])
+  @@index([perguntaId])
 }
