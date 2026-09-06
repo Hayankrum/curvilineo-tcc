@@ -30,6 +30,7 @@ interface MetaData {
   encerraEm?: string
   anonimo?: boolean
   corTema?: string
+  usuariosEsperados?: number
 }
 
 interface Props {
@@ -39,42 +40,43 @@ interface Props {
 }
 
 const EXEMPLO_JSON = `{
-  "titulo": "Pesquisa de Satisfação",
-  "descricao": "Ajude-nos a melhorar",
+  "titulo": "Titulo do Questionario",
+  "descricao": "Descricao opcional do questionario",
   "encerraEm": "2026-12-31T23:59",
   "anonimo": false,
   "corTema": "#6366f1",
+  "usuariosEsperados": 50,
   "perguntas": [
     {
-      "texto": "Como você nos avalia?",
+      "texto": "Texto da pergunta aqui",
       "tipo": "escala",
       "obrigatoria": true,
       "escala": { "min": 1, "max": 5, "passo": 1 }
     },
     {
-      "texto": "Qual seu canal preferido?",
+      "texto": "Outra pergunta",
       "tipo": "escolha_unica",
       "obrigatoria": true,
       "opcoes": [
-        { "texto": "Site", "correta": false },
-        { "texto": "App", "correta": true },
-        { "texto": "WhatsApp", "correta": false }
+        { "texto": "Opcao 1", "correta": false },
+        { "texto": "Opcao 2", "correta": true },
+        { "texto": "Opcao 3", "correta": false }
       ]
     },
     {
-      "texto": "Por que prefere esse canal?",
+      "texto": "Pergunta condicional",
       "tipo": "texto_longo",
       "obrigatoria": false,
       "condicoes": [
         {
           "perguntaOrigem": 2,
           "tipoCondicao": "igual",
-          "valor": "App"
+          "valor": "Opcao 2"
         }
       ]
     },
     {
-      "texto": "O que mais podemos melhorar?",
+      "texto": "Pergunta de texto livre",
       "tipo": "texto_longo",
       "obrigatoria": false
     }
@@ -126,6 +128,7 @@ export default function ImportarJson({ onImport, tituloAtual, descricaoAtual }: 
       if (dados.encerraEm) novaMeta.encerraEm = dados.encerraEm
       if (dados.anonimo !== undefined) novaMeta.anonimo = !!dados.anonimo
       if (dados.corTema) novaMeta.corTema = dados.corTema
+      if (dados.usuariosEsperados) novaMeta.usuariosEsperados = Number(dados.usuariosEsperados)
       if (Object.keys(novaMeta).length > 0) setMeta(novaMeta)
 
       const perguntasRaw = dados.perguntas || dados.questions || dados
@@ -263,6 +266,9 @@ export default function ImportarJson({ onImport, tituloAtual, descricaoAtual }: 
       >
         <div className="flex items-center justify-between p-4" style={{ borderBottom: '1px solid var(--border-color)' }}>
           <h3 className="font-medium" style={{ color: 'var(--text-primary)' }}>Importar perguntas via JSON</h3>
+          <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
+            Cole um JSON com as perguntas. Clique em &quot;Carregar exemplo&quot; para ver o formato aceito.
+          </p>
           <button
             type="button"
             onClick={() => { setAberto(false); setJson(''); setPreview(null); setErro(null) }}
@@ -337,6 +343,7 @@ export default function ImportarJson({ onImport, tituloAtual, descricaoAtual }: 
                       {meta.corTema}
                     </p>
                   )}
+                  {meta.usuariosEsperados && <p style={{ color: 'var(--text-secondary)' }}><strong>Respostas esperadas:</strong> {meta.usuariosEsperados}</p>}
                 </div>
               )}
 

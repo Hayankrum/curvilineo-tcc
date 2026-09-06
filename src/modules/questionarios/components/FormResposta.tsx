@@ -29,6 +29,7 @@ interface Questionario {
 
 interface Props {
   questionario: Questionario
+  anonimo?: boolean
   respostaExistente?: {
     id: number
     valores: {
@@ -49,7 +50,7 @@ interface ValoresResposta {
   }
 }
 
-export default function FormResposta({ questionario, respostaExistente }: Props) {
+export default function FormResposta({ questionario, anonimo, respostaExistente }: Props) {
   const router = useRouter()
   const [valores, setValores] = useState<ValoresResposta>(() => {
     if (!respostaExistente) return {}
@@ -65,6 +66,7 @@ export default function FormResposta({ questionario, respostaExistente }: Props)
   })
   const [erro, setErro] = useState<string | null>(null)
   const [enviando, setEnviando] = useState(false)
+  const [nomeAnonimo, setNomeAnonimo] = useState('')
 
   const isEdicao = !!respostaExistente
 
@@ -124,7 +126,7 @@ export default function FormResposta({ questionario, respostaExistente }: Props)
       if (isEdicao) {
         resultado = await editarResposta(questionario.id, valoresEnvio)
       } else {
-        resultado = await enviarResposta(questionario.id, valoresEnvio)
+        resultado = await enviarResposta(questionario.id, valoresEnvio, nomeAnonimo || undefined)
       }
       if (resultado?.error) {
         setErro(resultado.error)
@@ -262,6 +264,22 @@ export default function FormResposta({ questionario, respostaExistente }: Props)
         <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
           {questionario.descricao}
         </p>
+      )}
+
+      {anonimo && !isEdicao && (
+        <div className="rounded-lg p-4 flex flex-col gap-2" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
+          <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+            Como você gostaria de ser identificado? <span className="text-xs font-normal" style={{ color: 'var(--text-tertiary)' }}>(opcional)</span>
+          </p>
+          <input
+            type="text"
+            value={nomeAnonimo}
+            onChange={(e) => setNomeAnonimo(e.target.value)}
+            placeholder="Seu nome (ou deixe em branco para anônimo)"
+            className="rounded-lg px-4 py-2 text-sm focus:outline-none transition-colors"
+            style={{ backgroundColor: 'var(--input-bg)', border: '1px solid var(--input-border)', color: 'var(--text-primary)' }}
+          />
+        </div>
       )}
 
       {questionario.perguntas.map((pergunta) => (

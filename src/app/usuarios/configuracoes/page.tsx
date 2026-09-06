@@ -15,6 +15,7 @@ interface UserInfo {
   temSenha: boolean
   notificarComentarios: boolean
   notificarSistema: boolean
+  notificarQuestionarios: boolean
 }
 
 export default function ConfiguracoesPage() {
@@ -27,6 +28,7 @@ export default function ConfiguracoesPage() {
   const [preferencias, setPreferencias] = useState({
     notificarComentarios: true,
     notificarSistema: true,
+    notificarQuestionarios: true,
   })
 
   useEffect(() => {
@@ -39,6 +41,7 @@ export default function ConfiguracoesPage() {
           setPreferencias({
             notificarComentarios: data.notificarComentarios ?? true,
             notificarSistema: data.notificarSistema ?? true,
+            notificarQuestionarios: data.notificarQuestionarios ?? true,
           })
         }
       })
@@ -81,7 +84,7 @@ export default function ConfiguracoesPage() {
     }
   }
 
-  const handlePreferenciaChange = async (campo: 'notificarComentarios' | 'notificarSistema', valor: boolean) => {
+  const handlePreferenciaChange = async (campo: 'notificarComentarios' | 'notificarSistema' | 'notificarQuestionarios', valor: boolean) => {
     setPreferencias((prev) => ({ ...prev, [campo]: valor }))
     const result = await atualizarPreferenciasNotificacao({ [campo]: valor })
     if (result.error) {
@@ -226,6 +229,24 @@ export default function ConfiguracoesPage() {
                     <span
                       className="inline-block h-4 w-4 transform rounded-full transition-transform"
                       style={{ backgroundColor: 'var(--btn-primary-text)', transform: preferencias.notificarSistema ? 'translateX(22px)' : 'translateX(2px)' }}
+                    />
+                  </div>
+                </label>
+                <label className="flex items-center justify-between cursor-pointer">
+                  <div>
+                    <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Questionários</p>
+                    <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
+                      Quando alguém responder ao seu questionário
+                    </p>
+                  </div>
+                  <div
+                    className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
+                    style={{ backgroundColor: preferencias.notificarQuestionarios ? 'var(--btn-primary-bg)' : 'var(--btn-secondary-bg)' }}
+                    onClick={() => handlePreferenciaChange('notificarQuestionarios', !preferencias.notificarQuestionarios)}
+                  >
+                    <span
+                      className="inline-block h-4 w-4 transform rounded-full transition-transform"
+                      style={{ backgroundColor: 'var(--btn-primary-text)', transform: preferencias.notificarQuestionarios ? 'translateX(22px)' : 'translateX(2px)' }}
                     />
                   </div>
                 </label>

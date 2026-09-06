@@ -16,6 +16,7 @@ interface ResultadoData {
     descricao: string | null
     status: string
     corTema: string | null
+    anonimo: boolean
   }
   totalRespostas: number
   resultados: {
@@ -36,6 +37,11 @@ interface ResultadoData {
     min?: number
     max?: number
     respostas?: string[]
+  }[]
+  respondentes: {
+    id: number
+    nome: string
+    criadoEm: string
   }[]
 }
 
@@ -140,6 +146,27 @@ export default function ResultadosPage({ questionarioId }: Props) {
       </div>
 
       <FiltroResultados onFiltrar={handleFiltrar} loading={filtrando} />
+
+      {dados.respondentes.length > 0 && (
+        <div
+          className="rounded-lg p-4"
+          style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}
+        >
+          <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-primary)' }}>
+            Quem respondeu ({dados.respondentes.length})
+          </p>
+          <div className="flex flex-col gap-1">
+            {dados.respondentes.map((r) => (
+              <div key={r.id} className="flex items-center justify-between text-xs" style={{ color: 'var(--text-secondary)' }}>
+                <span>{r.nome}</span>
+                <span style={{ color: 'var(--text-tertiary)' }}>
+                  {new Date(r.criadoEm).toLocaleDateString('pt-BR')} {new Date(r.criadoEm).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <ResultadosBasicos
         totalRespostas={dados.totalRespostas}

@@ -85,6 +85,7 @@ export default function ResponderPage({ questionarioId }: Props) {
           descricao: questionario.descricao,
           perguntas: questionario.perguntas,
         }}
+        anonimo={questionario.anonimo}
       />
     </div>
   )

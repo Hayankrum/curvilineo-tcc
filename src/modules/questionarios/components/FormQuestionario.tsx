@@ -52,6 +52,8 @@ interface QuestionarioExistente {
   descricao: string | null
   encerraEm?: Date | string | null
   corTema?: string
+  usuariosEsperados?: number | null
+  anonimo?: boolean
   perguntas: {
     id: number
     texto: string
@@ -318,6 +320,8 @@ export default function FormQuestionario({ questionario }: Props) {
     questionario?.encerraEm ? new Date(questionario.encerraEm).toISOString().slice(0, 16) : ''
   )
   const [corTema, setCorTema] = useState(questionario?.corTema || '#6366f1')
+  const [usuariosEsperados, setUsuariosEsperados] = useState<string>(questionario?.usuariosEsperados?.toString() || '')
+  const [anonimo, setAnonimo] = useState(questionario?.anonimo ?? false)
 
   const isEdicao = !!questionario
 
@@ -411,7 +415,7 @@ export default function FormQuestionario({ questionario }: Props) {
     }
   }
 
-  function handleImportarJson(novasPerguntas: PerguntaData[], meta?: { titulo?: string; descricao?: string; encerraEm?: string; anonimo?: boolean; corTema?: string }) {
+  function handleImportarJson(novasPerguntas: PerguntaData[], meta?: { titulo?: string; descricao?: string; encerraEm?: string; anonimo?: boolean; corTema?: string; usuariosEsperados?: number }) {
     setPerguntas((prev) => {
       const atualizadas = [...prev, ...novasPerguntas]
       atualizadas.forEach((p, i) => (p.ordem = i + 1))
@@ -420,8 +424,9 @@ export default function FormQuestionario({ questionario }: Props) {
     if (meta?.titulo && !titulo) setTitulo(meta.titulo)
     if (meta?.descricao && !descricao) setDescricao(meta.descricao)
     if (meta?.encerraEm && !encerraEm) setEncerraEm(meta.encerraEm)
-    if (meta?.anonimo !== undefined) {}
+    if (meta?.anonimo !== undefined) setAnonimo(meta.anonimo)
     if (meta?.corTema) setCorTema(meta.corTema)
+    if (meta?.usuariosEsperados && !usuariosEsperados) setUsuariosEsperados(meta.usuariosEsperados.toString())
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -430,13 +435,14 @@ export default function FormQuestionario({ questionario }: Props) {
     setSalvando(true)
 
     const encerraEmDate = encerraEm ? new Date(encerraEm) : null
+    const usuariosEsperadosNum = usuariosEsperados ? parseInt(usuariosEsperados, 10) : null
 
     try {
       let resultado
       if (isEdicao) {
-        resultado = await editarQuestionario(questionario.id, titulo, descricao, perguntas, encerraEmDate)
+        resultado = await editarQuestionario(questionario.id, titulo, descricao, perguntas, encerraEmDate, anonimo, corTema, usuariosEsperadosNum)
       } else {
-        resultado = await criarQuestionario(titulo, descricao, perguntas, encerraEmDate, false, corTema)
+        resultado = await criarQuestionario(titulo, descricao, perguntas, encerraEmDate, anonimo, corTema, usuariosEsperadosNum)
       }
 
       if ('error' in resultado && resultado.error) {
@@ -503,6 +509,45 @@ export default function FormQuestionario({ questionario }: Props) {
           Se definido, o questionário encerrará automaticamente nesta data.
         </p>
       </div>
+
+      <div className="flex flex-col gap-1">
+        <label className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
+          Número de respostas esperadas (opcional)
+        </label>
+        <input
+          type="number"
+          min="1"
+          value={usuariosEsperados}
+          onChange={(e) => setUsuariosEsperados(e.target.value)}
+          placeholder="Ex: 50"
+          className="rounded-lg px-4 py-2 text-sm focus:outline-none transition-colors"
+          style={{ backgroundColor: 'var(--input-bg)', border: '1px solid var(--input-border)', color: 'var(--text-primary)' }}
+        />
+        <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
+          Ao atingir este número de respostas, você receberá uma notificação.
+        </p>
+      </div>
+
+      <label className="flex items-center gap-3 cursor-pointer">
+        <div
+          className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
+          style={{ backgroundColor: anonimo ? 'var(--btn-primary-bg)' : 'var(--btn-secondary-bg)' }}
+          onClick={() => setAnonimo(!anonimo)}
+        >
+          <span
+            className="inline-block h-4 w-4 transform rounded-full transition-transform"
+            style={{ backgroundColor: 'var(--btn-primary-text)', transform: anonimo ? 'translateX(22px)' : 'translateX(2px)' }}
+          />
+        </div>
+        <div>
+          <p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
+            Permitir respostas anônimas
+          </p>
+          <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
+            Quando ativo, qualquer pessoa pode responder sem estar logada.
+          </p>
+        </div>
+      </label>
 
       <div className="flex flex-col gap-1">
         <label className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>

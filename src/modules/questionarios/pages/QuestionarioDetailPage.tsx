@@ -32,6 +32,7 @@ interface QuestionarioData {
   corTema: string | null
   criadoEm: string
   encerraEm: string | null
+  usuariosEsperados: number | null
   autor: { id: number; nome: string }
   perguntas: Pergunta[]
   totalRespostas: number
@@ -197,6 +198,11 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
           <span>{questionario.totalRespostas} {questionario.totalRespostas === 1 ? 'resposta' : 'respostas'}</span>
           {questionario.anonimo && <span>Anônimo</span>}
           {encerraData && <span>Encerra {encerraData.toLocaleDateString('pt-BR')}</span>}
+          {questionario.usuariosEsperados && (
+            <span>
+              {questionario.totalRespostas}/{questionario.usuariosEsperados} respostas
+            </span>
+          )}
         </div>
       </div>
 

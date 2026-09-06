@@ -124,7 +124,8 @@ export async function criarQuestionario(
   perguntas: PerguntaInput[],
   encerraEm?: Date | null,
   anonimo?: boolean,
-  corTema?: string
+  corTema?: string,
+  usuariosEsperados?: number | null
 ) {
   const usuario = await getUsuarioLogado()
   if (!usuario) return { error: 'Você precisa estar logado para criar um questionário' }
@@ -146,6 +147,7 @@ export async function criarQuestionario(
       encerraEm: encerraEm ?? null,
       anonimo: anonimo ?? false,
       corTema: corTema || '#6366f1',
+      usuariosEsperados: usuariosEsperados ?? null,
       autorId: usuario.id,
       perguntas: {
         create: perguntas.map((p, idx) => ({
@@ -182,7 +184,10 @@ export async function editarQuestionario(
   titulo: string,
   descricao: string,
   perguntas: PerguntaInput[],
-  encerraEm?: Date | null
+  encerraEm?: Date | null,
+  anonimo?: boolean,
+  corTema?: string,
+  usuariosEsperados?: number | null
 ) {
   const { error, questionario } = await obterQuestionarioDoUsuario(id)
   if (error) return { error }
@@ -226,6 +231,9 @@ export async function editarQuestionario(
         titulo: tituloClean,
         descricao: descricaoClean || null,
         encerraEm: encerraEm ?? undefined,
+        anonimo: anonimo ?? undefined,
+        corTema: corTema ?? undefined,
+        usuariosEsperados: usuariosEsperados ?? undefined,
         atualizadoEm: new Date(),
       },
     })
@@ -378,7 +386,7 @@ export async function arquivarQuestionario(id: number) {
 
 // ---------- RESPOSTAS ----------
 
-export async function enviarResposta(questionarioId: number, valores: ValorRespostaInput[]) {
+export async function enviarResposta(questionarioId: number, valores: ValorRespostaInput[], nomeAnonimo?: string) {
   const usuario = await getUsuarioLogado()
 
   const questionario = await prisma.questionario.findUnique({
@@ -468,7 +476,7 @@ export async function enviarResposta(questionarioId: number, valores: ValorRespo
     if (questionario.anonimo && !usuario) {
       const usuarioAnonimo = await tx.usuario.create({
         data: {
-          nome: 'Anônimo',
+          nome: nomeAnonimo || 'Anônimo',
           email: `anonimo-${Date.now()}@temp.com`,
           senha: '',
         },
@@ -482,6 +490,7 @@ export async function enviarResposta(questionarioId: number, valores: ValorRespo
       data: {
         usuarioId: usuarioIdParaResposta,
         questionarioId,
+        nomeAnonimo: questionario.anonimo ? (nomeAnonimo || null) : null,
       },
     })
 
@@ -517,11 +526,11 @@ export async function enviarResposta(questionarioId: number, valores: ValorRespo
   try {
     const autor = await prisma.usuario.findUnique({
       where: { id: questionario.autorId },
-      select: { notificarSistema: true },
+      select: { notificarQuestionarios: true },
     })
 
-    if (autor?.notificarSistema) {
-      const nomeRespondente = usuario?.nome || 'Anônimo'
+    if (autor?.notificarQuestionarios) {
+      const nomeRespondente = nomeAnonimo || usuario?.nome || 'Anônimo'
       await prisma.notificacao.create({
         data: {
           titulo: 'Nova resposta recebida',
@@ -532,6 +541,25 @@ export async function enviarResposta(questionarioId: number, valores: ValorRespo
       })
 
       revalidatePath('/notificacoes')
+    }
+
+    if (questionario.usuariosEsperados && autor?.notificarQuestionarios) {
+      const totalRespostas = await prisma.resposta.count({
+        where: { questionarioId },
+      })
+
+      if (totalRespostas >= questionario.usuariosEsperados) {
+        await prisma.notificacao.create({
+          data: {
+            titulo: 'Meta de respostas atingida!',
+            mensagem: `O questionário "${questionario.titulo}" atingiu ${questionario.usuariosEsperados} respostas (${totalRespostas} no total)`,
+            url: `/questionarios/${questionarioId}/resultados`,
+            usuarioId: questionario.autorId,
+          },
+        })
+
+        revalidatePath('/notificacoes')
+      }
     }
   } catch {
     // Ignorar erros de notificação
@@ -663,8 +691,18 @@ export async function listarQuestionariosPublicos() {
     include: {
       autor: { select: { id: true, nome: true } },
       _count: { select: { respostas: true } },
+      respostas: {
+        select: {
+          id: true,
+          nomeAnonimo: true,
+          criadoEm: true,
+          usuario: {
+            select: { id: true, nome: true },
+          },
+        },
+        orderBy: { criadoEm: 'desc' },
+      },
     },
-    orderBy: { criadoEm: 'desc' },
   })
 
   return questionarios.map((q) => ({
@@ -674,17 +712,44 @@ export async function listarQuestionariosPublicos() {
   }))
 }
 
-export async function listarMeusQuestionarios() {
+export async function listarMeusQuestionarios(filtros?: {
+  busca?: string
+  status?: string
+  pagina?: number
+  porPagina?: number
+}) {
   const usuario = await getUsuarioLogado()
-  if (!usuario) return { error: 'Você precisa estar logado' as const, questionarios: [] }
+  if (!usuario) return { error: 'Você precisa estar logado' as const, questionarios: [], total: 0, paginas: 1 }
 
-  const questionarios = await prisma.questionario.findMany({
-    where: { autorId: usuario.id },
-    include: {
-      _count: { select: { perguntas: true, respostas: true } },
-    },
-    orderBy: { atualizadoEm: 'desc' },
-  })
+  const pagina = filtros?.pagina || 1
+  const porPagina = filtros?.porPagina || 10
+  const skip = (pagina - 1) * porPagina
+
+  const where: Record<string, unknown> = { autorId: usuario.id }
+
+  if (filtros?.busca && filtros.busca.trim()) {
+    where.OR = [
+      { titulo: { contains: filtros.busca, mode: 'insensitive' } },
+      { descricao: { contains: filtros.busca, mode: 'insensitive' } },
+    ]
+  }
+
+  if (filtros?.status && filtros.status !== 'todos') {
+    where.status = filtros.status
+  }
+
+  const [questionarios, total] = await Promise.all([
+    prisma.questionario.findMany({
+      where,
+      include: {
+        _count: { select: { perguntas: true, respostas: true } },
+      },
+      orderBy: { atualizadoEm: 'desc' },
+      skip,
+      take: porPagina,
+    }),
+    prisma.questionario.count({ where }),
+  ])
 
   return {
     questionarios: questionarios.map((q) => ({
@@ -693,6 +758,9 @@ export async function listarMeusQuestionarios() {
       totalRespostas: q._count.respostas,
       _count: undefined,
     })),
+    total,
+    paginas: Math.ceil(total / porPagina),
+    pagina,
   }
 }
 
@@ -851,6 +919,17 @@ export async function obterResultados(
         orderBy: { ordem: 'asc' },
       },
       _count: { select: { respostas: true } },
+      respostas: {
+        select: {
+          id: true,
+          nomeAnonimo: true,
+          criadoEm: true,
+          usuario: {
+            select: { id: true, nome: true },
+          },
+        },
+        orderBy: { criadoEm: 'desc' },
+      },
     },
   })
 
@@ -939,8 +1018,14 @@ export async function obterResultados(
       descricao: dados.descricao,
       status: dados.status,
       corTema: dados.corTema,
+      anonimo: dados.anonimo,
     },
     totalRespostas: dados._count.respostas,
     resultados,
+    respondentes: dados.respostas.map((r) => ({
+      id: r.id,
+      nome: r.nomeAnonimo || r.usuario.nome,
+      criadoEm: r.criadoEm,
+    })),
   }
 }

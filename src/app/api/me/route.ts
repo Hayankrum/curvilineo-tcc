@@ -19,6 +19,7 @@ export async function GET() {
       senha: true,
       notificarComentarios: true,
       notificarSistema: true,
+      notificarQuestionarios: true,
     },
   })
 
@@ -35,5 +36,6 @@ export async function GET() {
     temSenha: !!fullUser.senha,
     notificarComentarios: fullUser.notificarComentarios,
     notificarSistema: fullUser.notificarSistema,
+    notificarQuestionarios: fullUser.notificarQuestionarios,
   })
 }
