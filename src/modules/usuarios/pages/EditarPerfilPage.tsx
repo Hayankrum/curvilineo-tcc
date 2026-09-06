@@ -19,7 +19,7 @@ export default function EditarPerfilPage({ usuario }: Props) {
   const [estado, formAction, pending] = useActionState(editarAction, null)
 
   return (
-    <div className="max-w-sm">
+    <div>
       <Link
         href={`/usuarios/${usuario.id}`}
         className="text-sm transition-colors mb-6 inline-block hover:underline"

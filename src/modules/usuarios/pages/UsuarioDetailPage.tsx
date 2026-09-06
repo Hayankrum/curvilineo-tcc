@@ -25,7 +25,7 @@ export default async function UsuarioDetailPage({ id }: Props) {
   const isDono = usuarioLogado?.id === usuario.id
 
   return (
-    <div className="max-w-xl">
+    <div>
       <Link
         href="/posts"
         className="text-sm transition-colors mb-6 inline-block hover:underline"

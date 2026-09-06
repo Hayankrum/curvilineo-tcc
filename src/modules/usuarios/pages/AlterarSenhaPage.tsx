@@ -21,7 +21,7 @@ export default function AlterarSenhaPage({ usuarioId }: Props) {
   const [estado, formAction, pending] = useActionState(alterarAction, null)
 
   return (
-    <div className="max-w-sm">
+    <div>
       <Link
         href={`/usuarios/${usuarioId}`}
         className="text-sm transition-colors mb-6 inline-block hover:underline"

@@ -66,7 +66,7 @@ export default function PostFormPage({ post, error }: Props) {
   }
 
   return (
-    <div className="max-w-xl">
+    <div>
       <h1 className="text-2xl font-semibold mb-6" style={{ color: 'var(--text-primary)' }}>
         {isEditing ? 'Editar post' : 'Novo post'}
       </h1>

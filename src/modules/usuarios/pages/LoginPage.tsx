@@ -16,7 +16,7 @@ export default function LoginPage() {
   const [estado, formAction, pending] = useActionState(loginAction, null)
 
   return (
-    <div className="max-w-sm">
+    <div>
       <h1 className="text-2xl font-semibold mb-6" style={{ color: 'var(--text-primary)' }}>Entrar</h1>
 
       <form action={formAction} className="flex flex-col gap-4">

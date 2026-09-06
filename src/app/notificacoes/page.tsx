@@ -92,7 +92,7 @@ export default function NotificacoesPage() {
 
   if (isLoading) {
     return (
-      <div className="max-w-xl">
+      <div>
         <h1 className="text-2xl font-semibold mb-6" style={{ color: 'var(--text-primary)' }}>Notificações</h1>
         <p style={{ color: 'var(--text-secondary)' }}>Carregando...</p>
       </div>
@@ -101,7 +101,7 @@ export default function NotificacoesPage() {
 
   if (!isSupported) {
     return (
-      <div className="max-w-xl">
+      <div>
         <h1 className="text-2xl font-semibold mb-6" style={{ color: 'var(--text-primary)' }}>Notificações</h1>
         <div className="rounded-lg p-6" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
           <p style={{ color: 'var(--text-secondary)' }}>Seu navegador não suporta notificações push.</p>
@@ -111,7 +111,7 @@ export default function NotificacoesPage() {
   }
 
   return (
-    <div className="max-w-xl">
+    <div>
       <h1 className="text-2xl font-semibold mb-6" style={{ color: 'var(--text-primary)' }}>Notificações</h1>
 
       {statusMessage && (

@@ -18,7 +18,7 @@ export default function RegistroPage() {
   const [estado, formAction, pending] = useActionState(registrarAction, null)
 
   return (
-    <div className="max-w-sm">
+    <div>
       <h1 className="text-2xl font-semibold mb-6" style={{ color: 'var(--text-primary)' }}>Criar conta</h1>
 
       <form action={formAction} className="flex flex-col gap-4">

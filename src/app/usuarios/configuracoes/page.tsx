@@ -92,7 +92,7 @@ export default function ConfiguracoesPage() {
 
   if (!user) {
     return (
-      <div className="max-w-xl">
+      <div>
         <h1 className="text-2xl font-semibold mb-6" style={{ color: 'var(--text-primary)' }}>Configurações</h1>
         <p style={{ color: 'var(--text-secondary)' }}>Carregando...</p>
       </div>
@@ -100,7 +100,7 @@ export default function ConfiguracoesPage() {
   }
 
   return (
-    <div className="max-w-xl">
+    <div>
       <Link
         href={`/usuarios/${user.id}`}
         className="text-sm transition-colors mb-6 inline-block hover:underline"

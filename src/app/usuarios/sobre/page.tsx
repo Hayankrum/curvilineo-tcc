@@ -118,7 +118,7 @@ export default function SobrePage() {
   }, [])
 
   return (
-    <div className="max-w-xl">
+    <div>
       <Link
         href={user ? `/usuarios/${user.id}` : '/'}
         className="text-sm transition-colors mb-6 inline-block hover:underline"

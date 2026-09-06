@@ -17,7 +17,7 @@ export default function PostDetailPage({ id }: { id: number }) {
 
   if (loading) {
     return (
-      <div className="max-w-xl">
+      <div>
         <p style={{ color: 'var(--text-tertiary)' }}>Carregando...</p>
       </div>
     )
@@ -25,7 +25,7 @@ export default function PostDetailPage({ id }: { id: number }) {
 
   if (!post) {
     return (
-      <div className="max-w-xl">
+      <div>
         <OfflineBanner fromCache={fromCache} />
         <p style={{ color: 'var(--text-tertiary)' }}>Post não encontrado.</p>
         <Link href="/posts" className="text-sm mt-4 inline-block hover:underline" style={{ color: 'var(--text-tertiary)' }}>
@@ -38,7 +38,7 @@ export default function PostDetailPage({ id }: { id: number }) {
   const ehAutor = usuario?.id === post.autorId
 
   return (
-    <div className="max-w-xl">
+    <div>
       <OfflineBanner fromCache={fromCache} />
 
       <Link
