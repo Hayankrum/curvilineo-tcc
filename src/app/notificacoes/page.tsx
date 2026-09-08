@@ -21,6 +21,7 @@ export default function NotificacoesPage() {
   const [historico, setHistorico] = useState<NotificacaoHistorico[]>([])
   const [loadingHistorico, setLoadingHistorico] = useState(true)
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const [excluindo, setExcluindo] = useState<number | null>(null)
 
   const fetchHistorico = () => {
     fetch('/api/notifications/history')
@@ -90,6 +91,31 @@ export default function NotificacoesPage() {
     notificarAtualizacao()
   }
 
+  const excluirNotificacao = async (id: number) => {
+    setExcluindo(id)
+    await fetch('/api/notifications/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    })
+    setHistorico((prev) => prev.filter((n) => n.id !== id))
+    notificarAtualizacao()
+    setExcluindo(null)
+  }
+
+  const excluirTodas = async () => {
+    if (!confirm('Tem certeza que deseja excluir todas as notificações?')) return
+    await fetch('/api/notifications/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ all: true }),
+    })
+    setHistorico([])
+    notificarAtualizacao()
+  }
+
+  const totalNaoLidas = historico.filter((n) => !n.lida).length
+
   if (isLoading) {
     return (
       <div>
@@ -152,16 +178,34 @@ export default function NotificacoesPage() {
 
       <div className="pt-6" style={{ borderTop: '1px solid var(--border-color)' }}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-medium" style={{ color: 'var(--text-primary)' }}>Histórico</h2>
-          {historico.some((n) => !n.lida) && (
-            <button
-              onClick={marcarTodasComoLidas}
-              className="text-xs transition-colors hover:underline"
-              style={{ color: 'var(--text-tertiary)' }}
-            >
-              Marcar todas como lidas
-            </button>
-          )}
+          <div className="flex items-center gap-3">
+            <h2 className="font-medium" style={{ color: 'var(--text-primary)' }}>Histórico</h2>
+            {totalNaoLidas > 0 && (
+              <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: 'var(--card-bg)', color: 'var(--text-tertiary)', border: '1px solid var(--card-border)' }}>
+                {totalNaoLidas} não lida{totalNaoLidas > 1 ? 's' : ''}
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-3">
+            {historico.some((n) => !n.lida) && (
+              <button
+                onClick={marcarTodasComoLidas}
+                className="text-xs transition-colors hover:underline"
+                style={{ color: 'var(--text-tertiary)' }}
+              >
+                Marcar todas como lidas
+              </button>
+            )}
+            {historico.length > 0 && (
+              <button
+                onClick={excluirTodas}
+                className="text-xs transition-colors hover:underline"
+                style={{ color: '#dc2626' }}
+              >
+                Excluir todas
+              </button>
+            )}
+          </div>
         </div>
 
         {loadingHistorico ? (
@@ -171,61 +215,73 @@ export default function NotificacoesPage() {
             <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>Nenhuma notificação recebida ainda.</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {historico.map((notificacao) => (
               <div
                 key={notificacao.id}
-                className="rounded-lg p-4 cursor-pointer transition-colors"
-                style={{ backgroundColor: 'var(--card-bg)', border: `1px solid ${notificacao.lida ? 'var(--card-border)' : 'var(--border-color)'}` }}
-                onClick={() => {
-                  if (!notificacao.lida) marcarComoLida(notificacao.id)
-                  if (notificacao.url) router.push(notificacao.url)
+                className="rounded-lg p-4 transition-colors"
+                style={{
+                  backgroundColor: 'var(--card-bg)',
+                  border: '1px solid var(--card-border)',
+                  opacity: notificacao.lida ? 0.7 : 1,
                 }}
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      {!notificacao.lida && (
-                        <span className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
-                      )}
-                      <h3 className="font-medium text-sm" style={{ color: notificacao.lida ? 'var(--text-secondary)' : 'var(--text-primary)' }}>
-                        {notificacao.titulo}
-                      </h3>
-                    </div>
-                    <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>{notificacao.mensagem}</p>
-                  </div>
-                  <span className="text-xs ml-4 flex-shrink-0" style={{ color: 'var(--text-tertiary)' }}>
-                    {new Date(notificacao.criadaEm).toLocaleDateString('pt-BR', {
-                      day: '2-digit',
-                      month: '2-digit',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3 mt-2">
-                  {notificacao.url && (
-                    <Link
-                      href={notificacao.url}
-                      className="text-xs transition-colors inline-block hover:underline"
-                      style={{ color: 'var(--text-tertiary)' }}
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      Ver →
-                    </Link>
-                  )}
+                <div className="flex items-start gap-3">
                   {!notificacao.lida && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        marcarComoLida(notificacao.id)
-                      }}
-                      className="text-xs transition-colors hover:underline"
-                      style={{ color: 'var(--text-tertiary)' }}
-                    >
-                      Marcar como lida
-                    </button>
+                    <span className="w-2 h-2 rounded-full flex-shrink-0 mt-1.5" style={{ backgroundColor: 'var(--text-tertiary)' }} />
                   )}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-medium text-sm" style={{ color: 'var(--text-primary)' }}>
+                      {notificacao.titulo}
+                    </h3>
+                    <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>{notificacao.mensagem}</p>
+                    <div className="flex items-center gap-3 mt-2">
+                      {notificacao.url && (
+                        <Link
+                          href={notificacao.url}
+                          className="text-xs transition-colors inline-block hover:underline"
+                          style={{ color: 'var(--text-tertiary)' }}
+                          onClick={() => {
+                            if (!notificacao.lida) marcarComoLida(notificacao.id)
+                          }}
+                        >
+                          Ver detalhes →
+                        </Link>
+                      )}
+                      {!notificacao.lida && (
+                        <button
+                          onClick={() => marcarComoLida(notificacao.id)}
+                          className="text-xs transition-colors hover:underline"
+                          style={{ color: 'var(--text-tertiary)' }}
+                        >
+                          Marcar como lida
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <span className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
+                      {new Date(notificacao.criadaEm).toLocaleDateString('pt-BR', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </span>
+                    <button
+                      onClick={() => excluirNotificacao(notificacao.id)}
+                      disabled={excluindo === notificacao.id}
+                      className="p-1 rounded transition-colors hover:bg-red-100 disabled:opacity-50"
+                      style={{ color: '#dc2626' }}
+                      title="Excluir notificação"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M3 6h18" />
+                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}

@@ -183,7 +183,8 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
       </Link>
 
       <div>
-        <h1 className="text-2xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>{questionario.titulo}</h1>
+        <h1 className="text-2xl font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>{questionario.titulo}</h1>
+        <p className="text-sm mb-2" style={{ color: 'var(--text-tertiary)' }}>por {questionario.autor.nome}</p>
         {questionario.descricao && (
           <p className="text-sm mb-3" style={{ color: 'var(--text-secondary)' }}>{questionario.descricao}</p>
         )}
@@ -203,7 +204,6 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
             </span>
           )}
         </div>
-        <p className="text-xs mt-1" style={{ color: 'var(--text-tertiary)' }}>por {questionario.autor.nome}</p>
       </div>
 
       {isAutor && (
@@ -236,24 +236,44 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
             </div>
           )}
           {questionario.status === 'publicado' && (
-            <button
-              onClick={() => handleStatusAction('encerrar')}
-              disabled={processando}
-              className="text-xs font-medium px-3 py-1.5 transition-colors rounded-lg disabled:opacity-50"
-              style={{ backgroundColor: '#f59e0b', color: '#000', border: '1px solid #d97706' }}
-            >
-              Encerrar
-            </button>
+            <div className="flex">
+              <button
+                onClick={() => handleStatusAction('encerrar')}
+                disabled={processando}
+                className="text-xs font-medium px-3 py-1.5 transition-colors -ml-px first:ml-0 first:rounded-l-lg disabled:opacity-50"
+                style={{ backgroundColor: '#f59e0b', color: '#000', border: '1px solid #d97706' }}
+              >
+                Encerrar
+              </button>
+              <button
+                onClick={() => handleStatusAction('deletar')}
+                disabled={processando}
+                className="text-xs font-medium px-3 py-1.5 transition-colors -ml-px last:rounded-r-lg disabled:opacity-50"
+                style={{ backgroundColor: '#dc2626', color: '#fff', border: '1px solid #b91c1c' }}
+              >
+                Excluir
+              </button>
+            </div>
           )}
           {questionario.status === 'encerrado' && (
-            <button
-              onClick={() => handleStatusAction('arquivar')}
-              disabled={processando}
-              className="text-xs font-medium px-3 py-1.5 transition-colors rounded-lg disabled:opacity-50"
-              style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)', border: '1px solid var(--card-border)' }}
-            >
-              Arquivar
-            </button>
+            <div className="flex">
+              <button
+                onClick={() => handleStatusAction('arquivar')}
+                disabled={processando}
+                className="text-xs font-medium px-3 py-1.5 transition-colors -ml-px first:ml-0 first:rounded-l-lg disabled:opacity-50"
+                style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)', border: '1px solid var(--card-border)' }}
+              >
+                Arquivar
+              </button>
+              <button
+                onClick={() => handleStatusAction('deletar')}
+                disabled={processando}
+                className="text-xs font-medium px-3 py-1.5 transition-colors -ml-px last:rounded-r-lg disabled:opacity-50"
+                style={{ backgroundColor: '#dc2626', color: '#fff', border: '1px solid #b91c1c' }}
+              >
+                Excluir
+              </button>
+            </div>
           )}
           <button
             onClick={handleDuplicar}
@@ -261,7 +281,7 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
             className="text-xs font-medium px-3 py-1.5 transition-colors rounded-lg disabled:opacity-50"
             style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)', border: '1px solid var(--card-border)' }}
           >
-            Duplicar como rascunho
+            Copiar modelo
           </button>
         </div>
       )}

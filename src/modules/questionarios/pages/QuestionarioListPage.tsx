@@ -150,10 +150,11 @@ export default function QuestionarioListPage() {
             style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)', textDecoration: 'none' }}
           >
             <h2 className="font-medium text-lg mb-1" style={{ color: 'var(--text-primary)' }}>{q.titulo}</h2>
+            <p className="text-xs mb-2" style={{ color: 'var(--text-tertiary)' }}>por {q.autor.nome}</p>
             {q.descricao && (
               <p className="text-sm mb-2 line-clamp-2" style={{ color: 'var(--text-secondary)' }}>{q.descricao}</p>
             )}
-            <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs mb-1" style={{ color: 'var(--text-tertiary)' }}>
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs" style={{ color: 'var(--text-tertiary)' }}>
               <span
                 className="px-2 py-0.5 rounded-full font-medium"
                 style={{ backgroundColor: `${STATUS_COLORS[q.status]}20`, color: STATUS_COLORS[q.status] }}
@@ -164,9 +165,6 @@ export default function QuestionarioListPage() {
               <span>{q.totalRespostas} {q.totalRespostas === 1 ? 'resposta' : 'respostas'}</span>
               {q.anonimo && <span>Anônimo</span>}
             </div>
-            <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
-              por {q.autor.nome}
-            </p>
           </Link>
         ))}
       </div>
