@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { getUsuarioLogado } from '@/modules/usuarios/usuarios.actions'
+import { criarNotificacao } from '@/lib/notifications'
 
 const MAX_TITULO = 200
 const MAX_CONTEUDO = 5000
@@ -21,6 +22,30 @@ async function verificarAdmin() {
   if (!usuario) return { error: 'Você precisa estar logado' as const, usuario: null }
   if (!usuario.isAdmin) return { error: 'Apenas administradores podem criar publicações' as const, usuario: null }
   return { usuario, error: null as string | null }
+}
+
+async function notificarInscritosCanal(canalId: number, titulo: string, mensagem: string, url?: string) {
+  try {
+    const inscricoes = await prisma.notificacaoCanal.findMany({
+      where: { canalId },
+      select: { usuarioId: true },
+    })
+
+    await Promise.allSettled(
+      inscricoes.map((inscricao) =>
+        criarNotificacao({
+          usuarioId: inscricao.usuarioId,
+          titulo,
+          mensagem,
+          url,
+          tipo: 'canal',
+          canalId,
+        })
+      )
+    )
+  } catch (error) {
+    console.error('[Publicação] Erro ao notificar inscritos do canal:', error)
+  }
 }
 
 export async function criarPublicacao(
@@ -71,6 +96,11 @@ export async function criarPublicacao(
     revalidatePath(`/canais/${canalId}`)
     revalidatePath('/admin/canais')
     revalidatePath(`/admin/canais/${canalId}`)
+
+    const tituloNotif = tituloClean || 'Nova publicação'
+    const resumo = conteudoClean && conteudoClean.length > 100 ? conteudoClean.substring(0, 100) + '...' : conteudoClean
+    await notificarInscritosCanal(canalId, tituloNotif, resumo || 'Nova publicação de texto no canal', `/canais/${canalId}`)
+
     return { success: true, publicacaoId: publicacao.id }
   }
 
@@ -118,6 +148,10 @@ export async function criarPublicacao(
     revalidatePath(`/canais/${canalId}`)
     revalidatePath('/admin/canais')
     revalidatePath(`/admin/canais/${canalId}`)
+
+    const dataFormatada = dataEvento.toLocaleDateString('pt-BR')
+    await notificarInscritosCanal(canalId, `📅 Evento: ${tituloClean}`, `${tituloClean} em ${dataFormatada}`, `/canais/${canalId}`)
+
     return { success: true, publicacaoId: publicacao.id }
   }
 
@@ -172,6 +206,9 @@ export async function criarPublicacao(
     revalidatePath(`/canais/${canalId}`)
     revalidatePath('/admin/canais')
     revalidatePath(`/admin/canais/${canalId}`)
+
+    await notificarInscritosCanal(canalId, `📊 Enquete: ${perguntaClean}`, `Nova enquete no canal - vote agora!`, `/canais/${canalId}`)
+
     return { success: true, publicacaoId: publicacao.id }
   }
 
