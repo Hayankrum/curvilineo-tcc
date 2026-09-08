@@ -83,3 +83,7 @@ logs/
 
 # runtime
 .turbo/
+
+# agents
+.agents/
+.claude/
