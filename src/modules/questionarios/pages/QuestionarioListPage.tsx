@@ -1,9 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { useUsuario } from '@/lib/useData'
-import { listarMeusQuestionarios } from '../questionarios.actions'
 import { useState, useEffect, useCallback } from 'react'
+import { listarQuestionariosPublicos } from '../questionarios.actions'
 
 interface Questionario {
   id: number
@@ -13,28 +12,23 @@ interface Questionario {
   anonimo: boolean
   corTema: string | null
   criadoEm: string
-  encerraEm: string | null
+  autor: { id: number; nome: string }
   totalPerguntas: number
   totalRespostas: number
 }
 
 const STATUS_LABELS: Record<string, string> = {
   todos: 'Todos',
-  rascunho: 'Rascunho',
   publicado: 'Publicado',
   encerrado: 'Encerrado',
-  arquivado: 'Arquivado',
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  rascunho: 'var(--text-tertiary)',
   publicado: '#22c55e',
   encerrado: '#f59e0b',
-  arquivado: 'var(--text-tertiary)',
 }
 
 export default function QuestionarioListPage() {
-  const { usuario } = useUsuario()
   const [questionarios, setQuestionarios] = useState<Questionario[]>([])
   const [loading, setLoading] = useState(true)
   const [busca, setBusca] = useState('')
@@ -45,7 +39,7 @@ export default function QuestionarioListPage() {
 
   const carregar = useCallback(async (p: number, buscaVal: string, statusVal: string) => {
     setLoading(true)
-    const result = await listarMeusQuestionarios({
+    const result = await listarQuestionariosPublicos({
       busca: buscaVal || undefined,
       status: statusVal !== 'todos' ? statusVal : undefined,
       pagina: p,
@@ -60,12 +54,8 @@ export default function QuestionarioListPage() {
   }, [])
 
   useEffect(() => {
-    if (!usuario) {
-      setLoading(false)
-      return
-    }
     carregar(1, '', 'todos')
-  }, [usuario, carregar])
+  }, [carregar])
 
   function handleBuscar(e: React.FormEvent) {
     e.preventDefault()
@@ -84,25 +74,17 @@ export default function QuestionarioListPage() {
     carregar(p, busca, statusFiltro)
   }
 
-  if (!usuario) {
-    return (
-      <div>
-        <h1 className="text-2xl font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>Meus Questionários</h1>
-        <p style={{ color: 'var(--text-tertiary)' }}>Você precisa estar logado para ver seus questionários.</p>
-      </div>
-    )
-  }
-
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>Meus Questionários</h1>
+        <h1 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>Questionários</h1>
         <Link
           href="/questionarios/novo"
-          className="font-medium rounded-lg px-4 py-2 text-sm transition-colors"
+          className="font-medium rounded-lg w-8 h-8 flex items-center justify-center transition-colors"
           style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
+          title="Novo questionário"
         >
-          Novo questionário
+          +
         </Link>
       </div>
 
@@ -112,40 +94,41 @@ export default function QuestionarioListPage() {
           type="text"
           value={busca}
           onChange={(e) => setBusca(e.target.value)}
-          placeholder="Buscar por título ou descrição..."
+          placeholder="Buscar questionários..."
           className="flex-1 rounded-lg px-4 py-2 text-sm focus:outline-none transition-colors"
           style={{ backgroundColor: 'var(--input-bg)', border: '1px solid var(--input-border)', color: 'var(--text-primary)' }}
         />
         <button
           type="submit"
-          className="font-medium rounded-lg px-4 py-2 text-sm transition-colors"
+          className="font-medium rounded-lg w-8 h-8 flex items-center justify-center transition-colors"
           style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}
+          title="Buscar"
         >
-          Buscar
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
         </button>
       </form>
 
       {/* Filtros de status */}
-      <div className="flex gap-2 mb-6 flex-wrap">
-        {Object.entries(STATUS_LABELS).map(([key, label]) => (
-          <button
-            key={key}
-            onClick={() => handleFiltrarStatus(key)}
-            className="text-xs font-medium rounded-full px-3 py-1 transition-colors"
-            style={{
-              backgroundColor: statusFiltro === key ? 'var(--btn-primary-bg)' : 'var(--card-bg)',
-              color: statusFiltro === key ? 'var(--btn-primary-text)' : 'var(--text-tertiary)',
-              border: '1px solid var(--card-border)',
-            }}
-          >
-            {label}
-          </button>
-        ))}
-        {total > 0 && (
-          <span className="text-xs self-center ml-2" style={{ color: 'var(--text-tertiary)' }}>
-            {total} {total === 1 ? 'resultado' : 'resultados'}
-          </span>
-        )}
+      <div className="flex items-center gap-3 mb-6">
+        <div className="flex">
+          {Object.entries(STATUS_LABELS).map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() => handleFiltrarStatus(key)}
+              className="text-xs font-medium px-3 py-1.5 transition-colors -ml-px first:ml-0 first:rounded-l-lg last:rounded-r-lg"
+              style={{
+                backgroundColor: statusFiltro === key ? 'var(--btn-primary-bg)' : 'var(--card-bg)',
+                color: statusFiltro === key ? 'var(--btn-primary-text)' : 'var(--text-tertiary)',
+                border: '1px solid var(--card-border)',
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {loading && (
@@ -154,7 +137,7 @@ export default function QuestionarioListPage() {
 
       {!loading && questionarios.length === 0 && (
         <p style={{ color: 'var(--text-tertiary)' }}>
-          {busca || statusFiltro !== 'todos' ? 'Nenhum questionário encontrado com esses filtros.' : 'Nenhum questionário criado ainda.'}
+          {busca || statusFiltro !== 'todos' ? 'Nenhum questionário encontrado com esses filtros.' : 'Nenhum questionário publicado ainda.'}
         </p>
       )}
 
@@ -172,10 +155,12 @@ export default function QuestionarioListPage() {
                     className="px-2 py-0.5 rounded-full font-medium"
                     style={{ backgroundColor: `${STATUS_COLORS[q.status]}20`, color: STATUS_COLORS[q.status] }}
                   >
-                    {STATUS_LABELS[q.status]}
+                    {STATUS_LABELS[q.status] || q.status}
                   </span>
+                  <span>por {q.autor.nome}</span>
                   <span>{q.totalPerguntas} {q.totalPerguntas === 1 ? 'pergunta' : 'perguntas'}</span>
                   <span>{q.totalRespostas} {q.totalRespostas === 1 ? 'resposta' : 'respostas'}</span>
+                  {q.anonimo && <span>Anônimo</span>}
                 </div>
               </div>
               <div className="flex gap-2 ml-4">
@@ -186,13 +171,13 @@ export default function QuestionarioListPage() {
                 >
                   Ver
                 </Link>
-                {q.status === 'rascunho' && (
+                {q.status === 'publicado' && (
                   <Link
-                    href={`/questionarios/${q.id}/editar`}
-                    className="text-sm px-3 py-1.5 rounded-lg transition-colors"
-                    style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}
+                    href={`/questionarios/${q.id}/responder`}
+                    className="text-sm font-medium rounded-lg px-4 py-2 transition-colors"
+                    style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
                   >
-                    Editar
+                    Responder
                   </Link>
                 )}
               </div>

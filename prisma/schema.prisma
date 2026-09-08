@@ -7,28 +7,6 @@ datasource db {
   provider = "postgresql"
 }
 
-model Post {
-  id         Int         @id @default(autoincrement())
-  titulo     String
-  conteudo   String
-  latitude   Float?
-  longitude  Float?
-  criadoEm   DateTime    @default(now())
-  autorId    Int
-  autor      Usuario     @relation(fields: [autorId], references: [id], onDelete: Cascade)
-  comentarios Comentario[]
-}
-
-model Comentario {
-  id        Int      @id @default(autoincrement())
-  texto     String
-  criadoEm  DateTime @default(now())
-  postId    Int
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  autorId   Int
-  autor     Usuario  @relation(fields: [autorId], references: [id], onDelete: Cascade)
-}
-
 model Usuario {
   id                   Int              @id @default(autoincrement())
   nome                 String
@@ -44,16 +22,12 @@ model Usuario {
   notificarQuestionarios Boolean        @default(true)
   isAdmin              Boolean          @default(false)
   criadoEm             DateTime         @default(now())
-  posts                Post[]
-  comentarios          Comentario[]
   sessoes              Sessao[]
   inscricoes           InscricaoPush[]
   notificacoes         Notificacao[]
   medias               Media[]
   questionarios        Questionario[]
   respostasQuestionario Resposta[]
-  inscricoesCurso      Inscricao[]
-  turmasResponsavel    Turma[]
 }
 
 model Sessao {
@@ -116,14 +90,11 @@ model Questionario {
   usuariosEsperados Int?
   autorId      Int
   autor        Usuario     @relation(fields: [autorId], references: [id], onDelete: Cascade)
-  turmaId      Int?
-  turma        Turma?      @relation(fields: [turmaId], references: [id], onDelete: SetNull)
   perguntas    Pergunta[]
   respostas    Resposta[]
 
   @@index([autorId])
   @@index([status])
-  @@index([turmaId])
 }
 
 model Pergunta {
@@ -181,45 +152,4 @@ model ValorResposta {
 
   @@index([respostaId])
   @@index([perguntaId])
-}
-
-model Curso {
-  id              Int      @id @default(autoincrement())
-  nome            String
-  descricao       String?
-  duracao         Int?
-  dataInicio      DateTime?
-  dataFim         DateTime?
-  anosDisponiveis Json?    @default("[]")
-  criadoEm        DateTime @default(now())
-  turmas          Turma[]
-}
-
-model Turma {
-  id             Int             @id @default(autoincrement())
-  nome           String
-  dataInicio     DateTime
-  dataFim        DateTime
-  cursoId        Int
-  curso          Curso           @relation(fields: [cursoId], references: [id], onDelete: Cascade)
-  inscricoes     Inscricao[]
-  questionarios  Questionario[]
-  responsavelId  Int?
-  responsavel    Usuario?        @relation(fields: [responsavelId], references: [id], onDelete: SetNull)
-  criadoEm       DateTime        @default(now())
-
-  @@index([responsavelId])
-}
-
-model Inscricao {
-  id          Int      @id @default(autoincrement())
-  usuarioId   Int
-  usuario     Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-  turmaId     Int
-  turma       Turma    @relation(fields: [turmaId], references: [id], onDelete: Cascade)
-  tipoUsuario String   @default("discente")
-  dataInscricao DateTime @default(now())
-  status      String   @default("ativa")
-
-  @@unique([usuarioId, turmaId])
 }

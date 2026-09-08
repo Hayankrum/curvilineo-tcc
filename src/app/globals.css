@@ -62,27 +62,6 @@ body {
   border-color: var(--border-color);
 }
 
-.leaflet-container {
-  background: var(--bg-secondary);
-}
-
-.leaflet-popup-content-wrapper {
-  background: var(--card-bg);
-  color: var(--text-primary);
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.leaflet-popup-tip {
-  background: var(--card-bg);
-}
-
-.leaflet-control-zoom a {
-  background: var(--card-bg) !important;
-  color: var(--text-primary) !important;
-  border-color: var(--card-border) !important;
-}
-
 /* Rich text editor prose styles */
 .prose h2 { font-size: 1.25rem; font-weight: 600; margin: 1rem 0 0.5rem; }
 .prose h3 { font-size: 1.1rem; font-weight: 600; margin: 0.75rem 0 0.5rem; }
@@ -103,6 +82,83 @@ body {
 .prose ul[data-type="taskList"] { list-style: none; padding-left: 0; }
 .prose ul[data-type="taskList"] li { display: flex; align-items: center; gap: 0.5rem; }
 .prose ul[data-type="taskList"] li input[type="checkbox"] { width: 1rem; height: 1rem; }
+
+/* Utility classes for compact design */
+@layer components {
+  .btn {
+    @apply text-xs font-medium px-3 py-1.5 transition-colors;
+  }
+  .btn-primary {
+    @apply text-xs font-medium px-3 py-1.5 transition-colors;
+    background-color: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+  }
+  .btn-secondary {
+    @apply text-xs font-medium px-3 py-1.5 transition-colors;
+    background-color: var(--btn-secondary-bg);
+    color: var(--text-primary);
+  }
+  .btn-group {
+    @apply flex;
+  }
+  .btn-group .btn {
+    @apply -ml-px first:ml-0;
+  }
+  .btn-group .btn:first-child {
+    @apply rounded-l-lg;
+  }
+  .btn-group .btn:last-child {
+    @apply rounded-r-lg;
+  }
+  .card {
+    @apply rounded-lg p-4;
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+  }
+  .input {
+    @apply rounded-lg px-3 py-1.5 text-xs focus:outline-none transition-colors;
+    background-color: var(--input-bg);
+    border: 1px solid var(--input-border);
+    color: var(--text-primary);
+  }
+  .input:focus {
+    border-color: var(--input-focus);
+  }
+  .section-title {
+    @apply text-sm font-medium;
+    color: var(--text-primary);
+  }
+  .section-text {
+    @apply text-xs;
+    color: var(--text-secondary);
+  }
+  .section-text-muted {
+    @apply text-xs;
+    color: var(--text-tertiary);
+  }
+  .status-dot {
+    @apply w-1.5 h-1.5 rounded-full;
+  }
+  .status-dot-active {
+    @apply w-1.5 h-1.5 rounded-full bg-green-500;
+  }
+  .status-dot-inactive {
+    @apply w-1.5 h-1.5 rounded-full;
+    background-color: var(--text-tertiary);
+  }
+  .error-message {
+    @apply text-xs p-2 rounded-lg;
+    background-color: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+  }
+  .success-message {
+    @apply text-xs p-2 rounded-lg;
+    background-color: #dcfce7;
+    color: #16a34a;
+    border: 1px solid #bbf7d0;
+  }
+}
 
 /* Popup animation */
 @keyframes fadeInUp {

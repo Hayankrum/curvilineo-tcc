@@ -722,33 +722,6 @@ export async function editarResposta(questionarioId: number, valores: ValorRespo
 
 // ---------- CONSULTAS ----------
 
-export async function listarQuestionariosPublicos() {
-  const questionarios = await prisma.questionario.findMany({
-    where: { status: 'publicado' },
-    include: {
-      autor: { select: { id: true, nome: true } },
-      _count: { select: { respostas: true } },
-      respostas: {
-        select: {
-          id: true,
-          nomeAnonimo: true,
-          criadoEm: true,
-          usuario: {
-            select: { id: true, nome: true },
-          },
-        },
-        orderBy: { criadoEm: 'desc' },
-      },
-    },
-  })
-
-  return questionarios.map((q) => ({
-    ...q,
-    totalRespostas: q._count.respostas,
-    _count: undefined,
-  }))
-}
-
 export async function listarMeusQuestionarios(filtros?: {
   busca?: string
   status?: string
@@ -1078,5 +1051,63 @@ export async function obterResultados(
       nome: r.nomeAnonimo || r.usuario.nome,
       criadoEm: r.criadoEm,
     })),
+  }
+}
+
+export async function listarQuestionariosPublicos(filtros?: {
+  busca?: string
+  status?: string
+  pagina?: number
+  porPagina?: number
+}) {
+  const pagina = filtros?.pagina || 1
+  const porPagina = filtros?.porPagina || 10
+  const skip = (pagina - 1) * porPagina
+
+  const where: Record<string, unknown> = {}
+
+  if (filtros?.status && filtros.status !== 'todos') {
+    where.status = filtros.status
+  } else {
+    where.status = { in: ['publicado', 'encerrado'] }
+  }
+
+  if (filtros?.busca && filtros.busca.trim()) {
+    where.OR = [
+      { titulo: { contains: filtros.busca, mode: 'insensitive' } },
+      { descricao: { contains: filtros.busca, mode: 'insensitive' } },
+    ]
+  }
+
+  const [questionarios, total] = await Promise.all([
+    prisma.questionario.findMany({
+      where,
+      include: {
+        autor: { select: { id: true, nome: true } },
+        _count: { select: { perguntas: true, respostas: true } },
+      },
+      orderBy: { criadoEm: 'desc' },
+      skip,
+      take: porPagina,
+    }),
+    prisma.questionario.count({ where }),
+  ])
+
+  return {
+    questionarios: questionarios.map((q) => ({
+      id: q.id,
+      titulo: q.titulo,
+      descricao: q.descricao,
+      status: q.status,
+      anonimo: q.anonimo,
+      corTema: q.corTema,
+      criadoEm: q.criadoEm,
+      autor: q.autor,
+      totalPerguntas: q._count.perguntas,
+      totalRespostas: q._count.respostas,
+    })),
+    total,
+    paginas: Math.ceil(total / porPagina),
+    pagina,
   }
 }

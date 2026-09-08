@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { getUsuarioLogado } from '@/modules/usuarios/usuarios.actions'
-import { primeiroNome } from '@/lib/utils'
 
 
 interface Props {
@@ -12,11 +11,6 @@ interface Props {
 export default async function UsuarioDetailPage({ id }: Props) {
   const usuario = await prisma.usuario.findUnique({
     where: { id },
-    include: {
-      posts: {
-        orderBy: { criadoEm: 'desc' }
-      }
-    }
   })
 
   if (!usuario) notFound()
@@ -27,7 +21,7 @@ export default async function UsuarioDetailPage({ id }: Props) {
   return (
     <div>
       <Link
-        href="/posts"
+        href="/questionarios"
         className="text-sm transition-colors mb-6 inline-block hover:underline"
         style={{ color: 'var(--text-tertiary)' }}
       >
@@ -50,61 +44,41 @@ export default async function UsuarioDetailPage({ id }: Props) {
       )}
 
       {isDono && (
-        <div className="flex flex-wrap gap-4 mb-8 pb-6" style={{ borderBottom: '1px solid var(--border-color)' }}>
-          <Link
-            href={`/usuarios/${usuario.id}/editar`}
-            className="text-sm transition-colors hover:underline"
-            style={{ color: 'var(--text-secondary)' }}
-          >
-            Editar perfil
-          </Link>
-          {usuario.senha && (
+        <div className="mb-8 pb-6" style={{ borderBottom: '1px solid var(--border-color)' }}>
+          <div className="flex">
             <Link
-              href={`/usuarios/${usuario.id}/senha`}
-              className="text-sm transition-colors hover:underline"
-              style={{ color: 'var(--text-secondary)' }}
+              href={`/usuarios/${usuario.id}/editar`}
+              className="text-xs font-medium px-3 py-1.5 transition-colors -ml-px first:ml-0 first:rounded-l-lg hover:underline"
+              style={{ backgroundColor: 'var(--card-bg)', color: 'var(--text-secondary)', border: '1px solid var(--card-border)' }}
             >
-              Alterar senha
+              Editar perfil
             </Link>
-          )}
-          <Link
-            href="/usuarios/configuracoes"
-            className="text-sm transition-colors hover:underline"
-            style={{ color: 'var(--text-secondary)' }}
-          >
-            Configurações
-          </Link>
-          <Link
-            href="/usuarios/sobre"
-            className="text-sm transition-colors hover:underline"
-            style={{ color: 'var(--text-secondary)' }}
-          >
-            Sobre
-          </Link>
-        </div>
-      )}
-
-      <h2 className="text-lg font-medium mb-4" style={{ color: 'var(--text-primary)' }}>Posts de {primeiroNome(usuario.nome)}</h2>
-
-      {usuario.posts.length === 0 && (
-        <p style={{ color: 'var(--text-tertiary)' }}>Nenhum post ainda.</p>
-      )}
-
-      <div className="flex flex-col gap-4">
-        {usuario.posts.map(post => (
-          <div key={post.id} className="rounded-lg p-5" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
-            <h3 className="font-medium text-lg mb-1" style={{ color: 'var(--text-primary)' }}>{post.titulo}</h3>
-            <p className="text-sm mb-4 line-clamp-2" style={{ color: 'var(--text-secondary)' }}>{post.conteudo.length > 150 ? post.conteudo.slice(0, 150) + '...' : post.conteudo}</p>
+            {usuario.senha && (
+              <Link
+                href={`/usuarios/${usuario.id}/senha`}
+                className="text-xs font-medium px-3 py-1.5 transition-colors -ml-px hover:underline"
+                style={{ backgroundColor: 'var(--card-bg)', color: 'var(--text-secondary)', border: '1px solid var(--card-border)' }}
+              >
+                Alterar senha
+              </Link>
+            )}
             <Link
-              href={`/posts/${post.id}`}
-              className="text-sm transition-colors hover:underline"
-              style={{ color: 'var(--text-secondary)' }}
+              href="/usuarios/configuracoes"
+              className="text-xs font-medium px-3 py-1.5 transition-colors -ml-px hover:underline"
+              style={{ backgroundColor: 'var(--card-bg)', color: 'var(--text-secondary)', border: '1px solid var(--card-border)' }}
             >
-              Ver post →
+              Configurações
+            </Link>
+            <Link
+              href="/usuarios/sobre"
+              className="text-xs font-medium px-3 py-1.5 transition-colors -ml-px last:rounded-r-lg hover:underline"
+              style={{ backgroundColor: 'var(--card-bg)', color: 'var(--text-secondary)', border: '1px solid var(--card-border)' }}
+            >
+              Sobre
             </Link>
           </div>
-        ))}
-      </div>
+        </div>
+      )}
     </div>
   )
 }

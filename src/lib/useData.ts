@@ -1,170 +1,11 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
-  cachePosts,
-  getCachedPosts,
-  cachePostDetail,
-  getCachedPostDetail,
   syncPendingMutations,
   addPendingMutation,
 } from '@/lib/db'
 import { useOnlineStatus } from './useOnlineStatus'
-
-interface Post {
-  id: number
-  titulo: string
-  conteudo: string
-  latitude: number | null
-  longitude: number | null
-  criadoEm: string
-  autorId: number
-  autor: { id: number; nome: string; fotoUrl: string | null }
-}
-
-interface Comentario {
-  id: number
-  texto: string
-  criadoEm: string
-  postId: number
-  autorId: number
-  autor: { id: number; nome: string; fotoUrl: string | null }
-}
-
-interface PostCompleto extends Post {
-  comentarios: Comentario[]
-}
-
-// ---------- usePosts (lista) ----------
-
-export function usePosts() {
-  const [posts, setPosts] = useState<Post[]>([])
-  const [loading, setLoading] = useState(true)
-  const [fromCache, setFromCache] = useState(false)
-  const isOnline = useOnlineStatus()
-  const mountedRef = useRef(true)
-
-  useEffect(() => {
-    mountedRef.current = true
-    return () => { mountedRef.current = false }
-  }, [])
-
-  useEffect(() => {
-    let cancelled = false
-
-    async function run() {
-      try {
-        const res = await fetch('/api/posts')
-        if (!res.ok) throw new Error('Failed')
-        const json = await res.json()
-        const data: Post[] = Array.isArray(json)
-          ? json
-          : Array.isArray(json?.posts)
-            ? json.posts
-            : []
-        if (!cancelled && mountedRef.current) {
-          setPosts(data)
-          setFromCache(false)
-          await cachePosts(data)
-        }
-      } catch {
-        if (!cancelled && mountedRef.current) {
-          const cached = await getCachedPosts()
-          if (cached.length > 0) {
-            setPosts(cached)
-            setFromCache(true)
-          }
-        }
-      } finally {
-        if (!cancelled && mountedRef.current) setLoading(false)
-      }
-    }
-
-    run()
-    return () => { cancelled = true }
-  }, [])
-
-  useEffect(() => {
-    if (!isOnline) return
-
-    let cancelled = false
-    async function sync() {
-      await syncPendingMutations()
-      if (cancelled) return
-      try {
-        const res = await fetch('/api/posts')
-        if (res.ok) {
-          const json = await res.json()
-          const data: Post[] = Array.isArray(json)
-            ? json
-            : Array.isArray(json?.posts)
-              ? json.posts
-              : []
-          if (!cancelled && mountedRef.current) {
-            setPosts(data)
-            setFromCache(false)
-            await cachePosts(data)
-          }
-        }
-      } catch { /* ignore */ }
-    }
-    sync()
-    return () => { cancelled = true }
-  }, [isOnline])
-
-  return { posts, loading, fromCache }
-}
-
-// ---------- usePost (detalhe) ----------
-
-export function usePost(id: number, refreshKey = 0) {
-  const [post, setPost] = useState<PostCompleto | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [fromCache, setFromCache] = useState(false)
-  const isOnline = useOnlineStatus()
-  const mountedRef = useRef(true)
-
-  useEffect(() => {
-    mountedRef.current = true
-    return () => { mountedRef.current = false }
-  }, [])
-
-  useEffect(() => {
-    let cancelled = false
-
-    async function run() {
-      try {
-        const res = await fetch(`/api/posts/${id}`)
-        if (!res.ok) throw new Error('Failed')
-        const data: PostCompleto = await res.json()
-        if (!cancelled && mountedRef.current) {
-          setPost(data)
-          setFromCache(false)
-          await cachePostDetail(data)
-        }
-      } catch {
-        if (!cancelled && mountedRef.current) {
-          const cached = await getCachedPostDetail(id)
-          if (cached) {
-            setPost(cached)
-            setFromCache(true)
-          }
-        }
-      } finally {
-        if (!cancelled && mountedRef.current) setLoading(false)
-      }
-    }
-
-    run()
-    return () => { cancelled = true }
-  }, [id, refreshKey])
-
-  useEffect(() => {
-    if (isOnline) syncPendingMutations()
-  }, [isOnline])
-
-  return { post, loading, fromCache }
-}
 
 // ---------- useUsuario ----------
 
@@ -200,30 +41,27 @@ export function useUsuario() {
 export function useOfflineMutation() {
   const isOnline = useOnlineStatus()
 
-  const mutate = useCallback(
-    async (url: string, method: string, body: unknown) => {
-      if (isOnline) {
-        return fetch(url, {
-          method,
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body),
-        })
-      }
-
-      await addPendingMutation({
-        url,
+  const mutate = async (url: string, method: string, body: unknown) => {
+    if (isOnline) {
+      return fetch(url, {
         method,
-        body: JSON.stringify(body),
-        createdAt: Date.now(),
-      })
-
-      return new Response(JSON.stringify({ queued: true }), {
-        status: 202,
         headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
       })
-    },
-    [isOnline]
-  )
+    }
+
+    await addPendingMutation({
+      url,
+      method,
+      body: JSON.stringify(body),
+      createdAt: Date.now(),
+    })
+
+    return new Response(JSON.stringify({ queued: true }), {
+      status: 202,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
 
   return { mutate, isOnline }
 }

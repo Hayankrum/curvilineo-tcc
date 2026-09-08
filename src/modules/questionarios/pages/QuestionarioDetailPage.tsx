@@ -209,57 +209,75 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
       {isAutor && (
         <div className="flex flex-wrap gap-2">
           {questionario.status === 'rascunho' && (
-            <>
+            <div className="flex">
               <Link
                 href={`/questionarios/${questionario.id}/editar`}
-                className="text-sm font-medium rounded-lg px-4 py-2 transition-colors"
-                style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}
+                className="text-xs font-medium px-3 py-1.5 transition-colors -ml-px first:ml-0 first:rounded-l-lg hover:underline"
+                style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)', border: '1px solid var(--card-border)' }}
               >
                 Editar
               </Link>
               <button
                 onClick={() => handleStatusAction('publicar')}
                 disabled={processando}
-                className="text-sm font-medium rounded-lg px-4 py-2 transition-colors disabled:opacity-50"
-                style={{ backgroundColor: '#22c55e', color: '#fff' }}
+                className="text-xs font-medium px-3 py-1.5 transition-colors -ml-px disabled:opacity-50"
+                style={{ backgroundColor: '#22c55e', color: '#fff', border: '1px solid #16a34a' }}
               >
                 Publicar
               </button>
               <button
                 onClick={() => handleStatusAction('deletar')}
                 disabled={processando}
-                className="text-sm font-medium rounded-lg px-4 py-2 transition-colors disabled:opacity-50"
-                style={{ backgroundColor: '#dc2626', color: '#fff' }}
+                className="text-xs font-medium px-3 py-1.5 transition-colors -ml-px last:rounded-r-lg disabled:opacity-50"
+                style={{ backgroundColor: '#dc2626', color: '#fff', border: '1px solid #b91c1c' }}
               >
                 Excluir
               </button>
-            </>
+            </div>
           )}
           {questionario.status === 'publicado' && (
-            <button
-              onClick={() => handleStatusAction('encerrar')}
-              disabled={processando}
-              className="text-sm font-medium rounded-lg px-4 py-2 transition-colors disabled:opacity-50"
-              style={{ backgroundColor: '#f59e0b', color: '#000' }}
-            >
-              Encerrar
-            </button>
+            <div className="flex">
+              <button
+                onClick={() => handleStatusAction('encerrar')}
+                disabled={processando}
+                className="text-xs font-medium px-3 py-1.5 transition-colors -ml-px first:ml-0 first:rounded-l-lg disabled:opacity-50"
+                style={{ backgroundColor: '#f59e0b', color: '#000', border: '1px solid #d97706' }}
+              >
+                Encerrar
+              </button>
+              <Link
+                href={`/questionarios/${questionario.id}/resultados`}
+                className="text-xs font-medium px-3 py-1.5 transition-colors -ml-px last:rounded-r-lg hover:underline"
+                style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)', border: '1px solid var(--card-border)' }}
+              >
+                Ver resultados
+              </Link>
+            </div>
           )}
           {questionario.status === 'encerrado' && (
-            <button
-              onClick={() => handleStatusAction('arquivar')}
-              disabled={processando}
-              className="text-sm font-medium rounded-lg px-4 py-2 transition-colors disabled:opacity-50"
-              style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}
-            >
-              Arquivar
-            </button>
+            <div className="flex">
+              <button
+                onClick={() => handleStatusAction('arquivar')}
+                disabled={processando}
+                className="text-xs font-medium px-3 py-1.5 transition-colors -ml-px first:ml-0 first:rounded-l-lg disabled:opacity-50"
+                style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)', border: '1px solid var(--card-border)' }}
+              >
+                Arquivar
+              </button>
+              <Link
+                href={`/questionarios/${questionario.id}/resultados`}
+                className="text-xs font-medium px-3 py-1.5 transition-colors -ml-px last:rounded-r-lg hover:underline"
+                style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)', border: '1px solid var(--card-border)' }}
+              >
+                Ver resultados
+              </Link>
+            </div>
           )}
-          {questionario.status !== 'rascunho' && (
+          {questionario.status !== 'rascunho' && questionario.status !== 'publicado' && questionario.status !== 'encerrado' && (
             <Link
               href={`/questionarios/${questionario.id}/resultados`}
-              className="text-sm font-medium rounded-lg px-4 py-2 transition-colors"
-              style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}
+              className="text-xs font-medium px-3 py-1.5 transition-colors rounded-lg hover:underline"
+              style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)', border: '1px solid var(--card-border)' }}
             >
               Ver resultados
             </Link>
@@ -267,8 +285,8 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
           <button
             onClick={handleDuplicar}
             disabled={processando}
-            className="text-sm font-medium rounded-lg px-4 py-2 transition-colors disabled:opacity-50"
-            style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}
+            className="text-xs font-medium px-3 py-1.5 transition-colors rounded-lg disabled:opacity-50"
+            style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)', border: '1px solid var(--card-border)' }}
           >
             Duplicar como rascunho
           </button>

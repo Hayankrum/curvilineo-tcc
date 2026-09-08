@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const ROTAS_PROTEGIDAS = ['/posts/novo']
+const ROTAS_PROTEGIDAS: string[] = []
 
 export function proxy(request: NextRequest) {
   const sessionToken = request.cookies.get('sessionToken')?.value
@@ -10,7 +10,6 @@ export function proxy(request: NextRequest) {
 
   const precisaLogin =
     ROTAS_PROTEGIDAS.some(rota => pathname.startsWith(rota)) ||
-    /^\/posts\/\d+\/editar/.test(pathname) ||
     /^\/usuarios\/\d+\/editar/.test(pathname) ||
     /^\/usuarios\/\d+\/senha/.test(pathname)
 
@@ -25,5 +24,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/posts/:path*', '/usuarios/:path*'],
+  matcher: ['/usuarios/:path*'],
 }
