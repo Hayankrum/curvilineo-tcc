@@ -5,15 +5,26 @@ interface CriarNotificacaoParams {
   titulo: string
   mensagem: string
   url?: string
-  tipo?: 'sistema'
+  tipo?: 'sistema' | 'canal'
+  canalId?: number
 }
 
-export async function criarNotificacao({ usuarioId, titulo, mensagem, url, tipo = 'sistema' }: CriarNotificacaoParams) {
+export async function criarNotificacao({ usuarioId, titulo, mensagem, url, tipo = 'sistema', canalId }: CriarNotificacaoParams) {
   try {
     const usuario = await prisma.usuario.findUnique({ where: { id: usuarioId } })
     if (!usuario || !usuario.notificacoesAtivas) return
 
     if (tipo === 'sistema' && !usuario.notificarSistema) return
+
+    if (tipo === 'canal') {
+      if (!usuario.notificarCanais) return
+      if (canalId) {
+        const inscricao = await prisma.notificacaoCanal.findUnique({
+          where: { usuarioId_canalId: { usuarioId, canalId } },
+        })
+        if (!inscricao) return
+      }
+    }
 
     const notificacao = await prisma.notificacao.create({
       data: {

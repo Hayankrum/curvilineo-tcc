@@ -26,14 +26,6 @@ export default async function Home() {
       </p>
 
       <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-        <Link
-          href="/questionarios"
-          className="font-medium rounded-lg px-6 py-3 text-sm transition-colors text-center min-h-[44px] flex items-center justify-center"
-          style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
-        >
-          Ver questionários
-        </Link>
-
         {!usuario && (
           <Link
             href="/usuarios/login"

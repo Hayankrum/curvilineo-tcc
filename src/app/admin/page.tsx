@@ -1,134 +1,136 @@
 import { obterSessao } from '@/lib/session'
 import { redirect } from 'next/navigation'
+import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 
 export const metadata = {
   title: 'Painel Admin',
 }
 
+function formatarData(data: Date) {
+  return data.toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  })
+}
+
 export default async function AdminPage() {
   const usuario = await obterSessao()
+  if (!usuario || !usuario.isAdmin) redirect('/')
 
-  if (!usuario || !usuario.isAdmin) {
-    redirect('/')
+  const [totalUsuarios, totalQuestionarios, totalRespostas, totalCanais, totalPublicacoes, ultimosUsuarios, ultimosQuestionarios] = await Promise.all([
+    prisma.usuario.count(),
+    prisma.questionario.count(),
+    prisma.resposta.count(),
+    prisma.canal.count(),
+    prisma.publicacao.count(),
+    prisma.usuario.findMany({
+      select: { id: true, nome: true, email: true, criadoEm: true },
+      orderBy: { criadoEm: 'desc' },
+      take: 5,
+    }),
+    prisma.questionario.findMany({
+      select: {
+        id: true,
+        titulo: true,
+        status: true,
+        criadoEm: true,
+        autor: { select: { nome: true } },
+        _count: { select: { respostas: true } },
+      },
+      orderBy: { criadoEm: 'desc' },
+      take: 5,
+    }),
+  ])
+
+  const statusColors: Record<string, string> = {
+    rascunho: 'var(--text-tertiary)',
+    publicado: '#22c55e',
+    encerrado: '#f59e0b',
+    arquivado: 'var(--text-tertiary)',
+  }
+
+  const statusLabels: Record<string, string> = {
+    rascunho: 'Rascunho',
+    publicado: 'Publicado',
+    encerrado: 'Encerrado',
+    arquivado: 'Arquivado',
   }
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      padding: '2rem 1rem',
-      backgroundColor: 'var(--bg-primary)'
-    }}>
-      <div style={{
-        maxWidth: '900px',
-        margin: '0 auto',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '2rem'
-      }}>
-        <header style={{ textAlign: 'center' }}>
-          <h1 style={{
-            margin: '0 0 0.5rem 0',
-            color: 'var(--text-primary)',
-            fontSize: '2rem'
-          }}>
+    <div className="px-4 py-6 sm:px-6 sm:py-8" style={{ backgroundColor: 'var(--bg-primary)' }}>
+      <div className="max-w-4xl mx-auto flex flex-col gap-6">
+        <header>
+          <h1 className="text-xl sm:text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
             Painel Administrativo
           </h1>
-          <p style={{
-            margin: 0,
-            color: 'var(--text-secondary)',
-            fontSize: '1.1rem'
-          }}>
-            Gerencie questionários e configurações do sistema
-          </p>
         </header>
 
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-          gap: '1.5rem'
-        }}>
-          <Link
-            href="/usuarios/configuracoes"
-            style={{
-              padding: '2rem',
-              backgroundColor: 'var(--card-bg)',
-              borderRadius: '12px',
-              border: '1px solid var(--input-border)',
-              textDecoration: 'none',
-              transition: 'border-color 0.2s ease',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              textAlign: 'center',
-              gap: '1rem'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'var(--btn-primary-bg)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--input-border)'
-            }}
-          >
-            <div style={{
-              width: '64px',
-              height: '64px',
-              backgroundColor: 'var(--input-bg)',
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '2rem'
-            }}>
-              👥
-            </div>
-            <div>
-              <h2 style={{
-                margin: '0 0 0.5rem 0',
-                color: 'var(--text-primary)',
-                fontSize: '1.25rem'
-              }}>
-                Configurações
-              </h2>
-              <p style={{
-                margin: 0,
-                color: 'var(--text-secondary)',
-                fontSize: '0.9rem'
-              }}>
-                Gerenciar preferências e configurações do sistema
-              </p>
-            </div>
-          </Link>
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+          {[
+            { label: 'Usuários', value: totalUsuarios, href: '/admin/usuarios' },
+            { label: 'Questionários', value: totalQuestionarios, href: '/admin/questionarios' },
+            { label: 'Respostas', value: totalRespostas, href: '/admin/questionarios' },
+            { label: 'Canais', value: totalCanais, href: '/canais' },
+            { label: 'Publicações', value: totalPublicacoes, href: '/admin/publicacoes' },
+          ].map((item) => (
+            <Link
+              key={item.label}
+              href={item.href}
+              className="p-3 rounded-xl border text-center transition-colors hover:border-[var(--btn-primary-bg)]"
+              style={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--input-border)', textDecoration: 'none' }}
+            >
+              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{item.value}</p>
+              <p className="text-[11px]" style={{ color: 'var(--text-secondary)' }}>{item.label}</p>
+            </Link>
+          ))}
         </div>
 
-        <div style={{
-          padding: '1.5rem',
-          backgroundColor: 'var(--card-bg)',
-          borderRadius: '12px',
-          border: '1px solid var(--input-border)'
-        }}>
-          <h3 style={{
-            margin: '0 0 1rem 0',
-            color: 'var(--text-primary)'
-          }}>
-            Informações do Sistema
-          </h3>
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.5rem',
-            color: 'var(--text-secondary)',
-            fontSize: '0.9rem'
-          }}>
-            <p style={{ margin: 0 }}>
-              <strong style={{ color: 'var(--text-primary)' }}>Usuário:</strong> {usuario.nome}
-            </p>
-            <p style={{ margin: 0 }}>
-              <strong style={{ color: 'var(--text-primary)' }}>Email:</strong> {usuario.email}
-            </p>
-            <p style={{ margin: 0 }}>
-              <strong style={{ color: 'var(--text-primary)' }}>Tipo:</strong> Administrador
-            </p>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="card" style={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--input-border)' }}>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Últimos Usuários</h3>
+              <Link href="/admin/usuarios" className="text-[11px] hover:underline" style={{ color: 'var(--btn-primary-bg)' }}>Ver todos</Link>
+            </div>
+            <div className="space-y-1">
+              {ultimosUsuarios.map((u) => (
+                <div key={u.id} className="flex items-center justify-between py-1.5" style={{ borderBottom: '1px solid var(--input-border)' }}>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold flex-shrink-0" style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--text-secondary)' }}>
+                      {u.nome.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-medium truncate" style={{ color: 'var(--text-primary)' }}>{u.nome}</p>
+                    </div>
+                  </div>
+                  <span className="text-[10px] flex-shrink-0" style={{ color: 'var(--text-tertiary)' }}>{formatarData(u.criadoEm)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="card" style={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--input-border)' }}>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Últimos Questionários</h3>
+              <Link href="/admin/questionarios" className="text-[11px] hover:underline" style={{ color: 'var(--btn-primary-bg)' }}>Ver todos</Link>
+            </div>
+            <div className="space-y-1">
+              {ultimosQuestionarios.map((q) => (
+                <div key={q.id} className="flex items-center justify-between py-1.5" style={{ borderBottom: '1px solid var(--input-border)' }}>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-medium truncate" style={{ color: 'var(--text-primary)' }}>{q.titulo}</p>
+                    <p className="text-[10px]" style={{ color: 'var(--text-tertiary)' }}>{q.autor.nome}</p>
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0 ml-2">
+                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded" style={{ backgroundColor: `${statusColors[q.status]}20`, color: statusColors[q.status] }}>
+                      {statusLabels[q.status]}
+                    </span>
+                    <span className="text-[10px]" style={{ color: 'var(--text-tertiary)' }}>{q._count.respostas}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

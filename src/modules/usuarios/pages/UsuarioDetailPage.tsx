@@ -77,6 +77,24 @@ export default async function UsuarioDetailPage({ id }: Props) {
               Sobre
             </Link>
           </div>
+
+          {usuarioLogado?.isAdmin && (
+            <div className="mt-3">
+              <Link
+                href="/admin"
+                className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1.5 hover:underline"
+                style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="7" height="7"/>
+                  <rect x="14" y="3" width="7" height="7"/>
+                  <rect x="14" y="14" width="7" height="7"/>
+                  <rect x="3" y="14" width="7" height="7"/>
+                </svg>
+                Painel administrativo
+              </Link>
+            </div>
+          )}
         </div>
       )}
     </div>

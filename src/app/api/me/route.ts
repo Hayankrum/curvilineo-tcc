@@ -20,12 +20,18 @@ export async function GET() {
       isAdmin: true,
       notificarSistema: true,
       notificarQuestionarios: true,
+      notificarCanais: true,
     },
   })
 
   if (!fullUser) {
     return NextResponse.json(null)
   }
+
+  const inscricoesCanais = await prisma.notificacaoCanal.findMany({
+    where: { usuarioId: usuario.id },
+    select: { canalId: true },
+  })
 
   return NextResponse.json({
     id: fullUser.id,
@@ -37,5 +43,7 @@ export async function GET() {
     isAdmin: fullUser.isAdmin,
     notificarSistema: fullUser.notificarSistema,
     notificarQuestionarios: fullUser.notificarQuestionarios,
+    notificarCanais: fullUser.notificarCanais,
+    canaisInscritos: inscricoesCanais.map((i) => i.canalId),
   })
 }
