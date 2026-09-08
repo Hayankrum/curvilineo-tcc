@@ -17,7 +17,6 @@ model Usuario {
   tipoUsuario          String           @default("discente")
   aceitouTermos        Boolean          @default(false)
   notificacoesAtivas   Boolean          @default(true)
-  notificarComentarios Boolean          @default(true)
   notificarSistema     Boolean          @default(true)
   notificarQuestionarios Boolean        @default(true)
   isAdmin              Boolean          @default(false)

@@ -135,7 +135,6 @@ export class CredentialsAuthProvider implements AuthProvider {
     tipoUsuario: string
     aceitouTermos: boolean
     notificacoesAtivas: boolean
-    notificarComentarios: boolean
     notificarSistema: boolean
     isAdmin: boolean
     criadoEm: Date
@@ -150,7 +149,6 @@ export class CredentialsAuthProvider implements AuthProvider {
         tipoUsuario: usuario.tipoUsuario,
         aceitouTermos: usuario.aceitouTermos,
         notificacoesAtivas: usuario.notificacoesAtivas,
-        notificarComentarios: usuario.notificarComentarios,
         notificarSistema: usuario.notificarSistema,
         isAdmin: usuario.isAdmin,
         criadoEm: usuario.criadoEm,

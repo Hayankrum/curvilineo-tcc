@@ -14,7 +14,6 @@ interface UserInfo {
   id: number
   temSenha: boolean
   isAdmin: boolean
-  notificarComentarios: boolean
   notificarSistema: boolean
   notificarQuestionarios: boolean
 }
@@ -27,7 +26,6 @@ export default function ConfiguracoesPage() {
   const { theme, toggleTheme } = useTheme()
   const [user, setUser] = useState<UserInfo | null>(null)
   const [preferencias, setPreferencias] = useState({
-    notificarComentarios: true,
     notificarSistema: true,
     notificarQuestionarios: true,
   })
@@ -43,7 +41,6 @@ export default function ConfiguracoesPage() {
         if (!cancelled) {
           setUser(data)
           setPreferencias({
-            notificarComentarios: data.notificarComentarios ?? true,
             notificarSistema: data.notificarSistema ?? true,
             notificarQuestionarios: data.notificarQuestionarios ?? true,
           })
@@ -88,7 +85,7 @@ export default function ConfiguracoesPage() {
     }
   }
 
-  const handlePreferenciaChange = async (campo: 'notificarComentarios' | 'notificarSistema' | 'notificarQuestionarios', valor: boolean) => {
+  const handlePreferenciaChange = async (campo: 'notificarSistema' | 'notificarQuestionarios', valor: boolean) => {
     setPreferencias((prev) => ({ ...prev, [campo]: valor }))
     const result = await atualizarPreferenciasNotificacao({ [campo]: valor })
     if (result.error) {
@@ -228,24 +225,6 @@ export default function ConfiguracoesPage() {
                 Tipos de notificação
               </p>
               <div className="flex flex-col gap-3">
-                <label className="flex items-center justify-between cursor-pointer">
-                  <div>
-                    <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Comentários</p>
-                    <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
-                      Quando alguém comentar nos seus posts
-                    </p>
-                  </div>
-                  <div
-                    className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
-                    style={{ backgroundColor: preferencias.notificarComentarios ? 'var(--btn-primary-bg)' : 'var(--btn-secondary-bg)' }}
-                    onClick={() => handlePreferenciaChange('notificarComentarios', !preferencias.notificarComentarios)}
-                  >
-                    <span
-                      className="inline-block h-4 w-4 transform rounded-full transition-transform"
-                      style={{ backgroundColor: 'var(--btn-primary-text)', transform: preferencias.notificarComentarios ? 'translateX(22px)' : 'translateX(2px)' }}
-                    />
-                  </div>
-                </label>
                 <label className="flex items-center justify-between cursor-pointer">
                   <div>
                     <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Sistema</p>

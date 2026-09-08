@@ -39,7 +39,7 @@ export default async function AdminPage() {
             color: 'var(--text-secondary)',
             fontSize: '1.1rem'
           }}>
-            Gerencie cursos, salas e configurações do sistema
+            Gerencie questionários e configurações do sistema
           </p>
         </header>
 
@@ -48,110 +48,6 @@ export default async function AdminPage() {
           gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
           gap: '1.5rem'
         }}>
-          <Link
-            href="/admin/cursos"
-            style={{
-              padding: '2rem',
-              backgroundColor: 'var(--card-bg)',
-              borderRadius: '12px',
-              border: '1px solid var(--input-border)',
-              textDecoration: 'none',
-              transition: 'border-color 0.2s ease',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              textAlign: 'center',
-              gap: '1rem'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'var(--btn-primary-bg)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--input-border)'
-            }}
-          >
-            <div style={{
-              width: '64px',
-              height: '64px',
-              backgroundColor: 'var(--input-bg)',
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '2rem'
-            }}>
-              📚
-            </div>
-            <div>
-              <h2 style={{
-                margin: '0 0 0.5rem 0',
-                color: 'var(--text-primary)',
-                fontSize: '1.25rem'
-              }}>
-                Gerenciar Cursos
-              </h2>
-              <p style={{
-                margin: 0,
-                color: 'var(--text-secondary)',
-                fontSize: '0.9rem'
-              }}>
-                Criar, editar e excluir cursos e configurar anos disponíveis
-              </p>
-            </div>
-          </Link>
-
-          <Link
-            href="/admin/salas"
-            style={{
-              padding: '2rem',
-              backgroundColor: 'var(--card-bg)',
-              borderRadius: '12px',
-              border: '1px solid var(--input-border)',
-              textDecoration: 'none',
-              transition: 'border-color 0.2s ease',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              textAlign: 'center',
-              gap: '1rem'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = 'var(--btn-primary-bg)'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'var(--input-border)'
-            }}
-          >
-            <div style={{
-              width: '64px',
-              height: '64px',
-              backgroundColor: 'var(--input-bg)',
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '2rem'
-            }}>
-              🏠
-            </div>
-            <div>
-              <h2 style={{
-                margin: '0 0 0.5rem 0',
-                color: 'var(--text-primary)',
-                fontSize: '1.25rem'
-              }}>
-                Gerenciar Salas
-              </h2>
-              <p style={{
-                margin: 0,
-                color: 'var(--text-secondary)',
-                fontSize: '0.9rem'
-              }}>
-                Criar, editar e excluir salas (turmas)
-              </p>
-            </div>
-          </Link>
-
           <Link
             href="/cadastro"
             style={{
@@ -192,14 +88,14 @@ export default async function AdminPage() {
                 color: 'var(--text-primary)',
                 fontSize: '1.25rem'
               }}>
-                Inscrições
+                Usuários
               </h2>
               <p style={{
                 margin: 0,
                 color: 'var(--text-secondary)',
                 fontSize: '0.9rem'
               }}>
-                Gerenciar inscrições de usuários em turmas
+                Gerenciar inscrições de usuários
               </p>
             </div>
           </Link>

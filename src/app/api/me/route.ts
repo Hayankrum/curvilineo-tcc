@@ -18,7 +18,6 @@ export async function GET() {
       fotoUrl: true,
       senha: true,
       isAdmin: true,
-      notificarComentarios: true,
       notificarSistema: true,
       notificarQuestionarios: true,
     },
@@ -36,7 +35,6 @@ export async function GET() {
     fotoUrl: fullUser.fotoUrl,
     temSenha: !!fullUser.senha,
     isAdmin: fullUser.isAdmin,
-    notificarComentarios: fullUser.notificarComentarios,
     notificarSistema: fullUser.notificarSistema,
     notificarQuestionarios: fullUser.notificarQuestionarios,
   })

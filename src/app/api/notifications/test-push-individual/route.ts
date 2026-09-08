@@ -13,8 +13,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'usuarioId, título e mensagem são obrigatórios' }, { status: 400 })
     }
 
-    if (tipo !== 'comentario' && tipo !== 'sistema') {
-      return NextResponse.json({ error: 'Tipo deve ser "comentario" ou "sistema"' }, { status: 400 })
+    if (tipo !== 'sistema') {
+      return NextResponse.json({ error: 'Tipo deve ser "sistema"' }, { status: 400 })
     }
 
     const usuario = await prisma.usuario.findUnique({
@@ -28,10 +28,6 @@ export async function POST(request: Request) {
 
     if (!usuario.notificacoesAtivas) {
       return NextResponse.json({ error: 'Usuário com notificações desativadas' }, { status: 400 })
-    }
-
-    if (tipo === 'comentario' && !usuario.notificarComentarios) {
-      return NextResponse.json({ error: 'Usuário desativou notificações de comentários' }, { status: 400 })
     }
 
     if (tipo === 'sistema' && !usuario.notificarSistema) {

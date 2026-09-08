@@ -11,10 +11,8 @@ interface UsuarioResultado {
   usuario: { id: number; nome: string; email: string }
   preferencias: {
     notificacoesAtivas: boolean
-    notificarComentarios: boolean
     notificarSistema: boolean
   }
-  inscricoes: number
   cenarios: Record<string, CenarioResultado>
 }
 
@@ -30,7 +28,6 @@ export async function GET() {
         nome: true,
         email: true,
         notificacoesAtivas: true,
-        notificarComentarios: true,
         notificarSistema: true,
         inscricoes: {
           select: { id: true },
@@ -44,15 +41,12 @@ export async function GET() {
         usuario: { id: u.id, nome: u.nome, email: u.email },
         preferencias: {
           notificacoesAtivas: u.notificacoesAtivas,
-          notificarComentarios: u.notificarComentarios,
           notificarSistema: u.notificarSistema,
         },
-        inscricoes: u.inscricoes.length,
         cenarios: {},
       }
 
       const cenarios = [
-        { tipo: 'comentario', label: 'Comentário' },
         { tipo: 'sistema', label: 'Sistema' },
       ]
 
@@ -63,9 +57,6 @@ export async function GET() {
         if (!u.notificacoesAtivas) {
           bloqueado = true
           motivo = 'Notificações desativadas'
-        } else if (cenario.tipo === 'comentario' && !u.notificarComentarios) {
-          bloqueado = true
-          motivo = 'Tipo comentário desativado'
         } else if (cenario.tipo === 'sistema' && !u.notificarSistema) {
           bloqueado = true
           motivo = 'Tipo sistema desativado'

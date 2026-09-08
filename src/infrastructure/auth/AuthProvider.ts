@@ -7,7 +7,6 @@ export interface AuthUser {
   tipoUsuario: string
   aceitouTermos: boolean
   notificacoesAtivas: boolean
-  notificarComentarios: boolean
   notificarSistema: boolean
   isAdmin: boolean
   criadoEm: Date

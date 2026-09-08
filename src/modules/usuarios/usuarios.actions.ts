@@ -155,7 +155,6 @@ export async function toggleNotificacoes(enabled: boolean) {
 }
 
 export async function atualizarPreferenciasNotificacao(preferencias: {
-  notificarComentarios?: boolean
   notificarSistema?: boolean
   notificarQuestionarios?: boolean
 }) {

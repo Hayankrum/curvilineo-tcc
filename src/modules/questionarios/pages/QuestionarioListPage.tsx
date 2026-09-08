@@ -46,7 +46,7 @@ export default function QuestionarioListPage() {
       porPagina: 10,
     })
     if ('questionarios' in result) {
-      setQuestionarios(result.questionarios as Questionario[])
+      setQuestionarios(result.questionarios as unknown as Questionario[])
       setTotalPaginas(result.paginas as number)
       setTotal(result.total as number)
     }

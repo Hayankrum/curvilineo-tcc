@@ -125,8 +125,7 @@ export async function criarQuestionario(
   encerraEm?: Date | null,
   anonimo?: boolean,
   corTema?: string,
-  usuariosEsperados?: number | null,
-  turmaId?: number | null
+  usuariosEsperados?: number | null
 ) {
   const usuario = await getUsuarioLogado()
   if (!usuario) return { error: 'Você precisa estar logado para criar um questionário' }
@@ -141,20 +140,6 @@ export async function criarQuestionario(
   const erroPerguntas = validarPerguntas(perguntas)
   if (erroPerguntas) return { error: erroPerguntas }
 
-  if (turmaId) {
-    const temAcesso = await prisma.inscricao.findUnique({
-      where: {
-        usuarioId_turmaId: {
-          usuarioId: usuario.id,
-          turmaId
-        }
-      }
-    })
-    if (!temAcesso || temAcesso.status !== 'ativa') {
-      return { error: 'Você não tem acesso a esta sala' }
-    }
-  }
-
   const questionario = await prisma.questionario.create({
     data: {
       titulo: tituloClean,
@@ -164,7 +149,6 @@ export async function criarQuestionario(
       corTema: corTema || '#6366f1',
       usuariosEsperados: usuariosEsperados ?? null,
       autorId: usuario.id,
-      turmaId: turmaId ?? null,
       perguntas: {
         create: perguntas.map((p, idx) => ({
           texto: sanitizeInput(p.texto),
@@ -192,7 +176,6 @@ export async function criarQuestionario(
   })
 
   revalidatePath('/questionarios')
-  if (turmaId) revalidatePath(`/salas/${turmaId}`)
   return { questionario }
 }
 
@@ -204,8 +187,7 @@ export async function editarQuestionario(
   encerraEm?: Date | null,
   anonimo?: boolean,
   corTema?: string,
-  usuariosEsperados?: number | null,
-  turmaId?: number | null
+  usuariosEsperados?: number | null
 ) {
   const { error, questionario } = await obterQuestionarioDoUsuario(id)
   if (error) return { error }
@@ -223,22 +205,6 @@ export async function editarQuestionario(
 
   const erroPerguntas = validarPerguntas(perguntas)
   if (erroPerguntas) return { error: erroPerguntas }
-
-  if (turmaId) {
-    const temAcesso = await prisma.inscricao.findUnique({
-      where: {
-        usuarioId_turmaId: {
-          usuarioId: questionario!.autorId,
-          turmaId
-        }
-      }
-    })
-    if (!temAcesso || temAcesso.status !== 'ativa') {
-      return { error: 'Você não tem acesso a esta sala' }
-    }
-  }
-
-  const turmaAnteriorId = questionario!.turmaId
 
   await prisma.$transaction(async (tx) => {
     const perguntaIds = await tx.pergunta.findMany({
@@ -268,7 +234,6 @@ export async function editarQuestionario(
         anonimo: anonimo ?? undefined,
         corTema: corTema ?? undefined,
         usuariosEsperados: usuariosEsperados ?? undefined,
-        turmaId: turmaId ?? undefined,
         atualizadoEm: new Date(),
       },
     })
@@ -304,8 +269,6 @@ export async function editarQuestionario(
 
   revalidatePath('/questionarios')
   revalidatePath(`/questionarios/${id}`)
-  if (turmaAnteriorId) revalidatePath(`/salas/${turmaAnteriorId}`)
-  if (turmaId) revalidatePath(`/salas/${turmaId}`)
   redirect(`/questionarios/${id}`)
 }
 
@@ -820,7 +783,7 @@ export async function podeResponder(questionarioId: number) {
 
   const questionario = await prisma.questionario.findUnique({
     where: { id: questionarioId },
-    select: { status: true, autorId: true, anonimo: true, turmaId: true },
+    select: { status: true, autorId: true, anonimo: true },
   })
 
   if (!questionario) return { pode: false, razao: 'Questionário não encontrado' }
@@ -831,20 +794,6 @@ export async function podeResponder(questionarioId: number) {
   }
 
   if (!usuario) return { pode: false, razao: 'Não autenticado' }
-
-  if (questionario.turmaId) {
-    const temAcesso = await prisma.inscricao.findUnique({
-      where: {
-        usuarioId_turmaId: {
-          usuarioId: usuario.id,
-          turmaId: questionario.turmaId
-        }
-      }
-    })
-    if (!temAcesso || temAcesso.status !== 'ativa') {
-      return { pode: false, razao: 'Você não tem acesso a esta sala' }
-    }
-  }
 
   const respostaExistente = await prisma.resposta.findUnique({
     where: {

@@ -7,7 +7,6 @@ interface Usuario {
   nome: string
   email: string
   notificacoesAtivas: boolean
-  notificarComentarios: boolean
   notificarSistema: boolean
   inscricoes: { id: number; endpoint: string; criadoEm: string }[]
 }
@@ -15,7 +14,7 @@ interface Usuario {
 interface LogEnvio {
   key: string
   timestamp: string
-  tipo: 'sistema' | 'comentario'
+  tipo: 'sistema'
   destinatario: string
   destinatarioId: number
   resultado: 'enviado' | 'bloqueado' | 'erro'
@@ -56,15 +55,14 @@ export default function PushTestPanel() {
     setLogs((prev) => [{ ...log, key, timestamp: new Date().toLocaleTimeString('pt-BR') }, ...prev].slice(0, 50))
   }, [])
 
-  const verificarSeReceberia = (u: Usuario, tipo: 'sistema' | 'comentario') => {
+  const verificarSeReceberia = (u: Usuario, tipo: 'sistema') => {
     if (!u.notificacoesAtivas) return { receberia: false, motivo: 'Notificacoes desativadas' }
-    if (tipo === 'comentario' && !u.notificarComentarios) return { receberia: false, motivo: 'Tipo comentario desativado' }
     if (tipo === 'sistema' && !u.notificarSistema) return { receberia: false, motivo: 'Tipo sistema desativado' }
     if (u.inscricoes.length === 0) return { receberia: false, motivo: 'Sem inscricoes push' }
     return { receberia: true, motivo: null }
   }
 
-  const enviarParaUsuario = async (u: Usuario, tipo: 'sistema' | 'comentario') => {
+  const enviarParaUsuario = async (u: Usuario, tipo: 'sistema') => {
     setEnviando(u.id)
     const verificacao = verificarSeReceberia(u, tipo)
     if (!verificacao.receberia) {
@@ -86,7 +84,7 @@ export default function PushTestPanel() {
     setEnviando(null)
   }
 
-  const enviarParaTodos = async (tipo: 'sistema' | 'comentario') => {
+  const enviarParaTodos = async (tipo: 'sistema') => {
     setEnviando(-1)
     try {
       await fetch('/api/notifications/test-push', {
@@ -148,11 +146,6 @@ export default function PushTestPanel() {
             style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}>
             Enviar Todos - Sistema
           </button>
-          <button onClick={() => enviarParaTodos('comentario')} disabled={enviando !== null}
-            className="px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-50"
-            style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}>
-            Enviar Todos - Comentario
-          </button>
           <button onClick={() => { setLogs([]); fetchUsuarios() }}
             className="px-4 py-2 rounded-lg text-sm"
             style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}>
@@ -183,7 +176,6 @@ export default function PushTestPanel() {
               <div className="space-y-2 max-h-[400px] overflow-y-auto">
                 {usuariosFiltrados.map((u) => {
                   const verifSistema = verificarSeReceberia(u, 'sistema')
-                  const verifComentario = verificarSeReceberia(u, 'comentario')
                   return (
                     <div key={u.id} className="rounded-lg p-3 flex items-center gap-3"
                       style={{ backgroundColor: 'var(--input-bg)', border: '1px solid var(--border-color)' }}>
@@ -194,7 +186,6 @@ export default function PushTestPanel() {
                         </div>
                         <div className="flex items-center gap-2 mt-1">
                           <span className={`w-1.5 h-1.5 rounded-full ${u.notificacoesAtivas ? 'bg-green-500' : 'bg-red-500'}`} />
-                          <span className={`w-1.5 h-1.5 rounded-full ${u.notificarComentarios ? 'bg-green-500' : 'bg-red-500'}`} />
                           <span className={`w-1.5 h-1.5 rounded-full ${u.notificarSistema ? 'bg-green-500' : 'bg-red-500'}`} />
                         </div>
                       </div>
@@ -203,11 +194,6 @@ export default function PushTestPanel() {
                           className="px-2 py-1 rounded text-xs disabled:opacity-50"
                           style={{ backgroundColor: verifSistema.receberia ? '#16a34a20' : '#dc262620', color: verifSistema.receberia ? '#16a34a' : '#dc2626' }}>
                           {enviando === u.id ? '...' : 'Sys'}
-                        </button>
-                        <button onClick={() => enviarParaUsuario(u, 'comentario')} disabled={enviando !== null}
-                          className="px-2 py-1 rounded text-xs disabled:opacity-50"
-                          style={{ backgroundColor: verifComentario.receberia ? '#16a34a20' : '#dc262620', color: verifComentario.receberia ? '#16a34a' : '#dc2626' }}>
-                          {enviando === u.id ? '...' : 'Com'}
                         </button>
                       </div>
                     </div>
