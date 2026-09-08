@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import SinoNotificacoes from '@/modules/notificacoes/SinoNotificacoes'
 
 interface Usuario {
@@ -12,16 +13,18 @@ interface Usuario {
 export default function Navbar() {
   const [usuario, setUsuario] = useState<Usuario | null>(null)
   const [loaded, setLoaded] = useState(false)
+  const pathname = usePathname()
 
   useEffect(() => {
     fetch('/api/me')
       .then(r => r.json())
       .then(data => {
         if (data?.id) setUsuario(data)
+        else setUsuario(null)
       })
-      .catch(() => {})
+      .catch(() => setUsuario(null))
       .finally(() => setLoaded(true))
-  }, [])
+  }, [pathname])
 
   return (
     <nav className="border-b px-6 py-4" style={{ borderColor: 'var(--border-color)' }}>
