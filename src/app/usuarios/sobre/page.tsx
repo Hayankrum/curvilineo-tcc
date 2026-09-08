@@ -30,8 +30,8 @@ function ShareSection() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Meu App',
-          text: 'Confira o Meu App!',
+          title: 'Ellora',
+          text: 'Confira o Ellora!',
           url: shareData.url,
         })
       } catch {
@@ -131,7 +131,7 @@ export default function SobrePage() {
 
       <div className="flex flex-col gap-6">
         <section className="rounded-lg p-5" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
-          <h2 className="font-medium mb-3" style={{ color: 'var(--text-primary)' }}>Meu App</h2>
+          <h2 className="font-medium mb-3" style={{ color: 'var(--text-primary)' }}>Ellora</h2>
           <p className="text-sm mb-4 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
             Uma plataforma completa para criar e responder questionários com suporte offline,
             notificações push e gerenciamento de usuários.

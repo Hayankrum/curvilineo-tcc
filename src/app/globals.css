@@ -20,7 +20,7 @@
   --input-focus: #a1a1aa;
   --card-bg: #f4f4f5;
   --card-border: #e4e4e7;
-  --watermark-opacity: 0.06;
+  --watermark-opacity: 0.2;
 }
 
 html.dark {
@@ -41,7 +41,7 @@ html.dark {
   --input-focus: #71717a;
   --card-bg: #18181b;
   --card-border: #27272a;
-  --watermark-opacity: 0.08;
+  --watermark-opacity: 0.2;
 }
 
 @theme inline {

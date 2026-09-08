@@ -43,7 +43,7 @@ export async function POST(request: Request) {
       title: titulo,
       body: mensagem,
       url: url || '/',
-      icon: '/icons/icon.svg',
+      icon: '/icons/Ellora.svg',
     })
 
     for (const u of usuarios) {

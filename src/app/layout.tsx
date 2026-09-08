@@ -15,13 +15,13 @@ const geist = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "Meu App",
-  description: "Meu app Next.js com modo offline",
+  title: "Ellora",
+  description: "Ellora - Plataforma moderna",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Meu App",
+    title: "Ellora",
   },
   formatDetection: {
     telephone: false,
@@ -48,7 +48,7 @@ export default async function RootLayout({
   return (
     <html lang="pt-BR" className={`${geist.variable} h-full antialiased`} suppressHydrationWarning>
       <head>
-        <link rel="apple-touch-icon" href="/icons/icon.svg" />
+        <link rel="apple-touch-icon" href="/icons/Ellora.svg" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <script
@@ -72,6 +72,7 @@ export default async function RootLayout({
         <ThemeProvider>
           <ServiceWorkerRegister />
           <Navbar />
+          <div className="h-[60px]" />
           <TermosChecker usuario={usuario}>
             <main className="flex-1 max-w-3xl mx-auto w-full px-6 py-10">
               {children}

@@ -4,7 +4,7 @@ interface HeroMinimalProps {
   className?: string
 }
 
-export default function HeroMinimal({ children, logoSrc = '/icons/icon.svg', className }: HeroMinimalProps) {
+export default function HeroMinimal({ children, logoSrc = '/icons/Ellora.svg', className }: HeroMinimalProps) {
   return (
     <section
       className={`relative overflow-hidden min-h-[60vh] md:min-h-[70vh] flex items-center md:items-center ${className ?? ''}`}
@@ -20,7 +20,7 @@ export default function HeroMinimal({ children, logoSrc = '/icons/icon.svg', cla
           src={logoSrc}
           alt=""
           className="w-[50vw] h-auto md:w-[40vw] max-w-[420px] min-w-[180px]"
-          style={{ opacity: 'var(--watermark-opacity, 0.06)' }}
+          style={{ opacity: 'var(--watermark-opacity, 0.8)' }}
         />
       </div>
 

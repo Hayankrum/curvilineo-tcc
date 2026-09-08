@@ -58,7 +58,7 @@ export default function InstallPWMPopup() {
         <line x1="12" y1="15" x2="12" y2="3" />
       </svg>
       <div className="flex flex-col">
-        <span className="text-sm font-bold">Instalar Meu App</span>
+        <span className="text-sm font-bold">Instalar Ellora</span>
         <span className="text-xs opacity-80">Acesse rápido pela tela inicial</span>
       </div>
       <button

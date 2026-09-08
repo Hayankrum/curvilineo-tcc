@@ -9,7 +9,7 @@ self.addEventListener('install', (event) => {
       cache.addAll([
         '/',
         '/offline',
-        '/icons/icon.svg',
+        '/icons/Ellora.svg',
         '/manifest.json',
       ])
     ).then(() => {
@@ -154,8 +154,8 @@ self.addEventListener('push', (event) => {
 
   const options = {
     body: data.body || data.mensagem,
-    icon: data.icon || '/icons/icon.svg',
-    badge: data.badge || '/icons/icon.svg',
+    icon: data.icon || '/icons/Ellora.svg',
+    badge: data.badge || '/icons/Ellora.svg',
     vibrate: [100, 50, 100],
     data: { url: data.url || '/' },
     tag: data.tag || 'default',

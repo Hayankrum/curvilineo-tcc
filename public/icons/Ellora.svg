@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="150mm"
+   height="150mm"
+   viewBox="0 0 150 150"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="Ellora.svg"
+   inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="1.1099271"
+     inkscape:cx="378.85371"
+     inkscape:cy="378.85371"
+     inkscape:window-width="1920"
+     inkscape:window-height="1048"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg1" />
+  <defs
+     id="defs1" />
+  <g
+     id="layer1"
+     style="fill:#ffcf00;fill-opacity:1"
+     transform="translate(-27.47721,-27.477212)">
+    <path
+       id="text2"
+       style="font-size:88.7492px;font-family:'Arial Black';-inkscape-font-specification:'Arial Black, ';fill:#ffcf00;fill-opacity:1;fill-rule:evenodd;stroke-width:55.9045;stroke-opacity:0.996078"
+       transform="scale(1.0053789,0.99464988)"
+       d="M 69.625491,75.71618 H 122.23366 V 89.2799 H 89.299386 V 99.376855 H 119.85026 V 112.33389 H 89.299386 v 12.52369 h 33.887634 v 14.38708 H 69.625491 Z M 142.24796,59.790685 a 9.5066706,9.6092165 0 0 1 -9.50667,9.609218 9.5066706,9.6092165 0 0 1 -9.50667,-9.609218 9.5066706,9.6092165 0 0 1 9.50667,-9.609216 9.5066706,9.6092165 0 0 1 9.50667,9.609216 z M 43.244602,57.787958 144.75451,43.711071 158.68117,146.31594 57.171266,160.39283 Z" />
+  </g>
+</svg>

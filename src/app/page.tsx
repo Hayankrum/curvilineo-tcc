@@ -17,7 +17,7 @@ export default async function Home() {
             </span>
           </>
         ) : (
-          'Bem-vindo ao Meu App'
+          'Bem-vindo ao Ellora'
         )}
       </h1>
 

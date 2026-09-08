@@ -1,7 +1,7 @@
 {
-  "name": "Meu App",
-  "short_name": "MeuApp",
-  "description": "Meu app Next.js com modo offline",
+  "name": "Ellora",
+  "short_name": "Ellora",
+  "description": "Ellora - Plataforma moderna",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#09090b",
@@ -9,7 +9,7 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/icons/icon.svg",
+      "src": "/icons/Ellora.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
