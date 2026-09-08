@@ -131,7 +131,7 @@ export default function NotificacoesPage() {
           <div>
             <h2 className="font-medium mb-1" style={{ color: 'var(--text-primary)' }}>Notificações Push</h2>
             <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-              Receba notificações quando alguém comentar nos seus posts
+              Receba notificações push do sistema
             </p>
           </div>
           <button
@@ -234,8 +234,8 @@ export default function NotificacoesPage() {
       </div>
 
       <div className="mt-6">
-        <Link href="/posts" className="text-sm transition-colors hover:underline" style={{ color: 'var(--text-tertiary)' }}>
-          ← Voltar para os posts
+        <Link href="/questionarios" className="text-sm transition-colors hover:underline" style={{ color: 'var(--text-tertiary)' }}>
+          ← Voltar para questionários
         </Link>
       </div>
     </div>

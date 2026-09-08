@@ -84,10 +84,10 @@ export default function NotificationPermissionPopup({ usuarioId }: Props) {
         </span>
         <span className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
           {success
-            ? 'Você receberá alertas quando alguém comentar'
+            ? 'Você receberá alertas do sistema'
             : permissionDenied
               ? 'Clique no ícone 🔒 na barra de endereço e ative'
-              : 'Receba alertas quando alguém comentar nos seus posts'}
+              : 'Receba notificações push do sistema'}
         </span>
         {error && (
           <span className="text-xs mt-1 text-red-500 whitespace-pre-line">{error}</span>

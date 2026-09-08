@@ -49,7 +49,7 @@ export default async function AdminPage() {
           gap: '1.5rem'
         }}>
           <Link
-            href="/cadastro"
+            href="/usuarios/configuracoes"
             style={{
               padding: '2rem',
               backgroundColor: 'var(--card-bg)',
@@ -88,14 +88,14 @@ export default async function AdminPage() {
                 color: 'var(--text-primary)',
                 fontSize: '1.25rem'
               }}>
-                Usuários
+                Configurações
               </h2>
               <p style={{
                 margin: 0,
                 color: 'var(--text-secondary)',
                 fontSize: '0.9rem'
               }}>
-                Gerenciar inscrições de usuários
+                Gerenciar preferências e configurações do sistema
               </p>
             </div>
           </Link>

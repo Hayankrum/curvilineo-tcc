@@ -22,16 +22,16 @@ export default async function Home() {
       </h1>
 
       <p className="leading-relaxed mb-8 max-w-md" style={{ color: 'var(--text-secondary)' }}>
-        Um app de base com sistema de posts e autenticação de usuários.
+        Plataforma de questionários com notificações push e autenticação de usuários.
       </p>
 
       <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
         <Link
-          href="/posts"
+          href="/questionarios"
           className="font-medium rounded-lg px-6 py-3 text-sm transition-colors text-center min-h-[44px] flex items-center justify-center"
           style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
         >
-          Ver posts
+          Ver questionários
         </Link>
 
         {!usuario && (

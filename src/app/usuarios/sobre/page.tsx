@@ -133,8 +133,8 @@ export default function SobrePage() {
         <section className="rounded-lg p-5" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
           <h2 className="font-medium mb-3" style={{ color: 'var(--text-primary)' }}>Meu App</h2>
           <p className="text-sm mb-4 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-            Uma plataforma completa para criar, compartilhar e explorar posts com suporte offline,
-            notificações push e mapa interativo.
+            Uma plataforma completa para criar e responder questionários com suporte offline,
+            notificações push e gerenciamento de usuários.
           </p>
           <div className="flex items-center gap-2 mb-4">
             <span className="w-2 h-2 rounded-full bg-green-500" />
@@ -147,11 +147,7 @@ export default function SobrePage() {
           <ul className="text-sm space-y-2" style={{ color: 'var(--text-secondary)' }}>
             <li className="flex items-center gap-2">
               <span>📝</span>
-              <span>Criação e gerenciamento de posts</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <span>🗺️</span>
-              <span>Mapa interativo com Leaflet</span>
+              <span>Criação e gerenciamento de questionários</span>
             </li>
             <li className="flex items-center gap-2">
               <span>🔔</span>
@@ -183,7 +179,7 @@ export default function SobrePage() {
         <section className="rounded-lg p-5" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
           <h2 className="font-medium mb-3" style={{ color: 'var(--text-primary)' }}>Tecnologias</h2>
           <div className="flex flex-wrap gap-2">
-            {['Next.js', 'React', 'TypeScript', 'Tailwind CSS', 'Prisma', 'PostgreSQL', 'Leaflet'].map((tech) => (
+            {['Next.js', 'React', 'TypeScript', 'Tailwind CSS', 'Prisma', 'PostgreSQL'].map((tech) => (
               <span
                 key={tech}
                 className="px-2.5 py-1 rounded-md text-xs"

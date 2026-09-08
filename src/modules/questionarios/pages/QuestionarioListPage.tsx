@@ -143,46 +143,31 @@ export default function QuestionarioListPage() {
 
       <div className="flex flex-col gap-4">
         {questionarios.map((q) => (
-          <div key={q.id} className="rounded-lg p-5" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <h2 className="font-medium text-lg mb-1" style={{ color: 'var(--text-primary)' }}>{q.titulo}</h2>
-                {q.descricao && (
-                  <p className="text-sm mb-2 line-clamp-2" style={{ color: 'var(--text-secondary)' }}>{q.descricao}</p>
-                )}
-                <div className="flex items-center gap-4 text-xs" style={{ color: 'var(--text-tertiary)' }}>
-                  <span
-                    className="px-2 py-0.5 rounded-full font-medium"
-                    style={{ backgroundColor: `${STATUS_COLORS[q.status]}20`, color: STATUS_COLORS[q.status] }}
-                  >
-                    {STATUS_LABELS[q.status] || q.status}
-                  </span>
-                  <span>por {q.autor.nome}</span>
-                  <span>{q.totalPerguntas} {q.totalPerguntas === 1 ? 'pergunta' : 'perguntas'}</span>
-                  <span>{q.totalRespostas} {q.totalRespostas === 1 ? 'resposta' : 'respostas'}</span>
-                  {q.anonimo && <span>Anônimo</span>}
-                </div>
-              </div>
-              <div className="flex gap-2 ml-4">
-                <Link
-                  href={`/questionarios/${q.id}`}
-                  className="text-sm px-3 py-1.5 rounded-lg transition-colors"
-                  style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}
-                >
-                  Ver
-                </Link>
-                {q.status === 'publicado' && (
-                  <Link
-                    href={`/questionarios/${q.id}/responder`}
-                    className="text-sm font-medium rounded-lg px-4 py-2 transition-colors"
-                    style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
-                  >
-                    Responder
-                  </Link>
-                )}
-              </div>
+          <Link
+            key={q.id}
+            href={`/questionarios/${q.id}`}
+            className="rounded-lg p-5 block transition-colors hover:opacity-90"
+            style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)', textDecoration: 'none' }}
+          >
+            <h2 className="font-medium text-lg mb-1" style={{ color: 'var(--text-primary)' }}>{q.titulo}</h2>
+            {q.descricao && (
+              <p className="text-sm mb-2 line-clamp-2" style={{ color: 'var(--text-secondary)' }}>{q.descricao}</p>
+            )}
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs mb-1" style={{ color: 'var(--text-tertiary)' }}>
+              <span
+                className="px-2 py-0.5 rounded-full font-medium"
+                style={{ backgroundColor: `${STATUS_COLORS[q.status]}20`, color: STATUS_COLORS[q.status] }}
+              >
+                {STATUS_LABELS[q.status] || q.status}
+              </span>
+              <span>{q.totalPerguntas} {q.totalPerguntas === 1 ? 'pergunta' : 'perguntas'}</span>
+              <span>{q.totalRespostas} {q.totalRespostas === 1 ? 'resposta' : 'respostas'}</span>
+              {q.anonimo && <span>Anônimo</span>}
             </div>
-          </div>
+            <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
+              por {q.autor.nome}
+            </p>
+          </Link>
         ))}
       </div>
 

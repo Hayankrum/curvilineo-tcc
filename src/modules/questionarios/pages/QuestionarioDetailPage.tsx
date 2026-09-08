@@ -293,7 +293,7 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
         </div>
       )}
 
-      {isAutor && questionario.status === 'publicado' && (
+      {questionario.status === 'publicado' && (
         <div
           className="rounded-lg p-4"
           style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}
@@ -317,7 +317,7 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
                   setTimeout(() => setCopiado(false), 2000)
                 }}
                 className="text-xs font-medium rounded-lg px-3 py-1.5 transition-colors w-fit"
-                style={{ backgroundColor: copiado ? '#22c55e' : 'var(--btn-primary-bg)', color: '#fff' }}
+                style={{ backgroundColor: copiado ? '#22c55e' : 'var(--btn-primary-bg)', color: copiado ? '#fff' : 'var(--btn-primary-text)' }}
               >
                 {copiado ? 'Copiado!' : 'Copiar link'}
               </button>
