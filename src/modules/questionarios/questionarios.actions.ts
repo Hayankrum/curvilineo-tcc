@@ -849,7 +849,6 @@ export async function obterResultados(
   }
 ) {
   const usuario = await getUsuarioLogado()
-  if (!usuario) return { error: 'Você precisa estar logado' }
 
   const questionario = await prisma.questionario.findUnique({
     where: { id: questionarioId },
@@ -857,7 +856,6 @@ export async function obterResultados(
   })
 
   if (!questionario) return { error: 'Questionário não encontrado' }
-  if (questionario.autorId !== usuario.id) return { error: 'Apenas o autor pode ver os resultados' }
 
   const whereRespostas: Record<string, unknown> = {}
   if (filtros?.dataInicio && filtros.dataInicio.trim()) {

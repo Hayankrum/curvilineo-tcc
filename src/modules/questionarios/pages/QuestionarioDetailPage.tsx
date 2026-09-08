@@ -187,14 +187,13 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
         {questionario.descricao && (
           <p className="text-sm mb-3" style={{ color: 'var(--text-secondary)' }}>{questionario.descricao}</p>
         )}
-        <div className="flex items-center gap-4 text-xs" style={{ color: 'var(--text-tertiary)' }}>
+        <div className="flex items-center gap-4 text-xs flex-wrap" style={{ color: 'var(--text-tertiary)' }}>
           <span
             className="px-2 py-0.5 rounded-full font-medium"
             style={{ backgroundColor: `${STATUS_COLORS[questionario.status]}20`, color: STATUS_COLORS[questionario.status] }}
           >
             {STATUS_LABELS[questionario.status]}
           </span>
-          <span>por {questionario.autor.nome}</span>
           <span>{questionario.totalRespostas} {questionario.totalRespostas === 1 ? 'resposta' : 'respostas'}</span>
           {questionario.anonimo && <span>Anônimo</span>}
           {encerraData && <span>Encerra {encerraData.toLocaleDateString('pt-BR')}</span>}
@@ -204,6 +203,7 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
             </span>
           )}
         </div>
+        <p className="text-xs mt-1" style={{ color: 'var(--text-tertiary)' }}>por {questionario.autor.nome}</p>
       </div>
 
       {isAutor && (
@@ -236,51 +236,24 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
             </div>
           )}
           {questionario.status === 'publicado' && (
-            <div className="flex">
-              <button
-                onClick={() => handleStatusAction('encerrar')}
-                disabled={processando}
-                className="text-xs font-medium px-3 py-1.5 transition-colors -ml-px first:ml-0 first:rounded-l-lg disabled:opacity-50"
-                style={{ backgroundColor: '#f59e0b', color: '#000', border: '1px solid #d97706' }}
-              >
-                Encerrar
-              </button>
-              <Link
-                href={`/questionarios/${questionario.id}/resultados`}
-                className="text-xs font-medium px-3 py-1.5 transition-colors -ml-px last:rounded-r-lg hover:underline"
-                style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)', border: '1px solid var(--card-border)' }}
-              >
-                Ver resultados
-              </Link>
-            </div>
+            <button
+              onClick={() => handleStatusAction('encerrar')}
+              disabled={processando}
+              className="text-xs font-medium px-3 py-1.5 transition-colors rounded-lg disabled:opacity-50"
+              style={{ backgroundColor: '#f59e0b', color: '#000', border: '1px solid #d97706' }}
+            >
+              Encerrar
+            </button>
           )}
           {questionario.status === 'encerrado' && (
-            <div className="flex">
-              <button
-                onClick={() => handleStatusAction('arquivar')}
-                disabled={processando}
-                className="text-xs font-medium px-3 py-1.5 transition-colors -ml-px first:ml-0 first:rounded-l-lg disabled:opacity-50"
-                style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)', border: '1px solid var(--card-border)' }}
-              >
-                Arquivar
-              </button>
-              <Link
-                href={`/questionarios/${questionario.id}/resultados`}
-                className="text-xs font-medium px-3 py-1.5 transition-colors -ml-px last:rounded-r-lg hover:underline"
-                style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)', border: '1px solid var(--card-border)' }}
-              >
-                Ver resultados
-              </Link>
-            </div>
-          )}
-          {questionario.status !== 'rascunho' && questionario.status !== 'publicado' && questionario.status !== 'encerrado' && (
-            <Link
-              href={`/questionarios/${questionario.id}/resultados`}
-              className="text-xs font-medium px-3 py-1.5 transition-colors rounded-lg hover:underline"
+            <button
+              onClick={() => handleStatusAction('arquivar')}
+              disabled={processando}
+              className="text-xs font-medium px-3 py-1.5 transition-colors rounded-lg disabled:opacity-50"
               style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)', border: '1px solid var(--card-border)' }}
             >
-              Ver resultados
-            </Link>
+              Arquivar
+            </button>
           )}
           <button
             onClick={handleDuplicar}
@@ -293,63 +266,65 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
         </div>
       )}
 
-      {questionario.status === 'publicado' && (
-        <div
-          className="rounded-lg p-4"
-          style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}
-        >
-          <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-primary)' }}>Compartilhar</p>
-          <div className="flex items-start gap-4">
-            {qrCode ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={qrCode} alt="QR Code" className="w-24 h-24 rounded shrink-0" />
-            ) : (
-              <div className="w-24 h-24 rounded flex items-center justify-center shrink-0" style={{ backgroundColor: 'var(--input-bg)' }}>
-                <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>Gerando...</p>
-              </div>
-            )}
-            <div className="flex flex-col gap-2 flex-1 min-w-0">
-              <p className="text-xs break-all" style={{ color: 'var(--text-tertiary)' }}>{shareUrl}</p>
-              <button
-                onClick={async () => {
-                  try { await navigator.clipboard.writeText(shareUrl) } catch { /* ignore */ }
-                  setCopiado(true)
-                  setTimeout(() => setCopiado(false), 2000)
-                }}
-                className="text-xs font-medium rounded-lg px-3 py-1.5 transition-colors w-fit"
-                style={{ backgroundColor: copiado ? '#22c55e' : 'var(--btn-primary-bg)', color: copiado ? '#fff' : 'var(--btn-primary-text)' }}
-              >
-                {copiado ? 'Copiado!' : 'Copiar link'}
-              </button>
+      <div
+        className="rounded-lg p-4"
+        style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}
+      >
+        <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-primary)' }}>Compartilhar</p>
+        <div className="flex items-start gap-4">
+          {qrCode ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={qrCode} alt="QR Code" className="w-24 h-24 rounded shrink-0" />
+          ) : (
+            <div className="w-24 h-24 rounded flex items-center justify-center shrink-0" style={{ backgroundColor: 'var(--input-bg)' }}>
+              <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>Gerando...</p>
             </div>
+          )}
+          <div className="flex flex-col gap-2 flex-1 min-w-0">
+            <p className="text-xs break-all" style={{ color: 'var(--text-tertiary)' }}>{shareUrl}</p>
+            <button
+              onClick={async () => {
+                try { await navigator.clipboard.writeText(shareUrl) } catch { /* ignore */ }
+                setCopiado(true)
+                setTimeout(() => setCopiado(false), 2000)
+              }}
+              className="text-xs font-medium rounded-lg px-3 py-1.5 transition-colors w-fit"
+              style={{ backgroundColor: copiado ? '#22c55e' : 'var(--btn-primary-bg)', color: copiado ? '#fff' : 'var(--btn-primary-text)' }}
+            >
+              {copiado ? 'Copiado!' : 'Copiar link'}
+            </button>
           </div>
         </div>
-      )}
+      </div>
 
-      {podeResp.pode && (
+      <div className="flex">
         <Link
           href={`/questionarios/${questionario.id}/responder`}
-          className="font-medium rounded-lg px-4 py-2 text-sm transition-colors w-fit"
-          style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
+          className="text-xs font-medium px-3 py-1.5 transition-colors -ml-px first:ml-0 first:rounded-l-lg last:rounded-r-lg disabled:opacity-40 disabled:pointer-events-none"
+          style={{ backgroundColor: 'var(--card-bg)', color: 'var(--text-tertiary)', border: '1px solid var(--card-border)' }}
+          aria-disabled={!podeResp.pode}
+          tabIndex={podeResp.pode ? 0 : -1}
+          onClick={(e) => { if (!podeResp.pode) e.preventDefault() }}
         >
-          Responder questionário
+          {podeResp.pode ? 'Responder questionário' : 'Indisponível'}
         </Link>
-      )}
+        <Link
+          href={`/questionarios/${questionario.id}/resultados`}
+          className="text-xs font-medium px-3 py-1.5 transition-colors -ml-px first:ml-0 first:rounded-l-lg last:rounded-r-lg"
+          style={{ backgroundColor: 'var(--card-bg)', color: 'var(--text-tertiary)', border: '1px solid var(--card-border)' }}
+        >
+          Ver resultados
+        </Link>
+      </div>
 
       {podeResp.jaRespondeu && !isAutor && (
         <Link
           href={`/questionarios/${questionario.id}/editar-resposta`}
-          className="font-medium rounded-lg px-4 py-2 text-sm transition-colors w-fit"
-          style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}
+          className="text-xs font-medium px-3 py-1.5 transition-colors rounded-lg w-fit"
+          style={{ backgroundColor: 'var(--card-bg)', color: 'var(--text-tertiary)', border: '1px solid var(--card-border)' }}
         >
           Editar minha resposta
         </Link>
-      )}
-
-      {!podeResp.pode && !podeResp.jaRespondeu && !isAutor && questionario.status === 'publicado' && (
-        <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>
-          {podeResp.razao || 'Você não pode responder este questionário'}
-        </p>
       )}
 
       <div className="flex flex-col gap-4">

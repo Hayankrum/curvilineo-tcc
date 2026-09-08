@@ -69,13 +69,8 @@ export default function ResultadosPage({ questionarioId }: Props) {
   useEffect(() => {
     if (loadingUsuario) return
 
-    if (!usuario) {
-      router.push('/usuarios/login')
-      return
-    }
-
     carregarResultados().then(() => setLoading(false))
-  }, [questionarioId, usuario, loadingUsuario]) // removido router
+  }, [questionarioId, loadingUsuario])
 
   async function handleFiltrar(filtros: { dataInicio: string; dataFim: string }) {
     setFiltrando(true)
@@ -147,13 +142,13 @@ export default function ResultadosPage({ questionarioId }: Props) {
 
       <FiltroResultados onFiltrar={handleFiltrar} loading={filtrando} />
 
-      {dados.respondentes.length > 0 && (
+      {dados.respondentes.length > 0 && !dados.questionario.anonimo && (
         <div
           className="rounded-lg p-4"
           style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}
         >
-          <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-primary)' }}>
-            Quem respondeu ({dados.respondentes.length})
+          <p className="text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
+            Quem respondeu
           </p>
           <div className="flex flex-col gap-1">
             {dados.respondentes.map((r) => (
