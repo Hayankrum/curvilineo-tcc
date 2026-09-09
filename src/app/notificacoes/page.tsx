@@ -152,133 +152,143 @@ export default function NotificacoesPage() {
         </div>
       )}
 
-      <div className="rounded-lg p-6 mb-6" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
+      <div className="rounded-lg p-4 mb-6" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
         <div className="flex items-center justify-between">
-          <div>
-            <h2 className="font-medium mb-1" style={{ color: 'var(--text-primary)' }}>Notificações Push</h2>
-            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-              Receba notificações push do sistema
-            </p>
+          <div className="flex items-center gap-3">
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isSubscribed ? 'bg-green-500/20' : 'bg-zinc-500/20'}`}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={isSubscribed ? '#22c55e' : '#71717a'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+              </svg>
+            </div>
+            <div>
+              <h2 className="font-medium text-sm" style={{ color: 'var(--text-primary)' }}>Push</h2>
+              <p className="text-xs" style={{ color: isSubscribed ? '#22c55e' : 'var(--text-tertiary)' }}>
+                {isSubscribed ? 'Ativo' : 'Inativo'}
+              </p>
+            </div>
           </div>
           <button
             onClick={handleToggle}
-            className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            className="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
             style={isSubscribed ? { backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' } : { backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
           >
             {isSubscribed ? 'Desativar' : 'Ativar'}
           </button>
         </div>
-        <div className="mt-4 flex items-center gap-2">
-          <span className={`w-2 h-2 rounded-full ${isSubscribed ? 'bg-green-500' : 'bg-zinc-600'}`} />
-          <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-            {isSubscribed ? 'Notificações ativas' : 'Notificações desativadas'}
-          </span>
-        </div>
       </div>
 
-      <div className="pt-6" style={{ borderTop: '1px solid var(--border-color)' }}>
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <h2 className="font-medium" style={{ color: 'var(--text-primary)' }}>Histórico</h2>
+      <div className="pt-4" style={{ borderTop: '1px solid var(--border-color)' }}>
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <h2 className="font-medium text-sm" style={{ color: 'var(--text-primary)' }}>Histórico</h2>
             {totalNaoLidas > 0 && (
-              <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: 'var(--card-bg)', color: 'var(--text-tertiary)', border: '1px solid var(--card-border)' }}>
-                {totalNaoLidas} não lida{totalNaoLidas > 1 ? 's' : ''}
+              <span className="text-xs px-1.5 py-0.5 rounded-full font-medium" style={{ backgroundColor: '#f59e0b', color: '#000' }}>
+                {totalNaoLidas}
               </span>
             )}
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             {historico.some((n) => !n.lida) && (
               <button
                 onClick={marcarTodasComoLidas}
-                className="text-xs transition-colors hover:underline"
+                className="p-1.5 rounded-lg transition-colors"
                 style={{ color: 'var(--text-tertiary)' }}
+                title="Marcar todas como lidas"
               >
-                Marcar todas como lidas
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                  <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
               </button>
             )}
             {historico.length > 0 && (
               <button
                 onClick={excluirTodas}
-                className="text-xs transition-colors hover:underline"
+                className="p-1.5 rounded-lg transition-colors"
                 style={{ color: '#dc2626' }}
+                title="Excluir todas"
               >
-                Excluir todas
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 6h18" />
+                  <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                  <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                </svg>
               </button>
             )}
           </div>
         </div>
 
         {loadingHistorico ? (
-          <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>Carregando histórico...</p>
+          <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>Carregando...</p>
         ) : historico.length === 0 ? (
-          <div className="rounded-lg p-6 text-center" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
-            <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>Nenhuma notificação recebida ainda.</p>
+          <div className="rounded-lg p-8 text-center" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mx-auto mb-2 opacity-30" style={{ color: 'var(--text-tertiary)' }}>
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+            <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>Nenhuma notificação</p>
           </div>
         ) : (
           <div className="space-y-2">
             {historico.map((notificacao) => (
               <div
                 key={notificacao.id}
-                className="rounded-lg p-4 transition-colors"
+                className="rounded-lg p-3 transition-colors"
                 style={{
                   backgroundColor: 'var(--card-bg)',
                   border: '1px solid var(--card-border)',
-                  opacity: notificacao.lida ? 0.7 : 1,
+                  opacity: notificacao.lida ? 0.6 : 1,
                 }}
               >
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-2">
                   {!notificacao.lida && (
-                    <span className="w-2 h-2 rounded-full flex-shrink-0 mt-1.5" style={{ backgroundColor: 'var(--text-tertiary)' }} />
+                    <span className="w-2 h-2 rounded-full flex-shrink-0 mt-1.5" style={{ backgroundColor: '#22c55e' }} />
                   )}
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-sm" style={{ color: 'var(--text-primary)' }}>
+                    <h3 className="font-medium text-sm leading-tight" style={{ color: 'var(--text-primary)' }}>
                       {notificacao.titulo}
                     </h3>
-                    <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>{notificacao.mensagem}</p>
-                    <div className="flex items-center gap-3 mt-2">
+                    <p className="text-xs mt-0.5 line-clamp-2" style={{ color: 'var(--text-secondary)' }}>{notificacao.mensagem}</p>
+                    <div className="flex items-center gap-2 mt-1.5">
+                      <span className="text-[10px]" style={{ color: 'var(--text-tertiary)' }}>
+                        {new Date(notificacao.criadaEm).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })} {new Date(notificacao.criadaEm).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                      </span>
                       {notificacao.url && (
                         <Link
                           href={notificacao.url}
-                          className="text-xs transition-colors inline-block hover:underline"
+                          className="text-[10px] transition-colors hover:underline"
                           style={{ color: 'var(--text-tertiary)' }}
-                          onClick={() => {
-                            if (!notificacao.lida) marcarComoLida(notificacao.id)
-                          }}
+                          onClick={() => { if (!notificacao.lida) marcarComoLida(notificacao.id) }}
                         >
-                          Ver detalhes →
+                          Abrir →
                         </Link>
-                      )}
-                      {!notificacao.lida && (
-                        <button
-                          onClick={() => marcarComoLida(notificacao.id)}
-                          className="text-xs transition-colors hover:underline"
-                          style={{ color: 'var(--text-tertiary)' }}
-                        >
-                          Marcar como lida
-                        </button>
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <span className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
-                      {new Date(notificacao.criadaEm).toLocaleDateString('pt-BR', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </span>
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    {!notificacao.lida && (
+                      <button
+                        onClick={() => marcarComoLida(notificacao.id)}
+                        className="p-1 rounded transition-colors"
+                        style={{ color: 'var(--text-tertiary)' }}
+                        title="Marcar como lida"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                      </button>
+                    )}
                     <button
                       onClick={() => excluirNotificacao(notificacao.id)}
                       disabled={excluindo === notificacao.id}
-                      className="p-1 rounded transition-colors hover:bg-red-100 disabled:opacity-50"
+                      className="p-1 rounded transition-colors disabled:opacity-50"
                       style={{ color: '#dc2626' }}
-                      title="Excluir notificação"
+                      title="Excluir"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M3 6h18" />
-                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
                       </svg>
                     </button>
                   </div>

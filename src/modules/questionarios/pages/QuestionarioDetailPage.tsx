@@ -83,7 +83,7 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
   useEffect(() => {
     if (!shareUrl) return
     import('qrcode').then((QRCode) => {
-      QRCode.toDataURL(shareUrl, { width: 160, margin: 2, color: { dark: '#18181b', light: '#ffffff' } })
+      QRCode.toDataURL(shareUrl, { width: 300, margin: 2, color: { dark: '#18181b', light: '#ffffff' } })
         .then((dataUrl) => setQrCode(dataUrl))
     })
   }, [shareUrl])
@@ -294,9 +294,9 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
         <div className="flex items-start gap-4">
           {qrCode ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={qrCode} alt="QR Code" className="w-24 h-24 rounded shrink-0" />
+            <img src={qrCode} alt="QR Code" className="w-40 h-40 rounded shrink-0" />
           ) : (
-            <div className="w-24 h-24 rounded flex items-center justify-center shrink-0" style={{ backgroundColor: 'var(--input-bg)' }}>
+            <div className="w-40 h-40 rounded flex items-center justify-center shrink-0" style={{ backgroundColor: 'var(--input-bg)' }}>
               <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>Gerando...</p>
             </div>
           )}

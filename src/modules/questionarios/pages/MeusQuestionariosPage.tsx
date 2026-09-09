@@ -105,11 +105,11 @@ export default function MeusQuestionariosPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <h1 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>Meus Questionários</h1>
         <Link
           href="/questionarios/novo"
-          className="font-medium rounded-lg px-4 py-2 flex items-center gap-2 transition-colors text-sm"
+          className="font-medium rounded-lg px-4 py-2 flex items-center justify-center gap-2 transition-colors text-sm w-full sm:w-auto"
           style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
         >
           <span>+</span>
@@ -124,12 +124,12 @@ export default function MeusQuestionariosPage() {
           value={busca}
           onChange={(e) => setBusca(e.target.value)}
           placeholder="Buscar meus questionários..."
-          className="flex-1 rounded-lg px-4 py-2 text-sm focus:outline-none transition-colors"
+          className="flex-1 min-w-0 rounded-lg px-4 py-2 text-sm focus:outline-none transition-colors"
           style={{ backgroundColor: 'var(--input-bg)', border: '1px solid var(--input-border)', color: 'var(--text-primary)' }}
         />
         <button
           type="submit"
-          className="font-medium rounded-lg w-8 h-8 flex items-center justify-center transition-colors"
+          className="font-medium rounded-lg w-8 h-8 flex items-center justify-center transition-colors shrink-0"
           style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}
           title="Buscar"
         >
@@ -141,13 +141,13 @@ export default function MeusQuestionariosPage() {
       </form>
 
       {/* Filtros de status */}
-      <div className="flex items-center gap-3 mb-6">
-        <div className="flex">
+      <div className="mb-6 -mx-6 px-6 overflow-hidden">
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
           {Object.entries(STATUS_LABELS).map(([key, label]) => (
             <button
               key={key}
               onClick={() => handleFiltrarStatus(key)}
-              className="text-xs font-medium px-3 py-1.5 transition-colors -ml-px first:ml-0 first:rounded-l-lg last:rounded-r-lg"
+              className="text-xs font-medium px-3 py-1.5 transition-colors whitespace-nowrap rounded-lg shrink-0"
               style={{
                 backgroundColor: statusFiltro === key ? 'var(--btn-primary-bg)' : 'var(--card-bg)',
                 color: statusFiltro === key ? 'var(--btn-primary-text)' : 'var(--text-tertiary)',
@@ -188,7 +188,7 @@ export default function MeusQuestionariosPage() {
             className="rounded-lg p-5 transition-colors"
             style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}
           >
-            <div className="flex items-start justify-between gap-4 mb-3">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3">
               <Link
                 href={`/questionarios/${q.id}`}
                 className="flex-1 min-w-0"
@@ -200,7 +200,7 @@ export default function MeusQuestionariosPage() {
                 )}
               </Link>
               <span
-                className="px-2 py-0.5 rounded-full font-medium text-xs whitespace-nowrap"
+                className="px-2 py-0.5 rounded-full font-medium text-xs whitespace-nowrap self-start"
                 style={{ backgroundColor: `${STATUS_COLORS[q.status]}20`, color: STATUS_COLORS[q.status] }}
               >
                 {STATUS_LABELS[q.status] || q.status}

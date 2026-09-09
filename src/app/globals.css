@@ -231,3 +231,12 @@ input[type="range"]::-moz-range-thumb {
   border-radius: 8px !important;
   font-size: 14px !important;
 }
+
+/* Scrollbar hide for filters */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
