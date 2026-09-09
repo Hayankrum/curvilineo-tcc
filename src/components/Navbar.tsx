@@ -1,6 +1,5 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import SinoNotificacoes from '@/modules/notificacoes/SinoNotificacoes'
@@ -27,32 +26,10 @@ const navItems = [
       <polyline points="10 9 9 9 8 9"/>
     </svg>
   )},
-  { href: '/scanner', title: 'Scanner QR Code', icon: (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
-      <path d="M17 3h2a2 2 0 0 1 2 2v2"/>
-      <path d="M21 17v2a2 2 0 0 1-2 2h-2"/>
-      <path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
-      <rect x="7" y="7" width="10" height="10" rx="1"/>
-    </svg>
-  )},
 ]
 
-export default function Navbar() {
-  const [usuario, setUsuario] = useState<Usuario | null>(null)
-  const [loaded, setLoaded] = useState(false)
+export default function Navbar({ usuario }: { usuario: Usuario | null }) {
   const pathname = usePathname()
-
-  useEffect(() => {
-    fetch('/api/me')
-      .then(r => r.json())
-      .then(data => {
-        if (data?.id) setUsuario(data)
-        else setUsuario(null)
-      })
-      .catch(() => setUsuario(null))
-      .finally(() => setLoaded(true))
-  }, [pathname])
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b px-6 py-4 hidden md:block" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-primary)' }}>
@@ -80,8 +57,8 @@ export default function Navbar() {
         })}
 
         <div className="ml-auto flex items-center gap-4">
-          {loaded && usuario && <SinoNotificacoes />}
-          {loaded && usuario ? (
+          {usuario && <SinoNotificacoes />}
+          {usuario ? (
             <Link
               href={`/usuarios/${usuario.id}`}
               className="transition-colors flex items-center"
@@ -91,11 +68,11 @@ export default function Navbar() {
                 {usuario.nome.charAt(0).toUpperCase()}
               </span>
             </Link>
-          ) : loaded ? (
+          ) : (
             <Link href="/usuarios/login" className="text-sm transition-colors" style={{ color: 'var(--text-secondary)' }}>
               Entrar
             </Link>
-          ) : null}
+          )}
         </div>
       </div>
     </nav>

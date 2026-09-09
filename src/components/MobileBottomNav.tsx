@@ -1,6 +1,5 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import SinoNotificacoes from '@/modules/notificacoes/SinoNotificacoes'
@@ -16,15 +15,6 @@ const navItems = [
     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
       <polyline points="9 22 9 12 15 12 15 22"/>
-    </svg>
-  )},
-  { href: '/scanner', icon: (
-    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
-      <path d="M17 3h2a2 2 0 0 1 2 2v2"/>
-      <path d="M21 17v2a2 2 0 0 1-2 2h-2"/>
-      <path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
-      <rect x="7" y="7" width="10" height="10" rx="1"/>
     </svg>
   )},
   { href: '/questionarios', icon: (
@@ -44,21 +34,8 @@ const navItems = [
   )},
 ]
 
-export default function MobileBottomNav() {
-  const [usuario, setUsuario] = useState<Usuario | null>(null)
-  const [loaded, setLoaded] = useState(false)
+export default function MobileBottomNav({ usuario }: { usuario: Usuario | null }) {
   const pathname = usePathname()
-
-  useEffect(() => {
-    fetch('/api/me')
-      .then(r => r.json())
-      .then(data => {
-        if (data?.id) setUsuario(data)
-        else setUsuario(null)
-      })
-      .catch(() => setUsuario(null))
-      .finally(() => setLoaded(true))
-  }, [pathname])
 
   const linkClass = (isActive: boolean) =>
     `flex flex-col items-center gap-0.5 rounded-lg px-3 py-1.5 text-[11px] font-medium transition-colors ${isActive ? 'text-[#ffcf00]' : ''}`
@@ -80,7 +57,7 @@ export default function MobileBottomNav() {
           )
         })}
 
-        {loaded && usuario && (
+        {usuario && (
           <Link
             href="/notificacoes"
             className={linkClass(pathname === '/notificacoes')}
@@ -90,7 +67,7 @@ export default function MobileBottomNav() {
           </Link>
         )}
 
-        {loaded && usuario ? (
+        {usuario ? (
           <Link
             href={`/usuarios/${usuario.id}`}
             className={linkClass(pathname.startsWith(`/usuarios/${usuario.id}`))}
@@ -100,7 +77,7 @@ export default function MobileBottomNav() {
               {usuario.nome.charAt(0).toUpperCase()}
             </span>
           </Link>
-        ) : loaded ? (
+        ) : (
           <Link
             href="/usuarios/login"
             className={linkClass(false)}
@@ -112,7 +89,7 @@ export default function MobileBottomNav() {
               <line x1="15" y1="12" x2="3" y2="12"/>
             </svg>
           </Link>
-        ) : null}
+        )}
       </div>
     </nav>
   )

@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { listarMeusQuestionarios, deletarQuestionario, duplicarQuestionario, publicarQuestionario, encerrarQuestionario, arquivarQuestionario } from '../questionarios.actions'
+import { listarMeusQuestionarios, deletarQuestionario, duplicarQuestionario, publicarQuestionario, encerrarQuestionario } from '../questionarios.actions'
 
 interface Questionario {
   id: number
@@ -23,14 +23,12 @@ const STATUS_LABELS: Record<string, string> = {
   rascunho: 'Rascunho',
   publicado: 'Publicado',
   encerrado: 'Encerrado',
-  arquivado: 'Arquivado',
 }
 
 const STATUS_COLORS: Record<string, string> = {
   rascunho: 'var(--text-tertiary)',
   publicado: '#22c55e',
   encerrado: '#f59e0b',
-  arquivado: '#6b7280',
 }
 
 export default function MeusQuestionariosPage() {
@@ -105,15 +103,15 @@ export default function MeusQuestionariosPage() {
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+      <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>Meus Questionários</h1>
         <Link
           href="/questionarios/novo"
-          className="font-medium rounded-lg px-4 py-2 flex items-center justify-center gap-2 transition-colors text-sm w-full sm:w-auto"
+          className="font-medium rounded-lg w-8 h-8 flex items-center justify-center transition-colors"
           style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
+          title="Novo questionário"
         >
-          <span>+</span>
-          Novo
+          +
         </Link>
       </div>
 
@@ -141,17 +139,18 @@ export default function MeusQuestionariosPage() {
       </form>
 
       {/* Filtros de status */}
-      <div className="mb-6 -mx-6 px-6 overflow-hidden">
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+      <div className="mb-6 -mx-4 px-4 md:-mx-6 md:px-6 overflow-hidden">
+        <div className="flex gap-0 overflow-x-auto pb-1 scrollbar-hide">
           {Object.entries(STATUS_LABELS).map(([key, label]) => (
             <button
               key={key}
               onClick={() => handleFiltrarStatus(key)}
-              className="text-xs font-medium px-3 py-1.5 transition-colors whitespace-nowrap rounded-lg shrink-0"
+              className="text-xs font-medium px-3 py-1.5 transition-colors whitespace-nowrap first:rounded-l-lg last:rounded-r-lg shrink-0"
               style={{
                 backgroundColor: statusFiltro === key ? 'var(--btn-primary-bg)' : 'var(--card-bg)',
                 color: statusFiltro === key ? 'var(--btn-primary-text)' : 'var(--text-tertiary)',
                 border: '1px solid var(--card-border)',
+                marginLeft: '-1px',
               }}
             >
               {label}
@@ -188,32 +187,27 @@ export default function MeusQuestionariosPage() {
             className="rounded-lg p-5 transition-colors"
             style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}
           >
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3">
-              <Link
-                href={`/questionarios/${q.id}`}
-                className="flex-1 min-w-0"
-                style={{ textDecoration: 'none' }}
-              >
-                <h2 className="font-medium text-lg mb-1 truncate" style={{ color: 'var(--text-primary)' }}>{q.titulo}</h2>
-                {q.descricao && (
-                  <p className="text-sm mb-2 line-clamp-2" style={{ color: 'var(--text-secondary)' }}>{q.descricao}</p>
-                )}
-              </Link>
+            <Link
+              href={`/questionarios/${q.id}`}
+              className="block mb-3"
+              style={{ textDecoration: 'none' }}
+            >
+              <h2 className="font-medium text-lg mb-1" style={{ color: 'var(--text-primary)' }}>{q.titulo}</h2>
+              {q.descricao && (
+                <p className="text-sm mb-2 line-clamp-2" style={{ color: 'var(--text-secondary)' }}>{q.descricao}</p>
+              )}
+            </Link>
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs mb-3" style={{ color: 'var(--text-tertiary)' }}>
               <span
-                className="px-2 py-0.5 rounded-full font-medium text-xs whitespace-nowrap self-start"
+                className="px-2 py-0.5 rounded-full font-medium"
                 style={{ backgroundColor: `${STATUS_COLORS[q.status]}20`, color: STATUS_COLORS[q.status] }}
               >
                 {STATUS_LABELS[q.status] || q.status}
               </span>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs mb-4" style={{ color: 'var(--text-tertiary)' }}>
               <span>{q.totalPerguntas} {q.totalPerguntas === 1 ? 'pergunta' : 'perguntas'}</span>
               <span>{q.totalRespostas} {q.totalRespostas === 1 ? 'resposta' : 'respostas'}</span>
               {q.anonimo && <span>Anônimo</span>}
-              <span>Atualizado em {formatarData(q.atualizadoEm)}</span>
             </div>
-
             <div className="flex flex-wrap items-center gap-2">
               <Link
                 href={`/questionarios/${q.id}`}
@@ -251,17 +245,6 @@ export default function MeusQuestionariosPage() {
                   style={{ backgroundColor: '#f59e0b', color: '#fff' }}
                 >
                   Encerrar
-                </button>
-              )}
-
-              {q.status === 'encerrado' && (
-                <button
-                  onClick={() => handleAction(q.id, () => arquivarQuestionario(q.id))}
-                  disabled={actionLoading === q.id}
-                  className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
-                  style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-secondary)' }}
-                >
-                  Arquivar
                 </button>
               )}
 

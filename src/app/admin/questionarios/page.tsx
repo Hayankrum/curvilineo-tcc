@@ -35,14 +35,12 @@ export default async function AdminQuestionariosPage() {
     rascunho: 'Rascunho',
     publicado: 'Publicado',
     encerrado: 'Encerrado',
-    arquivado: 'Arquivado',
   }
 
   const statusColors: Record<string, string> = {
     rascunho: 'var(--text-tertiary)',
     publicado: '#22c55e',
     encerrado: '#f59e0b',
-    arquivado: 'var(--text-tertiary)',
   }
 
   return (

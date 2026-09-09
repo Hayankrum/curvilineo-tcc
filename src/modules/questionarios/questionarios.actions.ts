@@ -367,23 +367,6 @@ export async function encerrarQuestionario(id: number) {
   revalidatePath(`/questionarios/${id}`)
 }
 
-export async function arquivarQuestionario(id: number) {
-  const { error, questionario } = await obterQuestionarioDoUsuario(id)
-  if (error) return { error }
-
-  if (questionario!.status !== 'encerrado') {
-    return { error: 'Só é possível arquivar questionários encerrados' }
-  }
-
-  await prisma.questionario.update({
-    where: { id },
-    data: { status: 'arquivado' },
-  })
-
-  revalidatePath('/questionarios')
-  revalidatePath(`/questionarios/${id}`)
-}
-
 // ---------- RESPOSTAS ----------
 
 export async function enviarResposta(questionarioId: number, valores: ValorRespostaInput[], nomeAnonimo?: string) {

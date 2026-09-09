@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { getUsuarioLogado } from '@/modules/usuarios/usuarios.actions'
 import { primeiroNome } from '@/lib/utils'
 import HeroMinimal from '@/components/HeroMinimal'
+import HomeScanner from '@/components/HomeScanner'
 
 export default async function Home() {
   const usuario = await getUsuarioLogado()
@@ -25,7 +26,7 @@ export default async function Home() {
         Plataforma de questionários com notificações push e autenticação de usuários.
       </p>
 
-      <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+      <div className="flex flex-col gap-4 w-full sm:w-auto">
         {!usuario && (
           <Link
             href="/usuarios/login"
@@ -35,6 +36,7 @@ export default async function Home() {
             Entrar
           </Link>
         )}
+        <HomeScanner />
       </div>
     </HeroMinimal>
   )

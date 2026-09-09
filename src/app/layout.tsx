@@ -72,11 +72,11 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col">
         <ThemeProvider>
           <ServiceWorkerRegister />
-          <Navbar />
-          <MobileBottomNav />
+          <Navbar usuario={usuario ? { id: usuario.id, nome: usuario.nome, isAdmin: usuario.isAdmin } : null} />
+          <MobileBottomNav usuario={usuario ? { id: usuario.id, nome: usuario.nome, isAdmin: usuario.isAdmin } : null} />
           <div className="h-[60px] hidden md:block" />
           <TermosChecker usuario={usuario}>
-            <main className="flex-1 max-w-3xl mx-auto w-full px-6 py-10 pb-24 md:pb-10">
+            <main className="flex-1 w-full px-4 py-6 pb-24 md:max-w-3xl md:mx-auto md:px-6 md:py-10 md:pb-10">
               {children}
             </main>
           </TermosChecker>

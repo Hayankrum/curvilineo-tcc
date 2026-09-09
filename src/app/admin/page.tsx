@@ -46,14 +46,12 @@ export default async function AdminPage() {
     rascunho: 'var(--text-tertiary)',
     publicado: '#22c55e',
     encerrado: '#f59e0b',
-    arquivado: 'var(--text-tertiary)',
   }
 
   const statusLabels: Record<string, string> = {
     rascunho: 'Rascunho',
     publicado: 'Publicado',
     encerrado: 'Encerrado',
-    arquivado: 'Arquivado',
   }
 
   return (

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useUsuario } from '@/lib/useData'
 import { useState, useEffect } from 'react'
-import { obterQuestionario, podeResponder, publicarQuestionario, encerrarQuestionario, arquivarQuestionario, deletarQuestionario, duplicarQuestionario } from '../questionarios.actions'
+import { obterQuestionario, podeResponder, publicarQuestionario, encerrarQuestionario, deletarQuestionario, duplicarQuestionario } from '../questionarios.actions'
 
 interface Opcao {
   id: number
@@ -42,14 +42,12 @@ const STATUS_LABELS: Record<string, string> = {
   rascunho: 'Rascunho',
   publicado: 'Publicado',
   encerrado: 'Encerrado',
-  arquivado: 'Arquivado',
 }
 
 const STATUS_COLORS: Record<string, string> = {
   rascunho: 'var(--text-tertiary)',
   publicado: '#22c55e',
   encerrado: '#f59e0b',
-  arquivado: 'var(--text-tertiary)',
 }
 
 const TIPOS_LABELS: Record<string, string> = {
@@ -117,7 +115,7 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
     }
   }
 
-  async function handleStatusAction(action: 'publicar' | 'encerrar' | 'arquivar' | 'deletar') {
+  async function handleStatusAction(action: 'publicar' | 'encerrar' | 'deletar') {
     if (processando) return
     setProcessando(true)
 
@@ -129,9 +127,6 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
           break
         case 'encerrar':
           result = await encerrarQuestionario(questionarioId)
-          break
-        case 'arquivar':
-          result = await arquivarQuestionario(questionarioId)
           break
         case 'deletar':
           if (!confirm('Tem certeza que deseja excluir este questionário?')) {
@@ -244,26 +239,6 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
                 style={{ backgroundColor: '#f59e0b', color: '#000', border: '1px solid #d97706' }}
               >
                 Encerrar
-              </button>
-              <button
-                onClick={() => handleStatusAction('deletar')}
-                disabled={processando}
-                className="text-xs font-medium px-3 py-1.5 transition-colors -ml-px last:rounded-r-lg disabled:opacity-50"
-                style={{ backgroundColor: '#dc2626', color: '#fff', border: '1px solid #b91c1c' }}
-              >
-                Excluir
-              </button>
-            </div>
-          )}
-          {questionario.status === 'encerrado' && (
-            <div className="flex">
-              <button
-                onClick={() => handleStatusAction('arquivar')}
-                disabled={processando}
-                className="text-xs font-medium px-3 py-1.5 transition-colors -ml-px first:ml-0 first:rounded-l-lg disabled:opacity-50"
-                style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)', border: '1px solid var(--card-border)' }}
-              >
-                Arquivar
               </button>
               <button
                 onClick={() => handleStatusAction('deletar')}
