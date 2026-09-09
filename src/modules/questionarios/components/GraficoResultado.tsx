@@ -123,21 +123,17 @@ export default function GraficoResultado({ resultado }: Props) {
           </ResponsiveContainer>
         </div>
       ) : (
-        <div className="h-48">
+        <div className="h-56">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
                 data={dadosPizza}
                 cx="50%"
                 cy="50%"
-                labelLine={false}
-                label={({ name, percent }: { name?: string; percent?: number }) =>
-                  `${name || ''} (${((percent || 0) * 100).toFixed(0)}%)`
-                }
                 outerRadius={80}
+                innerRadius={35}
                 fill="#8884d8"
                 dataKey="value"
-                style={{ fontSize: '10px' }}
               >
                 {dadosPizza.map((_, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -156,11 +152,12 @@ export default function GraficoResultado({ resultado }: Props) {
         </div>
       )}
 
-      <div className="flex flex-wrap gap-2 mt-1">
+      <div className="flex flex-wrap gap-3 mt-2">
         {resultado.distribuicao.map((d, idx) => (
           <div key={d.opcaoId} className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--text-secondary)' }}>
-            <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: COLORS[idx % COLORS.length] }} />
-            {d.texto} ({d.count})
+            <span className="w-2.5 h-2.5 rounded-sm flex-shrink-0" style={{ backgroundColor: COLORS[idx % COLORS.length] }} />
+            <span className="truncate">{d.texto}</span>
+            <span className="text-[10px]" style={{ color: 'var(--text-tertiary)' }}>({d.count} · {d.percentual.toFixed(0)}%)</span>
           </div>
         ))}
       </div>

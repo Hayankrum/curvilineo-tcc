@@ -19,12 +19,10 @@ export default async function AdminPage() {
   const usuario = await obterSessao()
   if (!usuario || !usuario.isAdmin) redirect('/')
 
-  const [totalUsuarios, totalQuestionarios, totalRespostas, totalCanais, totalPublicacoes, ultimosUsuarios, ultimosQuestionarios] = await Promise.all([
+  const [totalUsuarios, totalQuestionarios, totalRespostas, ultimosUsuarios, ultimosQuestionarios] = await Promise.all([
     prisma.usuario.count(),
     prisma.questionario.count(),
     prisma.resposta.count(),
-    prisma.canal.count(),
-    prisma.publicacao.count(),
     prisma.usuario.findMany({
       select: { id: true, nome: true, email: true, criadoEm: true },
       orderBy: { criadoEm: 'desc' },
@@ -67,13 +65,11 @@ export default async function AdminPage() {
           </h1>
         </header>
 
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
             { label: 'Usuários', value: totalUsuarios, href: '/admin/usuarios' },
             { label: 'Questionários', value: totalQuestionarios, href: '/admin/questionarios' },
             { label: 'Respostas', value: totalRespostas, href: '/admin/questionarios' },
-            { label: 'Canais', value: totalCanais, href: '/canais' },
-            { label: 'Publicações', value: totalPublicacoes, href: '/admin/publicacoes' },
           ].map((item) => (
             <Link
               key={item.label}

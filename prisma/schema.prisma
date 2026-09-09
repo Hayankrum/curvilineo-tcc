@@ -19,8 +19,6 @@ model Usuario {
   notificacoesAtivas   Boolean          @default(true)
   notificarSistema     Boolean          @default(true)
   notificarQuestionarios Boolean        @default(true)
-  notificarCanais      Boolean          @default(true)
-  inscricoesCanal      NotificacaoCanal[]
   isAdmin              Boolean          @default(false)
   criadoEm             DateTime         @default(now())
   sessoes              Sessao[]
@@ -29,10 +27,6 @@ model Usuario {
   medias               Media[]
   questionarios        Questionario[]
   respostasQuestionario Resposta[]
-  canais               Canal[]
-  publicacoes          Publicacao[]
-  votosEnquete         Voto[]
-  reacoes              Reacao[]
 }
 
 model Sessao {
@@ -157,115 +151,4 @@ model ValorResposta {
 
   @@index([respostaId])
   @@index([perguntaId])
-}
-
-model Canal {
-  id           Int            @id @default(autoincrement())
-  nome         String
-  descricao    String?
-  ativo        Boolean        @default(true)
-  criadoEm     DateTime       @default(now())
-  atualizadoEm DateTime       @updatedAt
-  autorId      Int
-  autor        Usuario        @relation(fields: [autorId], references: [id], onDelete: Cascade)
-  publicacoes  Publicacao[]
-  inscricoes   NotificacaoCanal[]
-
-  @@index([autorId])
-  @@index([ativo])
-}
-
-model Publicacao {
-  id           Int            @id @default(autoincrement())
-  tipo         String
-  titulo       String?
-  conteudo     String?
-  criadoEm     DateTime       @default(now())
-  atualizadoEm DateTime       @updatedAt
-  canalId      Int
-  canal        Canal          @relation(fields: [canalId], references: [id], onDelete: Cascade)
-  autorId      Int
-  autor        Usuario        @relation(fields: [autorId], references: [id], onDelete: Cascade)
-  evento       Evento?
-  enquete      Enquete?
-  reacoes      Reacao[]
-
-  @@index([canalId])
-  @@index([autorId])
-  @@index([tipo])
-  @@index([criadoEm])
-}
-
-model Evento {
-  id             Int      @id @default(autoincrement())
-  publicacaoId   Int      @unique
-  publicacao     Publicacao @relation(fields: [publicacaoId], references: [id], onDelete: Cascade)
-  data           DateTime
-  horaInicio     String
-  horaFim        String?
-  local          String?
-  link           String?
-}
-
-model Enquete {
-  id                   Int        @id @default(autoincrement())
-  publicacaoId         Int        @unique
-  publicacao           Publicacao @relation(fields: [publicacaoId], references: [id], onDelete: Cascade)
-  permiteMultiplaEscolha Boolean @default(false)
-  opcoes               OpcaoEnquete[]
-  votos                Voto[]
-}
-
-model OpcaoEnquete {
-  id         Int        @id @default(autoincrement())
-  enqueteId  Int
-  enquete    Enquete    @relation(fields: [enqueteId], references: [id], onDelete: Cascade)
-  texto      String
-  ordem      Int
-  votos      Voto[]
-
-  @@index([enqueteId])
-}
-
-model Voto {
-  id          Int          @id @default(autoincrement())
-  enqueteId   Int
-  enquete     Enquete      @relation(fields: [enqueteId], references: [id], onDelete: Cascade)
-  opcaoId     Int
-  opcao       OpcaoEnquete @relation(fields: [opcaoId], references: [id], onDelete: Cascade)
-  usuarioId   Int
-  usuario     Usuario      @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-  criadoEm    DateTime     @default(now())
-
-  @@unique([enqueteId, usuarioId])
-  @@index([enqueteId])
-  @@index([opcaoId])
-  @@index([usuarioId])
-}
-
-model Reacao {
-  id          Int        @id @default(autoincrement())
-  publicacaoId Int
-  publicacao  Publicacao @relation(fields: [publicacaoId], references: [id], onDelete: Cascade)
-  usuarioId   Int
-  usuario     Usuario    @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-  tipo        String
-  criadoEm    DateTime   @default(now())
-
-  @@unique([publicacaoId, usuarioId])
-  @@index([publicacaoId])
-  @@index([usuarioId])
-}
-
-model NotificacaoCanal {
-  id        Int      @id @default(autoincrement())
-  usuarioId Int
-  usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-  canalId   Int
-  canal     Canal    @relation(fields: [canalId], references: [id], onDelete: Cascade)
-  criadoEm  DateTime @default(now())
-
-  @@unique([usuarioId, canalId])
-  @@index([usuarioId])
-  @@index([canalId])
 }

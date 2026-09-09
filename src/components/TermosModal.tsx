@@ -5,13 +5,15 @@ import { aceitarTermos } from '@/modules/usuarios/usuarios.actions'
 
 interface TermosModalProps {
   isOpen: boolean
+  onClose?: () => void
+  readonly?: boolean
 }
 
 async function aceitarTermosAction() {
   return await aceitarTermos()
 }
 
-export default function TermosModal({ isOpen }: TermosModalProps) {
+export default function TermosModal({ isOpen, onClose, readonly = false }: TermosModalProps) {
   const [estado, formAction, pending] = useActionState(aceitarTermosAction, null)
 
   if (!isOpen) return null
@@ -22,10 +24,23 @@ export default function TermosModal({ isOpen }: TermosModalProps) {
         className="relative w-full max-w-2xl max-h-[85vh] mx-4 rounded-xl shadow-2xl overflow-hidden flex flex-col"
         style={{ backgroundColor: 'var(--card-bg)' }}
       >
-        <div className="px-6 pt-6 pb-4 border-b" style={{ borderColor: 'var(--border-color)' }}>
+        <div className="px-6 pt-6 pb-4 border-b flex items-center justify-between" style={{ borderColor: 'var(--border-color)' }}>
           <h1 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
             Termos de Uso e Compromisso
           </h1>
+          {onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-1 rounded-lg transition-colors hover:bg-[var(--btn-secondary-bg)]"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          )}
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-4 prose prose-sm max-w-none" style={{ color: 'var(--text-secondary)' }}>
@@ -79,28 +94,41 @@ export default function TermosModal({ isOpen }: TermosModalProps) {
         </div>
 
         <div className="px-6 py-4 border-t" style={{ borderColor: 'var(--border-color)' }}>
-          {estado?.success && (
-            <p className="text-sm bg-green-950/40 border border-green-900 rounded-lg px-4 py-2 mb-3" style={{ color: '#4ade80' }}>
-              Termos aceitos com sucesso!
-            </p>
-          )}
-
-          {estado?.error && (
-            <p className="text-sm bg-red-950/40 border border-red-900 rounded-lg px-4 py-2 mb-3" style={{ color: '#f87171' }}>
-              {estado.error}
-            </p>
-          )}
-
-          <form action={formAction}>
+          {readonly ? (
             <button
-              type="submit"
-              disabled={pending}
-              className="w-full font-medium rounded-lg px-6 py-3 transition-colors disabled:opacity-50"
-              style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
+              type="button"
+              onClick={onClose}
+              className="w-full font-medium rounded-lg px-6 py-3 transition-colors"
+              style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}
             >
-              {pending ? 'Aceitando...' : 'Aceitar Termos e Compromisso'}
+              Fechar
             </button>
-          </form>
+          ) : (
+            <>
+              {estado?.success && (
+                <p className="text-sm bg-green-950/40 border border-green-900 rounded-lg px-4 py-2 mb-3" style={{ color: '#4ade80' }}>
+                  Termos aceitos com sucesso!
+                </p>
+              )}
+
+              {estado?.error && (
+                <p className="text-sm bg-red-950/40 border border-red-900 rounded-lg px-4 py-2 mb-3" style={{ color: '#f87171' }}>
+                  {estado.error}
+                </p>
+              )}
+
+              <form action={formAction}>
+                <button
+                  type="submit"
+                  disabled={pending}
+                  className="w-full font-medium rounded-lg px-6 py-3 transition-colors disabled:opacity-50"
+                  style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
+                >
+                  {pending ? 'Aceitando...' : 'Aceitar Termos e Compromisso'}
+                </button>
+              </form>
+            </>
+          )}
         </div>
       </div>
     </div>

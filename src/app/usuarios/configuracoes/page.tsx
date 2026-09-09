@@ -5,17 +5,10 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { usePushSubscription } from '@/lib/usePushSubscription'
 import { toggleNotificacoes, atualizarPreferenciasNotificacao, entrarAdmin, sairAdmin } from '@/modules/usuarios/usuarios.actions'
-import { toggleNotificacaoCanal } from '@/modules/canais/actions/canal.actions'
 import { useTheme } from '@/lib/ThemeProvider'
 import BotaoDeletarPerfil from '@/modules/usuarios/components/BotaoDeletarPerfil'
 import BotaoLogout from '@/modules/usuarios/components/BotaoLogout'
 import InstallPWAButton from '@/components/InstallPWAButton'
-
-interface CanalInfo {
-  id: number
-  nome: string
-  descricao?: string | null
-}
 
 interface UserInfo {
   id: number
@@ -23,8 +16,6 @@ interface UserInfo {
   isAdmin: boolean
   notificarSistema: boolean
   notificarQuestionarios: boolean
-  notificarCanais: boolean
-  canaisInscritos: number[]
 }
 
 export default function ConfiguracoesPage() {
@@ -37,10 +28,7 @@ export default function ConfiguracoesPage() {
   const [preferencias, setPreferencias] = useState({
     notificarSistema: true,
     notificarQuestionarios: true,
-    notificarCanais: true,
   })
-  const [canaisInscritos, setCanaisInscritos] = useState<number[]>([])
-  const [canais, setCanais] = useState<CanalInfo[]>([])
   const [codigoAdmin, setCodigoAdmin] = useState('')
   const [codigoSairAdmin, setCodigoSairAdmin] = useState('')
   const [adminLoading, setAdminLoading] = useState(false)
@@ -55,9 +43,7 @@ export default function ConfiguracoesPage() {
           setPreferencias({
             notificarSistema: data.notificarSistema ?? true,
             notificarQuestionarios: data.notificarQuestionarios ?? true,
-            notificarCanais: data.notificarCanais ?? true,
           })
-          setCanaisInscritos(data.canaisInscritos ?? [])
         }
       })
       .catch(() => {
@@ -65,15 +51,6 @@ export default function ConfiguracoesPage() {
       })
     return () => { cancelled = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  useEffect(() => {
-    fetch('/api/canais')
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data)) setCanais(data)
-      })
-      .catch(() => {})
   }, [])
 
   const showStatus = (type: 'success' | 'error', text: string) => {
@@ -108,25 +85,11 @@ export default function ConfiguracoesPage() {
     }
   }
 
-  const handlePreferenciaChange = async (campo: 'notificarSistema' | 'notificarQuestionarios' | 'notificarCanais', valor: boolean) => {
+  const handlePreferenciaChange = async (campo: 'notificarSistema' | 'notificarQuestionarios', valor: boolean) => {
     setPreferencias((prev) => ({ ...prev, [campo]: valor }))
     const result = await atualizarPreferenciasNotificacao({ [campo]: valor })
     if (result.error) {
       setPreferencias((prev) => ({ ...prev, [campo]: !valor }))
-      showStatus('error', result.error)
-    }
-  }
-
-  const handleToggleCanal = async (canalId: number) => {
-    const inscritoAntes = canaisInscritos.includes(canalId)
-    setCanaisInscritos((prev) =>
-      inscritoAntes ? prev.filter((id) => id !== canalId) : [...prev, canalId]
-    )
-    const result = await toggleNotificacaoCanal(canalId)
-    if (result.error) {
-      setCanaisInscritos((prev) =>
-        inscritoAntes ? [...prev, canalId] : prev.filter((id) => id !== canalId)
-      )
       showStatus('error', result.error)
     }
   }
@@ -298,58 +261,7 @@ export default function ConfiguracoesPage() {
                 />
               </div>
             </label>
-            <label className="flex items-center justify-between cursor-pointer">
-              <div>
-                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Canais</p>
-                <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
-                  Novas publicações nos canais inscritos
-                </p>
-              </div>
-              <div
-                className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
-                style={{ backgroundColor: preferencias.notificarCanais ? 'var(--btn-primary-bg)' : 'var(--btn-secondary-bg)' }}
-                onClick={() => handlePreferenciaChange('notificarCanais', !preferencias.notificarCanais)}
-              >
-                <span
-                  className="inline-block h-4 w-4 transform rounded-full transition-transform"
-                  style={{ backgroundColor: 'var(--btn-primary-text)', transform: preferencias.notificarCanais ? 'translateX(22px)' : 'translateX(2px)' }}
-                />
-              </div>
-            </label>
           </div>
-        </section>
-
-        <section className="rounded-lg p-5" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
-          <h2 className="font-medium mb-2" style={{ color: 'var(--text-primary)' }}>Canais</h2>
-          <p className="text-xs mb-4" style={{ color: 'var(--text-tertiary)' }}>
-            Selecione os canais para receber notificações de novas publicações
-          </p>
-          {canais.length === 0 ? (
-            <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>Nenhum canal disponível.</p>
-          ) : (
-            <div className="flex flex-col gap-3">
-              {canais.map((canal) => (
-                <label key={canal.id} className="flex items-center justify-between cursor-pointer">
-                  <div>
-                    <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{canal.nome}</p>
-                    {canal.descricao && (
-                      <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>{canal.descricao}</p>
-                    )}
-                  </div>
-                  <div
-                    className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
-                    style={{ backgroundColor: canaisInscritos.includes(canal.id) ? 'var(--btn-primary-bg)' : 'var(--btn-secondary-bg)' }}
-                    onClick={() => handleToggleCanal(canal.id)}
-                  >
-                    <span
-                      className="inline-block h-4 w-4 transform rounded-full transition-transform"
-                      style={{ backgroundColor: 'var(--btn-primary-text)', transform: canaisInscritos.includes(canal.id) ? 'translateX(22px)' : 'translateX(2px)' }}
-                    />
-                  </div>
-                </label>
-              ))}
-            </div>
-          )}
         </section>
 
         <section className="rounded-lg p-5" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>

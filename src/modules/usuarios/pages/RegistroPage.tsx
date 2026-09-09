@@ -1,9 +1,10 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, useState } from 'react'
 import { registrar } from '../usuarios.actions'
 import Link from 'next/link'
 import CampoSenha from '../components/CampoSenha'
+import TermosModal from '@/components/TermosModal'
 
 async function registrarAction(_prev: { error?: string } | null, formData: FormData) {
   const nome = formData.get('nome') as string
@@ -16,9 +17,11 @@ async function registrarAction(_prev: { error?: string } | null, formData: FormD
 
 export default function RegistroPage() {
   const [estado, formAction, pending] = useActionState(registrarAction, null)
+  const [termosAbertos, setTermosAbertos] = useState(false)
 
   return (
     <div>
+      <TermosModal isOpen={termosAbertos} onClose={() => setTermosAbertos(false)} readonly />
       <h1 className="text-2xl font-semibold mb-6" style={{ color: 'var(--text-primary)' }}>Criar conta</h1>
 
       <form action={formAction} className="flex flex-col gap-4">
@@ -63,7 +66,15 @@ export default function RegistroPage() {
             className="mt-1 rounded"
           />
           <label htmlFor="aceitouTermos" className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-            Li e aceito os Termos de Uso e Compromisso
+            Li e aceito os{' '}
+            <button
+              type="button"
+              onClick={() => setTermosAbertos(true)}
+              className="hover:underline cursor-pointer"
+              style={{ color: 'var(--text-primary)' }}
+            >
+              Termos de Uso e Compromisso
+            </button>
           </label>
         </div>
 
