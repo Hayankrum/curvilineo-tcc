@@ -1,0 +1,328 @@
+'use client'
+
+import Link from 'next/link'
+import { useState, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
+import { listarMeusQuestionarios, deletarQuestionario, duplicarQuestionario, publicarQuestionario, encerrarQuestionario, arquivarQuestionario } from '../questionarios.actions'
+
+interface Questionario {
+  id: number
+  titulo: string
+  descricao: string | null
+  status: string
+  anonimo: boolean
+  corTema: string | null
+  criadoEm: string
+  atualizadoEm: string
+  totalPerguntas: number
+  totalRespostas: number
+}
+
+const STATUS_LABELS: Record<string, string> = {
+  todos: 'Todos',
+  rascunho: 'Rascunho',
+  publicado: 'Publicado',
+  encerrado: 'Encerrado',
+  arquivado: 'Arquivado',
+}
+
+const STATUS_COLORS: Record<string, string> = {
+  rascunho: 'var(--text-tertiary)',
+  publicado: '#22c55e',
+  encerrado: '#f59e0b',
+  arquivado: '#6b7280',
+}
+
+export default function MeusQuestionariosPage() {
+  const router = useRouter()
+  const [questionarios, setQuestionarios] = useState<Questionario[]>([])
+  const [loading, setLoading] = useState(true)
+  const [busca, setBusca] = useState('')
+  const [statusFiltro, setStatusFiltro] = useState('todos')
+  const [pagina, setPagina] = useState(1)
+  const [totalPaginas, setTotalPaginas] = useState(1)
+  const [actionLoading, setActionLoading] = useState<number | null>(null)
+
+  const carregar = useCallback(async (p: number, buscaVal: string, statusVal: string) => {
+    setLoading(true)
+    const result = await listarMeusQuestionarios({
+      busca: buscaVal || undefined,
+      status: statusVal !== 'todos' ? statusVal : undefined,
+      pagina: p,
+      porPagina: 10,
+    })
+    if ('questionarios' in result) {
+      setQuestionarios(result.questionarios as unknown as Questionario[])
+      setTotalPaginas(result.paginas as number)
+    }
+    setLoading(false)
+  }, [])
+
+  useEffect(() => {
+    carregar(1, '', 'todos')
+  }, [carregar])
+
+  function handleBuscar(e: React.FormEvent) {
+    e.preventDefault()
+    setPagina(1)
+    carregar(1, busca, statusFiltro)
+  }
+
+  function handleFiltrarStatus(status: string) {
+    setStatusFiltro(status)
+    setPagina(1)
+    carregar(1, busca, status)
+  }
+
+  async function handleAction(id: number, action: () => Promise<unknown>) {
+    setActionLoading(id)
+    await action()
+    carregar(pagina, busca, statusFiltro)
+    setActionLoading(null)
+  }
+
+  function handleDeletar(id: number, titulo: string) {
+    if (confirm(`Tem certeza que deseja deletar "${titulo}"?`)) {
+      handleAction(id, () => deletarQuestionario(id))
+    }
+  }
+
+  async function handlePublicar(id: number) {
+    const result = await publicarQuestionario(id)
+    if (result && 'error' in result && result.error) {
+      alert(result.error)
+    }
+    carregar(pagina, busca, statusFiltro)
+  }
+
+  function formatarData(data: string) {
+    return new Date(data).toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    })
+  }
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>Meus Questionários</h1>
+        <Link
+          href="/questionarios/novo"
+          className="font-medium rounded-lg px-4 py-2 flex items-center gap-2 transition-colors text-sm"
+          style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
+        >
+          <span>+</span>
+          Novo
+        </Link>
+      </div>
+
+      {/* Busca */}
+      <form onSubmit={handleBuscar} className="flex gap-2 mb-4">
+        <input
+          type="text"
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+          placeholder="Buscar meus questionários..."
+          className="flex-1 rounded-lg px-4 py-2 text-sm focus:outline-none transition-colors"
+          style={{ backgroundColor: 'var(--input-bg)', border: '1px solid var(--input-border)', color: 'var(--text-primary)' }}
+        />
+        <button
+          type="submit"
+          className="font-medium rounded-lg w-8 h-8 flex items-center justify-center transition-colors"
+          style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}
+          title="Buscar"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+        </button>
+      </form>
+
+      {/* Filtros de status */}
+      <div className="flex items-center gap-3 mb-6">
+        <div className="flex">
+          {Object.entries(STATUS_LABELS).map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() => handleFiltrarStatus(key)}
+              className="text-xs font-medium px-3 py-1.5 transition-colors -ml-px first:ml-0 first:rounded-l-lg last:rounded-r-lg"
+              style={{
+                backgroundColor: statusFiltro === key ? 'var(--btn-primary-bg)' : 'var(--card-bg)',
+                color: statusFiltro === key ? 'var(--btn-primary-text)' : 'var(--text-tertiary)',
+                border: '1px solid var(--card-border)',
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {loading && (
+        <p style={{ color: 'var(--text-tertiary)' }}>Carregando...</p>
+      )}
+
+      {!loading && questionarios.length === 0 && (
+        <div className="text-center py-12">
+          <p className="mb-4" style={{ color: 'var(--text-tertiary)' }}>
+            {busca || statusFiltro !== 'todos' ? 'Nenhum questionário encontrado com esses filtros.' : 'Você ainda não criou nenhum questionário.'}
+          </p>
+          {!busca && statusFiltro === 'todos' && (
+            <Link
+              href="/questionarios/novo"
+              className="inline-flex items-center gap-2 font-medium rounded-lg px-4 py-2 transition-colors text-sm"
+              style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
+            >
+              Criar primeiro questionário
+            </Link>
+          )}
+        </div>
+      )}
+
+      <div className="flex flex-col gap-4">
+        {questionarios.map((q) => (
+          <div
+            key={q.id}
+            className="rounded-lg p-5 transition-colors"
+            style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}
+          >
+            <div className="flex items-start justify-between gap-4 mb-3">
+              <Link
+                href={`/questionarios/${q.id}`}
+                className="flex-1 min-w-0"
+                style={{ textDecoration: 'none' }}
+              >
+                <h2 className="font-medium text-lg mb-1 truncate" style={{ color: 'var(--text-primary)' }}>{q.titulo}</h2>
+                {q.descricao && (
+                  <p className="text-sm mb-2 line-clamp-2" style={{ color: 'var(--text-secondary)' }}>{q.descricao}</p>
+                )}
+              </Link>
+              <span
+                className="px-2 py-0.5 rounded-full font-medium text-xs whitespace-nowrap"
+                style={{ backgroundColor: `${STATUS_COLORS[q.status]}20`, color: STATUS_COLORS[q.status] }}
+              >
+                {STATUS_LABELS[q.status] || q.status}
+              </span>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs mb-4" style={{ color: 'var(--text-tertiary)' }}>
+              <span>{q.totalPerguntas} {q.totalPerguntas === 1 ? 'pergunta' : 'perguntas'}</span>
+              <span>{q.totalRespostas} {q.totalRespostas === 1 ? 'resposta' : 'respostas'}</span>
+              {q.anonimo && <span>Anônimo</span>}
+              <span>Atualizado em {formatarData(q.atualizadoEm)}</span>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <Link
+                href={`/questionarios/${q.id}`}
+                className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors"
+                style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)', textDecoration: 'none' }}
+              >
+                Ver
+              </Link>
+
+              {q.status === 'rascunho' && (
+                <>
+                  <Link
+                    href={`/questionarios/${q.id}/editar`}
+                    className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors"
+                    style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)', textDecoration: 'none' }}
+                  >
+                    Editar
+                  </Link>
+                  <button
+                    onClick={() => handlePublicar(q.id)}
+                    disabled={actionLoading === q.id}
+                    className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+                    style={{ backgroundColor: '#22c55e', color: '#fff' }}
+                  >
+                    Publicar
+                  </button>
+                </>
+              )}
+
+              {q.status === 'publicado' && (
+                <button
+                  onClick={() => handleAction(q.id, () => encerrarQuestionario(q.id))}
+                  disabled={actionLoading === q.id}
+                  className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+                  style={{ backgroundColor: '#f59e0b', color: '#fff' }}
+                >
+                  Encerrar
+                </button>
+              )}
+
+              {q.status === 'encerrado' && (
+                <button
+                  onClick={() => handleAction(q.id, () => arquivarQuestionario(q.id))}
+                  disabled={actionLoading === q.id}
+                  className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+                  style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-secondary)' }}
+                >
+                  Arquivar
+                </button>
+              )}
+
+              {q.status !== 'rascunho' && q.totalRespostas === 0 && (
+                <button
+                  onClick={() => handleDeletar(q.id, q.titulo)}
+                  disabled={actionLoading === q.id}
+                  className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+                  style={{ backgroundColor: '#dc2626', color: '#fff' }}
+                >
+                  Deletar
+                </button>
+              )}
+
+              <button
+                onClick={() => handleAction(q.id, () => duplicarQuestionario(q.id))}
+                disabled={actionLoading === q.id}
+                className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+                style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-secondary)' }}
+              >
+                Duplicar
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Paginação */}
+      {totalPaginas > 1 && (
+        <div className="flex items-center justify-center gap-2 mt-6">
+          <button
+            onClick={() => { setPagina(p => p - 1); carregar(pagina - 1, busca, statusFiltro) }}
+            disabled={pagina === 1}
+            className="text-sm px-3 py-1.5 rounded-lg transition-colors disabled:opacity-40"
+            style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}
+          >
+            ← Anterior
+          </button>
+          {Array.from({ length: totalPaginas }, (_, i) => i + 1).map((p) => (
+            <button
+              key={p}
+              onClick={() => { setPagina(p); carregar(p, busca, statusFiltro) }}
+              className="text-sm w-8 h-8 rounded-lg transition-colors"
+              style={{
+                backgroundColor: p === pagina ? 'var(--btn-primary-bg)' : 'transparent',
+                color: p === pagina ? 'var(--btn-primary-text)' : 'var(--text-tertiary)',
+              }}
+            >
+              {p}
+            </button>
+          ))}
+          <button
+            onClick={() => { setPagina(p => p + 1); carregar(pagina + 1, busca, statusFiltro) }}
+            disabled={pagina === totalPaginas}
+            className="text-sm px-3 py-1.5 rounded-lg transition-colors disabled:opacity-40"
+            style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}
+          >
+            Próxima →
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
