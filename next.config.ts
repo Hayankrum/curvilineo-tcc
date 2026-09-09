@@ -9,7 +9,7 @@ const cspDirectives = [
   "img-src 'self' data: blob: https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com https://server.arcgisonline.com",
   "font-src 'self' https://fonts.gstatic.com",
   "connect-src 'self' https://fcm.googleapis.com https://*.googleapis.com https://updates.push.services.mozilla.com https://web.push.apple.com https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com https://server.arcgisonline.com",
-  "worker-src 'self'",
+  "worker-src 'self' blob:",
   "frame-src 'none'",
   "object-src 'none'",
   "base-uri 'self'",
@@ -22,7 +22,7 @@ const securityHeaders = [
   { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-  { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(self)' },
+  { key: 'Permissions-Policy', value: 'camera=(self), microphone=(), geolocation=(self)' },
   { key: 'X-XSS-Protection', value: '1; mode=block' },
   ...(isProd ? [{ key: 'Content-Security-Policy', value: cspDirectives }] : []),
 ]

@@ -7,12 +7,33 @@
   "background_color": "#09090b",
   "theme_color": "#09090b",
   "orientation": "portrait-primary",
+  "scope": "/",
   "icons": [
     {
       "src": "/icons/Ellora.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+ellora",
+      "url": "/?q=%s"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Scanner QR Code",
+      "short_name": "Scanner",
+      "url": "/scanner",
+      "icons": [
+        {
+          "src": "/icons/Ellora.svg",
+          "sizes": "any",
+          "type": "image/svg+xml"
+        }
+      ]
     }
   ]
 }

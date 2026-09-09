@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 
-export default function SinoNotificacoes() {
+export default function SinoNotificacoes({ showLink = true, activeColor }: { showLink?: boolean; activeColor?: string }) {
   const [count, setCount] = useState(0)
 
   const fetchCount = useCallback(async () => {
@@ -40,20 +40,16 @@ export default function SinoNotificacoes() {
     }
   }, [fetchCount])
 
-  return (
-    <Link
-      href="/notificacoes"
-      className="relative transition-colors"
-      style={{ color: 'var(--text-secondary)' }}
-    >
+  const icon = (
+    <span className="relative" style={activeColor ? { color: activeColor } : undefined}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        width="18"
-        height="18"
+        width="22"
+        height="22"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
-        strokeWidth="2"
+        strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
       >
@@ -65,6 +61,18 @@ export default function SinoNotificacoes() {
           {count > 99 ? '99+' : count}
         </span>
       )}
+    </span>
+  )
+
+  if (!showLink) return icon
+
+  return (
+    <Link
+      href="/notificacoes"
+      className="relative transition-colors"
+      style={{ color: 'var(--text-secondary)' }}
+    >
+      {icon}
     </Link>
   )
 }

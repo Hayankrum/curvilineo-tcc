@@ -9,6 +9,7 @@ self.addEventListener('install', (event) => {
       cache.addAll([
         '/',
         '/offline',
+        '/scanner',
         '/icons/Ellora.svg',
         '/manifest.json',
       ])
@@ -277,6 +278,16 @@ self.addEventListener('pushsubscriptionchange', (event) => {
 self.addEventListener('sync', (event) => {
   if (event.tag === 'sync-mutations') {
     event.waitUntil(syncPending())
+  }
+})
+
+// Protocol handler for web+ellora
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'HANDLE_PROTOCOL') {
+    const url = event.data.url
+    if (url) {
+      clients.openWindow(url)
+    }
   }
 })
 

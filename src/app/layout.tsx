@@ -3,6 +3,7 @@ import { Geist } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/lib/ThemeProvider";
 import Navbar from "@/components/Navbar";
+import MobileBottomNav from "@/components/MobileBottomNav";
 import InstallPWMPopup from "@/components/InstallPWMPopup";
 import NotificationPermissionPopup from "@/components/NotificationPermissionPopup";
 import ServiceWorkerRegister from "@/modules/layout/ServiceWorkerRegister";
@@ -72,9 +73,10 @@ export default async function RootLayout({
         <ThemeProvider>
           <ServiceWorkerRegister />
           <Navbar />
-          <div className="h-[60px]" />
+          <MobileBottomNav />
+          <div className="h-[60px] hidden md:block" />
           <TermosChecker usuario={usuario}>
-            <main className="flex-1 max-w-3xl mx-auto w-full px-6 py-10">
+            <main className="flex-1 max-w-3xl mx-auto w-full px-6 py-10 pb-24 md:pb-10">
               {children}
             </main>
           </TermosChecker>
