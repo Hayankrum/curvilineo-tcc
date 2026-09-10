@@ -37,20 +37,29 @@ const navItems = [
 export default function MobileBottomNav({ usuario }: { usuario: Usuario | null }) {
   const pathname = usePathname()
 
-  const linkClass = (isActive: boolean) =>
-    `flex flex-col items-center gap-0.5 rounded-lg px-3 py-1.5 text-[11px] font-medium transition-colors ${isActive ? 'text-[#ffcf00]' : ''}`
+  const linkClass = () =>
+    `flex flex-col items-center gap-0.5 rounded-xl px-4 py-2 text-[11px] font-medium transition-all`
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t md:hidden" style={{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-primary)' }}>
-      <div className="flex items-center justify-center gap-4 px-2 py-1.5">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden px-4 pb-3">
+      <div
+        className="flex items-center justify-center gap-2 rounded-2xl px-4 py-2 backdrop-blur-xl"
+        style={{
+          backgroundColor: 'color-mix(in srgb, var(--bg-tertiary) 85%, transparent)',
+          boxShadow: '0 -2px 10px rgba(0,0,0,0.1)'
+        }}
+      >
         {navItems.map(item => {
           const isActive = item.href === '/' ? pathname === '/' : pathname === item.href || (pathname.startsWith(item.href + '/') && item.href !== '/questionarios')
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={linkClass(isActive)}
-              style={{ color: isActive ? '#ffcf00' : 'var(--text-secondary)' }}
+              className={linkClass()}
+              style={{
+                color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
+                backgroundColor: isActive ? 'var(--accent-dim)' : 'transparent'
+              }}
             >
               {item.icon}
             </Link>
@@ -60,27 +69,39 @@ export default function MobileBottomNav({ usuario }: { usuario: Usuario | null }
         {usuario && (
           <Link
             href="/notificacoes"
-            className={linkClass(pathname === '/notificacoes')}
-            style={{ color: pathname === '/notificacoes' ? '#ffcf00' : 'var(--text-secondary)' }}
+            className={linkClass()}
+            style={{
+              color: pathname === '/notificacoes' ? 'var(--accent)' : 'var(--text-secondary)',
+              backgroundColor: pathname === '/notificacoes' ? 'var(--accent-dim)' : 'transparent'
+            }}
           >
-            <SinoNotificacoes showLink={false} activeColor={pathname === '/notificacoes' ? '#ffcf00' : undefined} />
+            <SinoNotificacoes showLink={false} activeColor={pathname === '/notificacoes' ? 'var(--accent)' : undefined} />
           </Link>
         )}
 
         {usuario ? (
           <Link
             href={`/usuarios/${usuario.id}`}
-            className={linkClass(pathname.startsWith(`/usuarios/${usuario.id}`))}
-            style={{ color: pathname.startsWith(`/usuarios/${usuario.id}`) ? '#ffcf00' : 'var(--text-secondary)' }}
+            className={linkClass()}
+            style={{
+              color: pathname.startsWith(`/usuarios/${usuario.id}`) ? 'var(--accent)' : 'var(--text-secondary)',
+              backgroundColor: pathname.startsWith(`/usuarios/${usuario.id}`) ? 'var(--accent-dim)' : 'transparent'
+            }}
           >
-            <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium" style={{ backgroundColor: 'var(--bg-tertiary)', border: '1px solid var(--border-color)' }}>
+            <span
+              className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium"
+              style={{
+                backgroundColor: 'var(--accent)',
+                color: 'var(--btn-primary-text)'
+              }}
+            >
               {usuario.nome.charAt(0).toUpperCase()}
             </span>
           </Link>
         ) : (
           <Link
             href="/usuarios/login"
-            className={linkClass(false)}
+            className={linkClass()}
             style={{ color: 'var(--text-secondary)' }}
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">

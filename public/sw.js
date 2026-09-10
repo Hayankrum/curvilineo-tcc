@@ -10,7 +10,12 @@ self.addEventListener('install', (event) => {
         '/',
         '/offline',
         '/scanner',
-        '/icons/Ellora.svg',
+        '/icons/icon1.svg',
+        '/icons/pwa/icon-192x192.png',
+        '/icons/pwa/icon-512x512.png',
+        '/icons/pwa/icon-192x192-maskable.png',
+        '/icons/pwa/icon-512x512-maskable.png',
+        '/icons/pwa/apple-touch-icon.png',
         '/manifest.json',
       ])
     ).then(() => {
@@ -155,8 +160,8 @@ self.addEventListener('push', (event) => {
 
   const options = {
     body: data.body || data.mensagem,
-    icon: data.icon || '/icons/Ellora.svg',
-    badge: data.badge || '/icons/Ellora.svg',
+    icon: data.icon || '/icons/icon1.svg',
+    badge: data.badge || '/icons/icon1.svg',
     vibrate: [100, 50, 100],
     data: { url: data.url || '/' },
     tag: data.tag || 'default',

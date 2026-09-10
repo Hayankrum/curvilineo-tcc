@@ -16,13 +16,13 @@ const geist = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "Ellora",
-  description: "Ellora - Plataforma moderna",
+  title: "Aplicativo",
+  description: "Crie, compartilhe e responda questionários em segundos.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Ellora",
+    title: "Aplicativo",
   },
   formatDetection: {
     telephone: false,
@@ -36,7 +36,7 @@ export const viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  themeColor: "#09090b",
+  themeColor: "#1B3A3A",
 };
 
 export default async function RootLayout({
@@ -49,7 +49,7 @@ export default async function RootLayout({
   return (
     <html lang="pt-BR" className={`${geist.variable} h-full antialiased`} suppressHydrationWarning>
       <head>
-        <link rel="apple-touch-icon" href="/icons/Ellora.svg" />
+        <link rel="apple-touch-icon" href="/icons/pwa/apple-touch-icon.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <script
@@ -74,7 +74,7 @@ export default async function RootLayout({
           <ServiceWorkerRegister />
           <Navbar usuario={usuario ? { id: usuario.id, nome: usuario.nome, isAdmin: usuario.isAdmin } : null} />
           <MobileBottomNav usuario={usuario ? { id: usuario.id, nome: usuario.nome, isAdmin: usuario.isAdmin } : null} />
-          <div className="h-[60px] hidden md:block" />
+          <div className="h-[76px] hidden md:block" />
           <TermosChecker usuario={usuario}>
             <main className="flex-1 w-full px-4 py-6 pb-24 md:max-w-3xl md:mx-auto md:px-6 md:py-10 md:pb-10">
               {children}

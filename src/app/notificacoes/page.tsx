@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { usePushSubscription } from '@/lib/usePushSubscription'
 import { toggleNotificacoes } from '@/modules/usuarios/usuarios.actions'
 
@@ -16,7 +15,6 @@ interface NotificacaoHistorico {
 }
 
 export default function NotificacoesPage() {
-  const router = useRouter()
   const { isSubscribed, isSupported, isLoading, subscribe, unsubscribe } = usePushSubscription()
   const [historico, setHistorico] = useState<NotificacaoHistorico[]>([])
   const [loadingHistorico, setLoadingHistorico] = useState(true)
@@ -64,7 +62,6 @@ export default function NotificacoesPage() {
 
   const notificarAtualizacao = () => {
     window.dispatchEvent(new Event('notifications:updated'))
-    localStorage.setItem('notifications:updated', String(Date.now()))
   }
 
   const marcarComoLida = async (id: number) => {
@@ -297,12 +294,6 @@ export default function NotificacoesPage() {
             ))}
           </div>
         )}
-      </div>
-
-      <div className="mt-6">
-        <Link href="/questionarios" className="text-sm transition-colors hover:underline" style={{ color: 'var(--text-tertiary)' }}>
-          ← Voltar para questionários
-        </Link>
       </div>
     </div>
   )

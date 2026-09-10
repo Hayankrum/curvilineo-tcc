@@ -18,20 +18,19 @@ export default async function Home() {
             </span>
           </>
         ) : (
-          'Bem-vindo ao Ellora'
+          'Bem-vindo ao aplicativo'
         )}
       </h1>
 
       <p className="leading-relaxed mb-8 max-w-md" style={{ color: 'var(--text-secondary)' }}>
-        Plataforma de questionários com notificações push e autenticação de usuários.
+        Crie, compartilhe e responda seus questionários em segundos.
       </p>
 
       <div className="flex flex-col gap-4 w-full sm:w-auto">
         {!usuario && (
           <Link
             href="/usuarios/login"
-            className="rounded-lg px-6 py-3 text-sm transition-colors text-center min-h-[44px] flex items-center justify-center"
-            style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}
+            className="btn-primary rounded-xl px-6 py-3 text-sm transition-all text-center min-h-[44px] flex items-center justify-center hover:scale-[1.02]"
           >
             Entrar
           </Link>

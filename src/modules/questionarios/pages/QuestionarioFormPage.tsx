@@ -31,7 +31,7 @@ export default function QuestionarioFormPage({ questionarioId }: Props) {
   const router = useRouter()
   const { usuario, loading: loadingUsuario } = useUsuario()
   const [questionario, setQuestionario] = useState<QuestionarioExistente | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [carregandoEdicao, setCarregandoEdicao] = useState(!!questionarioId)
 
   const isEdicao = !!questionarioId
 
@@ -43,21 +43,24 @@ export default function QuestionarioFormPage({ questionarioId }: Props) {
       return
     }
 
-    if (questionarioId) {
-      obterQuestionarioParaEdicao(questionarioId).then((result) => {
-        if (result && 'questionario' in result && result.questionario) {
-          setQuestionario(result.questionario as unknown as QuestionarioExistente)
-        } else {
-          router.push('/questionarios')
-        }
-        setLoading(false)
-      })
-    } else {
-      setLoading(false)
-    }
-  }, [questionarioId, usuario, loadingUsuario]) // removido router
+    if (!questionarioId) return
 
-  if (loading || loadingUsuario) {
+    let cancelled = false
+    obterQuestionarioParaEdicao(questionarioId).then((result) => {
+      if (cancelled) return
+      if (result && 'questionario' in result && result.questionario) {
+        setQuestionario(result.questionario as unknown as QuestionarioExistente)
+      } else {
+        router.push('/questionarios')
+      }
+      setCarregandoEdicao(false)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [questionarioId, usuario, loadingUsuario, router])
+
+  if (loadingUsuario || (isEdicao && carregandoEdicao)) {
     return <p style={{ color: 'var(--text-tertiary)' }}>Carregando...</p>
   }
 

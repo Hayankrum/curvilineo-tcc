@@ -1,27 +1,33 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useSyncExternalStore } from 'react'
+import { useState, useEffect, useSyncExternalStore } from 'react'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
 }
 
+type NavigatorWithStandalone = Navigator & { standalone?: boolean }
+
+function subscribeStandalone(onStoreChange: () => void) {
+  if (typeof window === 'undefined') return () => {}
+  const mql = window.matchMedia('(display-mode: standalone)')
+  mql.addEventListener('change', onStoreChange)
+  return () => mql.removeEventListener('change', onStoreChange)
+}
+
+function getStandaloneSnapshot() {
+  if (typeof window === 'undefined') return false
+  const nav = window.navigator as NavigatorWithStandalone
+  return window.matchMedia('(display-mode: standalone)').matches || nav.standalone === true
+}
+
 export default function InstallPWAButton() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
-  const [isStandalone, setIsStandalone] = useState(false)
   const [installing, setInstalling] = useState(false)
-  const subscribe = () => () => {}
-  const getSnapshot = () => {
-    if (typeof window === 'undefined') return false
-    return window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true
-  }
-  const alreadyInstalled = useSyncExternalStore(subscribe, getSnapshot, () => false)
+  const isStandalone = useSyncExternalStore(subscribeStandalone, getStandaloneSnapshot, () => false)
 
   useEffect(() => {
-    setIsStandalone(window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true)
-
     const handler = (e: Event) => {
       e.preventDefault()
       setDeferredPrompt(e as BeforeInstallPromptEvent)
@@ -29,7 +35,6 @@ export default function InstallPWAButton() {
 
     const handleAppInstalled = () => {
       setDeferredPrompt(null)
-      setIsStandalone(true)
     }
 
     window.addEventListener('beforeinstallprompt', handler)
@@ -41,7 +46,7 @@ export default function InstallPWAButton() {
     }
   }, [])
 
-  if (isStandalone || alreadyInstalled) {
+  if (isStandalone) {
     return (
       <div className="flex items-center gap-2">
         <span className="w-2 h-2 rounded-full bg-green-500" />

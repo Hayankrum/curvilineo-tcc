@@ -216,7 +216,7 @@ export function usePushSubscription() {
 
       // 3. Wait for Service Worker
       console.log(`${LOG_PREFIX} Waiting for Service Worker...`)
-      let registration = await waitForServiceWorkerReady(20000)
+      const registration = await waitForServiceWorkerReady(20000)
       console.log(`${LOG_PREFIX} Service Worker ready, state:`, registration.installing ? 'installing' : registration.waiting ? 'waiting' : 'active')
 
       if (!registration.pushManager) {

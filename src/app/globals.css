@@ -3,45 +3,57 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --bg-primary: #ffffff;
-  --bg-secondary: #f4f4f5;
-  --bg-tertiary: #e4e4e7;
-  --border-color: #d4d4d8;
-  --text-primary: #18181b;
-  --text-secondary: #52525b;
-  --text-tertiary: #71717a;
-  --btn-primary-bg: #18181b;
-  --btn-primary-text: #ffffff;
-  --btn-primary-hover: #27272a;
-  --btn-secondary-bg: #e4e4e7;
-  --btn-secondary-hover: #d4d4d8;
+  /* Light Theme - Mint/Verde claro */
+  --bg-primary: #f0f7f3;
+  --bg-secondary: #e5f0ea;
+  --bg-tertiary: #d5e5db;
+  --border-color: #c4d9ce;
+  --text-primary: #1B3A3A;
+  --text-secondary: #3d6b5a;
+  --text-tertiary: #5a8a78;
+  --btn-primary-bg: #1B3A3A;
+  --btn-primary-text: #d5e5db;
+  --btn-primary-hover: #223D3C;
+  --btn-secondary-bg: #d5e5db;
+  --btn-secondary-hover: #c4d9ce;
   --input-bg: #ffffff;
-  --input-border: #d4d4d8;
-  --input-focus: #a1a1aa;
-  --card-bg: #f4f4f5;
-  --card-border: #e4e4e7;
-  --watermark-opacity: 0.2;
+  --input-border: #c4d9ce;
+  --input-focus: #8BA89C;
+  --card-bg: #ffffff;
+  --card-border: #d5e5db;
+  --watermark-opacity: 0.35;
+  --watermark-glow-1: drop-shadow(0 0 15px rgba(27, 58, 58, 0.6));
+  --watermark-glow-2: drop-shadow(0 0 40px rgba(27, 58, 58, 0.35));
+  --watermark-glow-3: drop-shadow(0 0 80px rgba(27, 58, 58, 0.2));
+  --accent: #1B3A3A;
+  --accent-dim: rgba(27, 58, 58, 0.08);
 }
 
 html.dark {
-  --bg-primary: #09090b;
-  --bg-secondary: #18181b;
-  --bg-tertiary: #27272a;
-  --border-color: #3f3f46;
-  --text-primary: #fafafa;
-  --text-secondary: #a1a1aa;
-  --text-tertiary: #71717a;
-  --btn-primary-bg: #fafafa;
-  --btn-primary-text: #09090b;
-  --btn-primary-hover: #e4e4e7;
-  --btn-secondary-bg: #27272a;
-  --btn-secondary-hover: #3f3f46;
-  --input-bg: #18181b;
-  --input-border: #3f3f46;
-  --input-focus: #71717a;
-  --card-bg: #18181b;
-  --card-border: #27272a;
-  --watermark-opacity: 0.2;
+  /* Dark Theme - Verde escuro */
+  --bg-primary: #1B3A3A;
+  --bg-secondary: #223D3C;
+  --bg-tertiary: #2D4A49;
+  --border-color: #2D4A49;
+  --text-primary: #D5E5DB;
+  --text-secondary: #8BA89C;
+  --text-tertiary: #6B8A7C;
+  --btn-primary-bg: #D5E5DB;
+  --btn-primary-text: #1B3A3A;
+  --btn-primary-hover: #E5F0EA;
+  --btn-secondary-bg: #2D4A49;
+  --btn-secondary-hover: #3A5C5B;
+  --input-bg: #223D3C;
+  --input-border: #2D4A49;
+  --input-focus: #8BA89C;
+  --card-bg: #223D3C;
+  --card-border: #2D4A49;
+  --watermark-opacity: 0.08;
+  --watermark-glow-1: none;
+  --watermark-glow-2: none;
+  --watermark-glow-3: none;
+  --accent: #D5E5DB;
+  --accent-dim: rgba(213, 229, 219, 0.1);
 }
 
 @theme inline {
@@ -63,18 +75,19 @@ body {
 }
 
 /* Rich text editor prose styles */
-.prose h2 { font-size: 1.25rem; font-weight: 600; margin: 1rem 0 0.5rem; }
-.prose h3 { font-size: 1.1rem; font-weight: 600; margin: 0.75rem 0 0.5rem; }
-.prose p { margin: 0.5rem 0; }
+.prose h2 { font-size: 1.25rem; font-weight: 600; margin: 1rem 0 0.5rem; color: var(--text-primary); }
+.prose h3 { font-size: 1.1rem; font-weight: 600; margin: 0.75rem 0 0.5rem; color: var(--text-primary); }
+.prose p { margin: 0.5rem 0; color: var(--text-secondary); }
 .prose ul { list-style: disc; padding-left: 1.5rem; margin: 0.5rem 0; }
 .prose ol { list-style: decimal; padding-left: 1.5rem; margin: 0.5rem 0; }
-.prose li { margin: 0.25rem 0; }
-.prose blockquote { border-left: 3px solid var(--border-color); padding-left: 1rem; margin: 0.5rem 0; color: var(--text-secondary); }
+.prose li { margin: 0.25rem 0; color: var(--text-secondary); }
+.prose blockquote { border-left: 3px solid var(--border-color); padding-left: 1rem; margin: 0.5rem 0; color: var(--text-tertiary); }
 .prose pre { background: var(--bg-tertiary); padding: 0.75rem 1rem; border-radius: 0.5rem; overflow-x: auto; margin: 0.5rem 0; }
-.prose code { font-size: 0.875rem; }
+.prose code { font-size: 0.875rem; color: var(--text-primary); }
 .prose :not(pre) > code { background: var(--bg-tertiary); padding: 0.15rem 0.35rem; border-radius: 0.25rem; }
 .prose img { max-width: 100%; height: auto; border-radius: 0.5rem; margin: 0.75rem 0; }
-.prose a { color: #3b82f6; text-decoration: underline; }
+.prose a { color: #1B3A3A; text-decoration: underline; }
+html.dark .prose a { color: #D5E5DB; }
 .prose table { border-collapse: collapse; width: 100%; margin: 0.5rem 0; }
 .prose th, .prose td { border: 1px solid var(--border-color); padding: 0.5rem; text-align: left; }
 .prose th { background: var(--bg-tertiary); font-weight: 600; }
@@ -85,19 +98,109 @@ body {
 
 /* Utility classes for compact design */
 @layer components {
-  .btn {
-    @apply text-xs font-medium px-3 py-1.5 transition-colors;
-  }
+  /* Primary - ação principal */
   .btn-primary {
-    @apply text-xs font-medium px-3 py-1.5 transition-colors;
+    @apply inline-flex items-center justify-center gap-1.5 text-[11px] font-semibold tracking-wide uppercase px-3 py-1.5 transition-all duration-150 rounded-lg cursor-pointer select-none;
     background-color: var(--btn-primary-bg);
     color: var(--btn-primary-text);
   }
+  .btn-primary:hover {
+    background-color: var(--btn-primary-hover);
+  }
+
+  /* Secondary - ações secundárias */
   .btn-secondary {
-    @apply text-xs font-medium px-3 py-1.5 transition-colors;
+    @apply inline-flex items-center justify-center gap-1.5 text-[11px] font-semibold tracking-wide uppercase px-3 py-1.5 transition-all duration-150 rounded-lg cursor-pointer select-none;
     background-color: var(--btn-secondary-bg);
     color: var(--text-primary);
   }
+  .btn-secondary:hover {
+    background-color: var(--btn-secondary-hover);
+  }
+
+  /* Ghost - botões sutis */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-1.5 text-[11px] font-semibold tracking-wide uppercase px-3 py-1.5 transition-all duration-150 rounded-lg cursor-pointer select-none;
+    background-color: transparent;
+    color: var(--text-secondary);
+  }
+  .btn-ghost:hover {
+    background-color: var(--accent-dim);
+    color: var(--text-primary);
+  }
+
+  /* Danger - ações destrutivas */
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-1.5 text-[11px] font-semibold tracking-wide uppercase px-3 py-1.5 transition-all duration-150 rounded-lg cursor-pointer select-none;
+    background-color: rgba(220, 38, 38, 0.1);
+    color: #dc2626;
+    border: 1px solid rgba(220, 38, 38, 0.2);
+  }
+  .btn-danger:hover {
+    background-color: rgba(220, 38, 38, 0.2);
+  }
+  html.dark .btn-danger {
+    color: #f87171;
+    background-color: rgba(248, 113, 113, 0.1);
+    border-color: rgba(248, 113, 113, 0.2);
+  }
+  html.dark .btn-danger:hover {
+    background-color: rgba(248, 113, 113, 0.2);
+  }
+
+  /* Success - ações positivas */
+  .btn-success {
+    @apply inline-flex items-center justify-center gap-1.5 text-[11px] font-semibold tracking-wide uppercase px-3 py-1.5 transition-all duration-150 rounded-lg cursor-pointer select-none;
+    background-color: rgba(22, 163, 74, 0.1);
+    color: #16a34a;
+    border: 1px solid rgba(22, 163, 74, 0.2);
+  }
+  .btn-success:hover {
+    background-color: rgba(22, 163, 74, 0.2);
+  }
+  html.dark .btn-success {
+    color: #4ade80;
+    background-color: rgba(74, 222, 128, 0.1);
+    border-color: rgba(74, 222, 128, 0.2);
+  }
+  html.dark .btn-success:hover {
+    background-color: rgba(74, 222, 128, 0.2);
+  }
+
+  /* Warning - ações de atenção */
+  .btn-warning {
+    @apply inline-flex items-center justify-center gap-1.5 text-[11px] font-semibold tracking-wide uppercase px-3 py-1.5 transition-all duration-150 rounded-lg cursor-pointer select-none;
+    background-color: rgba(245, 158, 11, 0.1);
+    color: #d97706;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+  }
+  .btn-warning:hover {
+    background-color: rgba(245, 158, 11, 0.2);
+  }
+  html.dark .btn-warning {
+    color: #fbbf24;
+    background-color: rgba(251, 191, 36, 0.1);
+    border-color: rgba(251, 191, 36, 0.2);
+  }
+  html.dark .btn-warning:hover {
+    background-color: rgba(251, 191, 36, 0.2);
+  }
+
+  /* Icon button - apenas ícone */
+  .btn-icon {
+    @apply inline-flex items-center justify-center w-7 h-7 transition-all duration-150 rounded-lg cursor-pointer select-none;
+    color: var(--text-secondary);
+    background-color: transparent;
+  }
+  .btn-icon:hover {
+    background-color: var(--accent-dim);
+    color: var(--text-primary);
+  }
+  .btn-icon:active {
+    @apply scale-[0.93];
+  }
+
+  /* Button group */
   .btn-group {
     @apply flex;
   }
@@ -110,20 +213,29 @@ body {
   .btn-group .btn:last-child {
     @apply rounded-r-lg;
   }
+
+  /* Card */
   .card {
-    @apply rounded-lg p-4;
+    @apply rounded-xl p-4;
     background-color: var(--card-bg);
     border: 1px solid var(--card-border);
   }
+
+  /* Input */
   .input {
-    @apply rounded-lg px-3 py-1.5 text-xs focus:outline-none transition-colors;
+    @apply rounded-xl px-3 py-2 text-sm focus:outline-none transition-colors;
     background-color: var(--input-bg);
     border: 1px solid var(--input-border);
-    color: var(--text-primary);
+    color: var(--text-primary) !important;
+  }
+  .input::placeholder {
+    color: var(--text-tertiary);
   }
   .input:focus {
     border-color: var(--input-focus);
   }
+
+  /* Section utilities */
   .section-title {
     @apply text-sm font-medium;
     color: var(--text-primary);
@@ -136,27 +248,77 @@ body {
     @apply text-xs;
     color: var(--text-tertiary);
   }
+
+  /* Status dots */
   .status-dot {
     @apply w-1.5 h-1.5 rounded-full;
   }
   .status-dot-active {
-    @apply w-1.5 h-1.5 rounded-full bg-green-500;
+    @apply w-1.5 h-1.5 rounded-full;
+    background-color: #1B3A3A;
+  }
+  html.dark .status-dot-active {
+    background-color: #8BA89C;
   }
   .status-dot-inactive {
     @apply w-1.5 h-1.5 rounded-full;
     background-color: var(--text-tertiary);
   }
+
+  /* Messages */
   .error-message {
-    @apply text-xs p-2 rounded-lg;
-    background-color: #fee2e2;
+    @apply text-xs p-2 rounded-xl;
+    background-color: rgba(220, 80, 80, 0.15);
     color: #dc2626;
-    border: 1px solid #fecaca;
+    border: 1px solid rgba(220, 80, 80, 0.3);
+  }
+  html.dark .error-message {
+    color: #F0A0A0;
+  }
+
+  /* Modern error alert */
+  .alert-error {
+    @apply text-sm font-medium px-4 py-3 rounded-xl flex items-start gap-2.5;
+    background-color: rgba(239, 68, 68, 0.12);
+    color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.35);
+  }
+  html.dark .alert-error {
+    background-color: rgba(248, 113, 113, 0.16);
+    color: #fca5a5;
+    border-color: rgba(248, 113, 113, 0.4);
+  }
+  .alert-error svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* Modern success alert */
+  .alert-success {
+    @apply text-sm font-medium px-4 py-3 rounded-xl flex items-start gap-2.5;
+    background-color: rgba(22, 163, 74, 0.12);
+    color: #16a34a;
+    border: 1px solid rgba(22, 163, 74, 0.35);
+  }
+  html.dark .alert-success {
+    background-color: rgba(74, 222, 128, 0.16);
+    color: #4ade80;
+    border-color: rgba(74, 222, 128, 0.4);
+  }
+  .alert-success svg {
+    flex-shrink: 0;
+    margin-top: 2px;
   }
   .success-message {
-    @apply text-xs p-2 rounded-lg;
-    background-color: #dcfce7;
-    color: #16a34a;
-    border: 1px solid #bbf7d0;
+    @apply text-xs p-2 rounded-xl;
+    background-color: rgba(27, 58, 58, 0.1);
+    color: #1B3A3A;
+    border: 1px solid rgba(27, 58, 58, 0.2);
+  }
+  html.dark .success-message {
+    background-color: rgba(139, 168, 156, 0.15);
+    color: #D5E5DB;
+    border: 1px solid rgba(139, 168, 156, 0.3);
   }
 }
 
@@ -228,7 +390,7 @@ input[type="range"]::-moz-range-thumb {
   background-color: var(--btn-primary-bg) !important;
   color: var(--btn-primary-text) !important;
   padding: 8px 16px !important;
-  border-radius: 8px !important;
+  border-radius: 12px !important;
   font-size: 14px !important;
 }
 
@@ -239,4 +401,27 @@ input[type="range"]::-moz-range-thumb {
 }
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* Select styling */
+select.input,
+select {
+  color: var(--text-primary) !important;
+  background-color: var(--input-bg) !important;
+}
+
+select.input option,
+select option {
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+}
+
+/* Textarea styling */
+textarea.input {
+  color: var(--text-primary) !important;
+}
+
+/* All form elements */
+input, textarea, select {
+  color: var(--text-primary);
 }

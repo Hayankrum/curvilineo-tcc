@@ -7,6 +7,8 @@ export default function GlobalError({
   error: Error & { digest?: string }
   reset: () => void
 }) {
+  console.error(error)
+
   return (
     <html lang="pt-BR">
       <body style={{ margin: 0, fontFamily: 'system-ui, sans-serif', backgroundColor: '#09090b', color: '#fafafa' }}>

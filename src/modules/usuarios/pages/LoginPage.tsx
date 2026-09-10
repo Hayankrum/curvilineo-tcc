@@ -21,9 +21,14 @@ export default function LoginPage() {
 
       <form action={formAction} className="flex flex-col gap-4">
         {estado?.error && (
-          <p className="text-sm bg-red-950/40 border border-red-900 rounded-lg px-4 py-2" style={{ color: '#f87171' }}>
+          <div className="alert-error" role="alert">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
             {estado.error}
-          </p>
+          </div>
         )}
 
         <div className="flex flex-col gap-1">
@@ -42,8 +47,7 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={pending}
-          className="font-medium rounded-lg px-4 py-2 transition-colors w-fit disabled:opacity-50"
-          style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
+          className="btn-primary w-fit"
         >
           {pending ? 'Entrando...' : 'Entrar'}
         </button>
@@ -60,8 +64,7 @@ export default function LoginPage() {
 
       <button
         onClick={() => signIn('google', { callbackUrl: '/' })}
-        className="w-full flex items-center justify-center gap-3 rounded-lg px-4 py-2 transition-colors"
-        style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}
+        className="btn-secondary w-full"
       >
         <svg className="w-5 h-5" viewBox="0 0 24 24">
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />

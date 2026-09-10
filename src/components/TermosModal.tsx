@@ -106,15 +106,24 @@ export default function TermosModal({ isOpen, onClose, readonly = false }: Termo
           ) : (
             <>
               {estado?.success && (
-                <p className="text-sm bg-green-950/40 border border-green-900 rounded-lg px-4 py-2 mb-3" style={{ color: '#4ade80' }}>
+                <div className="alert-success mb-3" role="status">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="m9 12 2 2 4-4"/>
+                  </svg>
                   Termos aceitos com sucesso!
-                </p>
+                </div>
               )}
 
               {estado?.error && (
-                <p className="text-sm bg-red-950/40 border border-red-900 rounded-lg px-4 py-2 mb-3" style={{ color: '#f87171' }}>
+                <div className="alert-error mb-3" role="alert">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
                   {estado.error}
-                </p>
+                </div>
               )}
 
               <form action={formAction}>

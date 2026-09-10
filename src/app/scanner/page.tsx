@@ -1,7 +1,7 @@
 import QRCodeScanner from '@/components/QRCodeScanner'
 
 export const metadata = {
-  title: 'Scanner QR Code - Ellora',
+  title: 'Scanner QR Code',
   description: 'Escaneie QR codes para acessar questionários rapidamente',
 }
 
@@ -21,7 +21,7 @@ export default function ScannerPage() {
 
       <div className="text-center mt-4">
         <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-          Dica: Se o Ellora estiver instalado como PWA, os links abrirão diretamente no app
+          Dica: Se o aplicativo estiver instalado como PWA, os links abrirão diretamente no app
         </p>
       </div>
     </div>

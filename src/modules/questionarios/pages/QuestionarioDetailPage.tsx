@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useUsuario } from '@/lib/useData'
 import { useState, useEffect } from 'react'
 import { obterQuestionario, podeResponder, publicarQuestionario, encerrarQuestionario, deletarQuestionario, duplicarQuestionario } from '../questionarios.actions'
+import BannerQuestionario from '../components/BannerQuestionario'
 
 interface Opcao {
   id: number
@@ -177,6 +178,8 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
         ← Voltar
       </Link>
 
+      <BannerQuestionario cor={questionario.corTema} />
+
       <div>
         <h1 className="text-2xl font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>{questionario.titulo}</h1>
         <p className="text-sm mb-2" style={{ color: 'var(--text-tertiary)' }}>por {questionario.autor.nome}</p>
@@ -202,59 +205,53 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
       </div>
 
       {isAutor && (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5">
           {questionario.status === 'rascunho' && (
-            <div className="flex">
+            <>
               <Link
                 href={`/questionarios/${questionario.id}/editar`}
-                className="text-xs font-medium px-3 py-1.5 transition-colors -ml-px first:ml-0 first:rounded-l-lg hover:underline"
-                style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)', border: '1px solid var(--card-border)' }}
+                className="btn-secondary"
               >
                 Editar
               </Link>
               <button
                 onClick={() => handleStatusAction('publicar')}
                 disabled={processando}
-                className="text-xs font-medium px-3 py-1.5 transition-colors -ml-px disabled:opacity-50"
-                style={{ backgroundColor: '#22c55e', color: '#fff', border: '1px solid #16a34a' }}
+                className="btn-success"
               >
                 Publicar
               </button>
               <button
                 onClick={() => handleStatusAction('deletar')}
                 disabled={processando}
-                className="text-xs font-medium px-3 py-1.5 transition-colors -ml-px last:rounded-r-lg disabled:opacity-50"
-                style={{ backgroundColor: '#dc2626', color: '#fff', border: '1px solid #b91c1c' }}
+                className="btn-danger"
               >
                 Excluir
               </button>
-            </div>
+            </>
           )}
           {questionario.status === 'publicado' && (
-            <div className="flex">
+            <>
               <button
                 onClick={() => handleStatusAction('encerrar')}
                 disabled={processando}
-                className="text-xs font-medium px-3 py-1.5 transition-colors -ml-px first:ml-0 first:rounded-l-lg disabled:opacity-50"
-                style={{ backgroundColor: '#f59e0b', color: '#000', border: '1px solid #d97706' }}
+                className="btn-warning"
               >
                 Encerrar
               </button>
               <button
                 onClick={() => handleStatusAction('deletar')}
                 disabled={processando}
-                className="text-xs font-medium px-3 py-1.5 transition-colors -ml-px last:rounded-r-lg disabled:opacity-50"
-                style={{ backgroundColor: '#dc2626', color: '#fff', border: '1px solid #b91c1c' }}
+                className="btn-danger"
               >
                 Excluir
               </button>
-            </div>
+            </>
           )}
           <button
             onClick={handleDuplicar}
             disabled={processando}
-            className="text-xs font-medium px-3 py-1.5 transition-colors rounded-lg disabled:opacity-50"
-            style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)', border: '1px solid var(--card-border)' }}
+            className="btn-ghost"
           >
             Copiar modelo
           </button>
@@ -283,8 +280,7 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
                 setCopiado(true)
                 setTimeout(() => setCopiado(false), 2000)
               }}
-              className="text-xs font-medium rounded-lg px-3 py-1.5 transition-colors w-fit"
-              style={{ backgroundColor: copiado ? '#22c55e' : 'var(--btn-primary-bg)', color: copiado ? '#fff' : 'var(--btn-primary-text)' }}
+              className={copiado ? 'btn-success' : 'btn-primary'}
             >
               {copiado ? 'Copiado!' : 'Copiar link'}
             </button>
@@ -292,11 +288,10 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
         </div>
       </div>
 
-      <div className="flex">
+      <div className="flex gap-1.5">
         <Link
           href={`/questionarios/${questionario.id}/responder`}
-          className="text-xs font-medium px-3 py-1.5 transition-colors -ml-px first:ml-0 first:rounded-l-lg last:rounded-r-lg disabled:opacity-40 disabled:pointer-events-none"
-          style={{ backgroundColor: 'var(--card-bg)', color: 'var(--text-tertiary)', border: '1px solid var(--card-border)' }}
+          className={!podeResp.pode ? 'btn-ghost opacity-40 pointer-events-none' : 'btn-primary'}
           aria-disabled={!podeResp.pode}
           tabIndex={podeResp.pode ? 0 : -1}
           onClick={(e) => { if (!podeResp.pode) e.preventDefault() }}
@@ -305,8 +300,7 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
         </Link>
         <Link
           href={`/questionarios/${questionario.id}/resultados`}
-          className="text-xs font-medium px-3 py-1.5 transition-colors -ml-px first:ml-0 first:rounded-l-lg last:rounded-r-lg"
-          style={{ backgroundColor: 'var(--card-bg)', color: 'var(--text-tertiary)', border: '1px solid var(--card-border)' }}
+          className="btn-secondary"
         >
           Ver resultados
         </Link>
@@ -315,8 +309,7 @@ export default function QuestionarioDetailPage({ questionarioId }: Props) {
       {podeResp.jaRespondeu && !isAutor && (
         <Link
           href={`/questionarios/${questionario.id}/editar-resposta`}
-          className="text-xs font-medium px-3 py-1.5 transition-colors rounded-lg w-fit"
-          style={{ backgroundColor: 'var(--card-bg)', color: 'var(--text-tertiary)', border: '1px solid var(--card-border)' }}
+          className="btn-ghost w-fit"
         >
           Editar minha resposta
         </Link>

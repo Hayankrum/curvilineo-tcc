@@ -1,7 +1,7 @@
 {
-  "name": "Ellora",
-  "short_name": "Ellora",
-  "description": "Ellora - Plataforma moderna",
+  "name": "Aplicativo",
+  "short_name": "Aplicativo",
+  "description": "Crie, compartilhe e responda questionários em segundos.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#09090b",
@@ -10,10 +10,28 @@
   "scope": "/",
   "icons": [
     {
-      "src": "/icons/Ellora.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "src": "/icons/pwa/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/pwa/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/pwa/icon-192x192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/pwa/icon-512x512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
   "protocol_handlers": [
@@ -29,9 +47,9 @@
       "url": "/scanner",
       "icons": [
         {
-          "src": "/icons/Ellora.svg",
-          "sizes": "any",
-          "type": "image/svg+xml"
+          "src": "/icons/pwa/icon-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png"
         }
       ]
     }

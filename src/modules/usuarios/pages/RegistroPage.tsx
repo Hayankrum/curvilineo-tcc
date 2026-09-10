@@ -26,9 +26,14 @@ export default function RegistroPage() {
 
       <form action={formAction} className="flex flex-col gap-4">
         {estado?.error && (
-          <p className="text-sm bg-red-950/40 border border-red-900 rounded-lg px-4 py-2" style={{ color: '#f87171' }}>
+          <div className="alert-error" role="alert">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
             {estado.error}
-          </p>
+          </div>
         )}
 
         <div className="flex flex-col gap-1">
@@ -81,8 +86,7 @@ export default function RegistroPage() {
         <button
           type="submit"
           disabled={pending}
-          className="font-medium rounded-lg px-4 py-2 transition-colors w-fit disabled:opacity-50"
-          style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
+          className="btn-primary w-fit"
         >
           {pending ? 'Criando...' : 'Criar conta'}
         </button>

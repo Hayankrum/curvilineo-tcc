@@ -20,13 +20,7 @@ export default async function UsuarioDetailPage({ id }: Props) {
 
   return (
     <div>
-      <Link
-        href="/questionarios"
-        className="text-sm transition-colors mb-6 inline-block hover:underline"
-        style={{ color: 'var(--text-tertiary)' }}
-      >
-        ← Voltar
-      </Link>
+      <h1 className="text-2xl font-semibold mb-6" style={{ color: 'var(--text-primary)' }}>Perfil</h1>
 
       <div className="flex items-start gap-5 mb-6">
         <div className="w-16 h-16 rounded-full flex items-center justify-center text-xl font-semibold flex-shrink-0" style={{ backgroundColor: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', color: 'var(--text-secondary)' }}>

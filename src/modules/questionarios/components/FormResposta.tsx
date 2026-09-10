@@ -255,9 +255,14 @@ export default function FormResposta({ questionario, anonimo, respostaExistente 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6">
       {erro && (
-        <p className="text-sm bg-red-950/40 border border-red-900 rounded-lg px-4 py-2" style={{ color: '#f87171' }}>
+        <div className="alert-error" role="alert">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
           {erro}
-        </p>
+        </div>
       )}
 
       {questionario.descricao && (
@@ -300,20 +305,18 @@ export default function FormResposta({ questionario, anonimo, respostaExistente 
         </div>
       ))}
 
-      <div className="flex gap-3 pt-2">
+      <div className="flex gap-2 pt-2">
         <button
           type="submit"
           disabled={enviando}
-          className="font-medium rounded-lg px-4 py-2 transition-colors disabled:opacity-50"
-          style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
+          className="btn-primary"
         >
           {enviando ? (isEdicao ? 'Salvando...' : 'Enviando...') : (isEdicao ? 'Salvar alterações' : 'Enviar respostas')}
         </button>
         <button
           type="button"
           onClick={() => router.back()}
-          className="font-medium rounded-lg px-4 py-2 transition-colors"
-          style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--btn-secondary-text)' }}
+          className="btn-ghost"
         >
           Cancelar
         </button>

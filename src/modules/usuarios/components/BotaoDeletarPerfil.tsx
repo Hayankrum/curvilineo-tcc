@@ -37,7 +37,7 @@ export default function BotaoDeletarPerfil({ id, temSenha }: Props) {
     <>
       <button
         onClick={() => setAberto(true)}
-        className="text-sm text-red-400 hover:text-red-300 transition-colors"
+        className="btn-danger"
       >
         Deletar conta
       </button>
@@ -54,19 +54,27 @@ export default function BotaoDeletarPerfil({ id, temSenha }: Props) {
                 <CampoSenha name="senha" label="Digite sua senha para confirmar" />
               </div>
             )}
-            {erro && <p className="text-sm mb-4" style={{ color: '#f87171' }}>{erro}</p>}
-            <div className="flex gap-3 justify-end">
+            {erro && (
+              <div className="alert-error mb-4" role="alert">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="12" y1="8" x2="12" y2="12"/>
+                  <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                {erro}
+              </div>
+            )}
+            <div className="flex gap-2 justify-end">
               <button
                 onClick={() => { setAberto(false); setSenha(''); setErro('') }}
-                className="px-4 py-2 text-sm rounded-lg transition-colors"
-                style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}
+                className="btn-ghost"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleDeletar}
                 disabled={carregando}
-                className="px-4 py-2 text-sm rounded-lg bg-red-600 hover:bg-red-500 text-white transition-colors disabled:opacity-50"
+                className="btn-danger"
               >
                 {carregando ? 'Deletando...' : 'Deletar'}
               </button>

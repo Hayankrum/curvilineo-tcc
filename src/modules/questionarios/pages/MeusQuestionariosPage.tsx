@@ -2,8 +2,8 @@
 
 import Link from 'next/link'
 import { useState, useEffect, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
 import { listarMeusQuestionarios, deletarQuestionario, duplicarQuestionario, publicarQuestionario, encerrarQuestionario } from '../questionarios.actions'
+import BannerQuestionario from '../components/BannerQuestionario'
 
 interface Questionario {
   id: number
@@ -32,7 +32,6 @@ const STATUS_COLORS: Record<string, string> = {
 }
 
 export default function MeusQuestionariosPage() {
-  const router = useRouter()
   const [questionarios, setQuestionarios] = useState<Questionario[]>([])
   const [loading, setLoading] = useState(true)
   const [busca, setBusca] = useState('')
@@ -42,7 +41,6 @@ export default function MeusQuestionariosPage() {
   const [actionLoading, setActionLoading] = useState<number | null>(null)
 
   const carregar = useCallback(async (p: number, buscaVal: string, statusVal: string) => {
-    setLoading(true)
     const result = await listarMeusQuestionarios({
       busca: buscaVal || undefined,
       status: statusVal !== 'todos' ? statusVal : undefined,
@@ -57,24 +55,38 @@ export default function MeusQuestionariosPage() {
   }, [])
 
   useEffect(() => {
-    carregar(1, '', 'todos')
-  }, [carregar])
+    let cancelled = false
+    listarMeusQuestionarios({ pagina: 1, porPagina: 10 }).then((result) => {
+      if (cancelled) return
+      if ('questionarios' in result) {
+        setQuestionarios(result.questionarios as unknown as Questionario[])
+        setTotalPaginas(result.paginas as number)
+      }
+      setLoading(false)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   function handleBuscar(e: React.FormEvent) {
     e.preventDefault()
     setPagina(1)
+    setLoading(true)
     carregar(1, busca, statusFiltro)
   }
 
   function handleFiltrarStatus(status: string) {
     setStatusFiltro(status)
     setPagina(1)
+    setLoading(true)
     carregar(1, busca, status)
   }
 
   async function handleAction(id: number, action: () => Promise<unknown>) {
     setActionLoading(id)
     await action()
+    setLoading(true)
     carregar(pagina, busca, statusFiltro)
     setActionLoading(null)
   }
@@ -90,15 +102,8 @@ export default function MeusQuestionariosPage() {
     if (result && 'error' in result && result.error) {
       alert(result.error)
     }
+    setLoading(true)
     carregar(pagina, busca, statusFiltro)
-  }
-
-  function formatarData(data: string) {
-    return new Date(data).toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    })
   }
 
   return (
@@ -111,7 +116,10 @@ export default function MeusQuestionariosPage() {
           style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
           title="Novo questionário"
         >
-          +
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
         </Link>
       </div>
 
@@ -127,7 +135,7 @@ export default function MeusQuestionariosPage() {
         />
         <button
           type="submit"
-          className="font-medium rounded-lg w-8 h-8 flex items-center justify-center transition-colors shrink-0"
+          className="font-medium rounded-lg w-8 h-8 flex items-center justify-center transition-colors"
           style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}
           title="Buscar"
         >
@@ -171,8 +179,7 @@ export default function MeusQuestionariosPage() {
           {!busca && statusFiltro === 'todos' && (
             <Link
               href="/questionarios/novo"
-              className="inline-flex items-center gap-2 font-medium rounded-lg px-4 py-2 transition-colors text-sm"
-              style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
+              className="btn-primary"
             >
               Criar primeiro questionário
             </Link>
@@ -192,6 +199,7 @@ export default function MeusQuestionariosPage() {
               className="block mb-3"
               style={{ textDecoration: 'none' }}
             >
+              <BannerQuestionario cor={q.corTema} compacto className="mb-3" />
               <h2 className="font-medium text-lg mb-1" style={{ color: 'var(--text-primary)' }}>{q.titulo}</h2>
               {q.descricao && (
                 <p className="text-sm mb-2 line-clamp-2" style={{ color: 'var(--text-secondary)' }}>{q.descricao}</p>
@@ -208,11 +216,11 @@ export default function MeusQuestionariosPage() {
               <span>{q.totalRespostas} {q.totalRespostas === 1 ? 'resposta' : 'respostas'}</span>
               {q.anonimo && <span>Anônimo</span>}
             </div>
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-1.5">
               <Link
                 href={`/questionarios/${q.id}`}
-                className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors"
-                style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)', textDecoration: 'none' }}
+                className="btn-secondary"
+                style={{ textDecoration: 'none' }}
               >
                 Ver
               </Link>
@@ -221,16 +229,15 @@ export default function MeusQuestionariosPage() {
                 <>
                   <Link
                     href={`/questionarios/${q.id}/editar`}
-                    className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors"
-                    style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)', textDecoration: 'none' }}
+                    className="btn-secondary"
+                    style={{ textDecoration: 'none' }}
                   >
                     Editar
                   </Link>
                   <button
                     onClick={() => handlePublicar(q.id)}
                     disabled={actionLoading === q.id}
-                    className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
-                    style={{ backgroundColor: '#22c55e', color: '#fff' }}
+                    className="btn-success"
                   >
                     Publicar
                   </button>
@@ -241,8 +248,7 @@ export default function MeusQuestionariosPage() {
                 <button
                   onClick={() => handleAction(q.id, () => encerrarQuestionario(q.id))}
                   disabled={actionLoading === q.id}
-                  className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
-                  style={{ backgroundColor: '#f59e0b', color: '#fff' }}
+                  className="btn-warning"
                 >
                   Encerrar
                 </button>
@@ -252,8 +258,7 @@ export default function MeusQuestionariosPage() {
                 <button
                   onClick={() => handleDeletar(q.id, q.titulo)}
                   disabled={actionLoading === q.id}
-                  className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
-                  style={{ backgroundColor: '#dc2626', color: '#fff' }}
+                  className="btn-danger"
                 >
                   Deletar
                 </button>
@@ -262,8 +267,7 @@ export default function MeusQuestionariosPage() {
               <button
                 onClick={() => handleAction(q.id, () => duplicarQuestionario(q.id))}
                 disabled={actionLoading === q.id}
-                className="text-xs font-medium px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
-                style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-secondary)' }}
+                className="btn-ghost"
               >
                 Duplicar
               </button>
@@ -274,33 +278,27 @@ export default function MeusQuestionariosPage() {
 
       {/* Paginação */}
       {totalPaginas > 1 && (
-        <div className="flex items-center justify-center gap-2 mt-6">
+        <div className="flex items-center justify-center gap-1.5 mt-6">
           <button
-            onClick={() => { setPagina(p => p - 1); carregar(pagina - 1, busca, statusFiltro) }}
+            onClick={() => { setPagina(p => p - 1); setLoading(true); carregar(pagina - 1, busca, statusFiltro) }}
             disabled={pagina === 1}
-            className="text-sm px-3 py-1.5 rounded-lg transition-colors disabled:opacity-40"
-            style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}
+            className="btn-secondary"
           >
             ← Anterior
           </button>
           {Array.from({ length: totalPaginas }, (_, i) => i + 1).map((p) => (
             <button
               key={p}
-              onClick={() => { setPagina(p); carregar(p, busca, statusFiltro) }}
-              className="text-sm w-8 h-8 rounded-lg transition-colors"
-              style={{
-                backgroundColor: p === pagina ? 'var(--btn-primary-bg)' : 'transparent',
-                color: p === pagina ? 'var(--btn-primary-text)' : 'var(--text-tertiary)',
-              }}
+              onClick={() => { setPagina(p); setLoading(true); carregar(p, busca, statusFiltro) }}
+              className={`btn ${p === pagina ? 'btn-primary' : 'btn-ghost'}`}
             >
               {p}
             </button>
           ))}
           <button
-            onClick={() => { setPagina(p => p + 1); carregar(pagina + 1, busca, statusFiltro) }}
+            onClick={() => { setPagina(p => p + 1); setLoading(true); carregar(pagina + 1, busca, statusFiltro) }}
             disabled={pagina === totalPaginas}
-            className="text-sm px-3 py-1.5 rounded-lg transition-colors disabled:opacity-40"
-            style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}
+            className="btn-secondary"
           >
             Próxima →
           </button>

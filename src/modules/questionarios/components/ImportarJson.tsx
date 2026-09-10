@@ -35,8 +35,6 @@ interface MetaData {
 
 interface Props {
   onImport: (perguntas: PerguntaData[], meta?: MetaData) => void
-  tituloAtual: string
-  descricaoAtual: string
 }
 
 const EXEMPLO_JSON = `{
@@ -83,7 +81,7 @@ const EXEMPLO_JSON = `{
   ]
 }`
 
-export default function ImportarJson({ onImport, tituloAtual, descricaoAtual }: Props) {
+export default function ImportarJson({ onImport }: Props) {
   const [aberto, setAberto] = useState(false)
   const [json, setJson] = useState('')
   const [erro, setErro] = useState<string | null>(null)
@@ -250,10 +248,9 @@ export default function ImportarJson({ onImport, tituloAtual, descricaoAtual }: 
       <button
         type="button"
         onClick={() => setAberto(true)}
-        className="text-sm font-medium rounded-lg px-3 py-1.5 transition-colors"
-        style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--btn-secondary-text)' }}
+        className="btn-secondary"
       >
-        Importar JSON
+        Importar perguntas
       </button>
     )
   }
@@ -272,10 +269,12 @@ export default function ImportarJson({ onImport, tituloAtual, descricaoAtual }: 
           <button
             type="button"
             onClick={() => { setAberto(false); setJson(''); setPreview(null); setErro(null) }}
-            className="text-lg px-2"
-            style={{ color: 'var(--text-tertiary)' }}
+            className="btn-icon"
           >
-            ✕
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
           </button>
         </div>
 
@@ -286,8 +285,7 @@ export default function ImportarJson({ onImport, tituloAtual, descricaoAtual }: 
                 <button
                   type="button"
                   onClick={() => setJson(EXEMPLO_JSON)}
-                  className="text-xs underline"
-                  style={{ color: 'var(--text-secondary)' }}
+                  className="btn-ghost !text-xs"
                 >
                   Carregar exemplo
                 </button>
@@ -304,25 +302,28 @@ export default function ImportarJson({ onImport, tituloAtual, descricaoAtual }: 
               />
 
               {erro && (
-                <p className="text-sm p-3 rounded-lg" style={{ backgroundColor: '#dc262620', color: '#f87171' }}>
+                <div className="alert-error" role="alert">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
                   {erro}
-                </p>
+                </div>
               )}
 
               <div className="flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => { setAberto(false); setJson(''); setErro(null) }}
-                  className="text-sm font-medium rounded-lg px-4 py-2 transition-colors"
-                  style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--btn-secondary-text)' }}
+                  className="btn-ghost"
                 >
                   Cancelar
                 </button>
                 <button
                   type="button"
                   onClick={validarEConverter}
-                  className="text-sm font-medium rounded-lg px-4 py-2 transition-colors"
-                  style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
+                  className="btn-primary"
                 >
                   Validar e visualizar
                 </button>
@@ -384,16 +385,14 @@ export default function ImportarJson({ onImport, tituloAtual, descricaoAtual }: 
                 <button
                   type="button"
                   onClick={() => { setPreview(null); setMeta(null) }}
-                  className="text-sm font-medium rounded-lg px-4 py-2 transition-colors"
-                  style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--btn-secondary-text)' }}
+                  className="btn-ghost"
                 >
                   ← Voltar
                 </button>
                 <button
                   type="button"
                   onClick={handleImportar}
-                  className="text-sm font-medium rounded-lg px-4 py-2 transition-colors"
-                  style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
+                  className="btn-primary"
                 >
                   Importar {preview.length} {preview.length === 1 ? 'pergunta' : 'perguntas'}
                 </button>

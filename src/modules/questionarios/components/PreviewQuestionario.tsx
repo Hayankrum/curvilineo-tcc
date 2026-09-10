@@ -1,7 +1,5 @@
 'use client'
 
-import { useState } from 'react'
-
 interface Opcao {
   id?: number
   texto: string
@@ -30,12 +28,6 @@ interface Props {
 }
 
 export default function PreviewQuestionario({ questionario, onFechar }: Props) {
-  const [valores, setValores] = useState<Record<number, unknown>>({})
-
-  function atualizarValor(perguntaId: number, valor: unknown) {
-    setValores((prev) => ({ ...prev, [perguntaId]: valor }))
-  }
-
   function renderPergunta(pergunta: Pergunta, idx: number) {
     const id = pergunta.id || idx
 

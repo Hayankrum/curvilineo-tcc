@@ -6,6 +6,7 @@ import { useUsuario } from '@/lib/useData'
 import { useState, useEffect } from 'react'
 import { obterQuestionario } from '../questionarios.actions'
 import FormResposta from '../components/FormResposta'
+import BannerQuestionario from '../components/BannerQuestionario'
 
 interface Pergunta {
   id: number
@@ -53,7 +54,7 @@ export default function ResponderPage({ questionarioId }: Props) {
       }
       setLoading(false)
     })
-  }, [questionarioId, usuario, loadingUsuario]) // removido router
+  }, [questionarioId, usuario, loadingUsuario, router])
 
   if (loading || loadingUsuario) {
     return <p style={{ color: 'var(--text-tertiary)' }}>Carregando...</p>
@@ -72,6 +73,7 @@ export default function ResponderPage({ questionarioId }: Props) {
       >
         ← Voltar
       </Link>
+      <BannerQuestionario cor={questionario.corTema} compacto className="mb-6" />
       <h1 className="text-2xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
         {questionario.titulo}
       </h1>

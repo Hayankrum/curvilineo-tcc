@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react'
 import {
-  syncPendingMutations,
   addPendingMutation,
 } from '@/lib/db'
 import { useOnlineStatus } from './useOnlineStatus'

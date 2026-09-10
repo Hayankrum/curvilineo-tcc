@@ -30,8 +30,8 @@ function ShareSection() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Ellora',
-          text: 'Confira o Ellora!',
+          title: 'Confira este aplicativo',
+          text: 'Confira este aplicativo!',
           url: shareData.url,
         })
       } catch {
@@ -131,38 +131,56 @@ export default function SobrePage() {
 
       <div className="flex flex-col gap-6">
         <section className="rounded-lg p-5" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
-          <h2 className="font-medium mb-3" style={{ color: 'var(--text-primary)' }}>Ellora</h2>
-          <p className="text-sm mb-4 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+          <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
             Uma plataforma completa para criar e responder questionários com suporte offline,
             notificações push e gerenciamento de usuários.
           </p>
-          <div className="flex items-center gap-2 mb-4">
-            <span className="w-2 h-2 rounded-full bg-green-500" />
-            <span className="text-xs" style={{ color: 'var(--text-tertiary)' }}>Versão 0.1.0</span>
-          </div>
         </section>
 
         <section className="rounded-lg p-5" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
           <h2 className="font-medium mb-3" style={{ color: 'var(--text-primary)' }}>Funcionalidades</h2>
-          <ul className="text-sm space-y-2" style={{ color: 'var(--text-secondary)' }}>
-            <li className="flex items-center gap-2">
-              <span>📝</span>
+          <ul className="text-sm space-y-3" style={{ color: 'var(--text-secondary)' }}>
+            <li className="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+              </svg>
               <span>Criação e gerenciamento de questionários</span>
             </li>
-            <li className="flex items-center gap-2">
-              <span>🔔</span>
+            <li className="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+              </svg>
               <span>Notificações push em tempo real</span>
             </li>
-            <li className="flex items-center gap-2">
-              <span>📴</span>
+            <li className="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0">
+                <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
+              </svg>
               <span>Suporte offline completo</span>
             </li>
-            <li className="flex items-center gap-2">
-              <span>🌙</span>
+            <li className="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0">
+                <circle cx="12" cy="12" r="5"/>
+                <line x1="12" y1="1" x2="12" y2="3"/>
+                <line x1="12" y1="21" x2="12" y2="23"/>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                <line x1="1" y1="12" x2="3" y2="12"/>
+                <line x1="21" y1="12" x2="23" y2="12"/>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+              </svg>
               <span>Tema claro e escuro</span>
             </li>
-            <li className="flex items-center gap-2">
-              <span>📱</span>
+            <li className="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0">
+                <rect x="5" y="2" width="14" height="20" rx="2"/>
+                <line x1="12" y1="18" x2="12" y2="18"/>
+              </svg>
               <span>PWA - instalável em qualquer dispositivo</span>
             </li>
           </ul>
@@ -174,21 +192,6 @@ export default function SobrePage() {
             Instale o aplicativo na sua tela inicial para acesso rápido e melhor experiência offline.
           </p>
           <InstallPWAButton />
-        </section>
-
-        <section className="rounded-lg p-5" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
-          <h2 className="font-medium mb-3" style={{ color: 'var(--text-primary)' }}>Tecnologias</h2>
-          <div className="flex flex-wrap gap-2">
-            {['Next.js', 'React', 'TypeScript', 'Tailwind CSS', 'Prisma', 'PostgreSQL'].map((tech) => (
-              <span
-                key={tech}
-                className="px-2.5 py-1 rounded-md text-xs"
-                style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-secondary)' }}
-              >
-                {tech}
-              </span>
-            ))}
-          </div>
         </section>
 
         <section className="rounded-lg p-5" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>

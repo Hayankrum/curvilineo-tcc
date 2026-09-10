@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useSyncExternalStore } from 'react'
 import TermosModal from './TermosModal'
 
 interface TermosCheckerProps {
@@ -11,12 +11,20 @@ interface TermosCheckerProps {
   } | null
 }
 
-export default function TermosChecker({ children, usuario }: TermosCheckerProps) {
-  const [mounted, setMounted] = useState(false)
+function subscribeNoop() {
+  return () => {}
+}
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+function getMountedSnapshot() {
+  return true
+}
+
+function getServerSnapshot() {
+  return false
+}
+
+export default function TermosChecker({ children, usuario }: TermosCheckerProps) {
+  const mounted = useSyncExternalStore(subscribeNoop, getMountedSnapshot, getServerSnapshot)
 
   const precisaAceitar = mounted && usuario && !usuario.aceitouTermos
 

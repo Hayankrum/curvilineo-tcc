@@ -831,8 +831,6 @@ export async function obterResultados(
     usuarioId?: number
   }
 ) {
-  const usuario = await getUsuarioLogado()
-
   const questionario = await prisma.questionario.findUnique({
     where: { id: questionarioId },
     select: { autorId: true },

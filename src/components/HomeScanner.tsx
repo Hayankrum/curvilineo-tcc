@@ -11,8 +11,7 @@ export default function HomeScanner() {
       {!isOpen ? (
         <button
           onClick={() => setIsOpen(true)}
-          className="w-full rounded-lg px-6 py-4 text-sm font-medium transition-colors flex items-center justify-center gap-3"
-          style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--text-primary)' }}
+          className="btn-secondary w-full rounded-xl px-6 py-4 text-sm font-medium transition-all flex items-center justify-center gap-3 hover:scale-[1.02]"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M3 7V5a2 2 0 0 1 2-2h2"/>

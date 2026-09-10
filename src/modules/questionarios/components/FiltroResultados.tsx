@@ -61,16 +61,14 @@ export default function FiltroResultados({ onFiltrar, loading }: Props) {
         <button
           onClick={handleFiltrar}
           disabled={loading}
-          className="text-sm font-medium rounded-lg px-4 py-2 transition-colors disabled:opacity-50"
-          style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
+          className="btn-primary"
         >
           {loading ? 'Filtrando...' : 'Filtrar'}
         </button>
         <button
           onClick={handleLimpar}
           disabled={loading}
-          className="text-sm font-medium rounded-lg px-4 py-2 transition-colors disabled:opacity-50"
-          style={{ backgroundColor: 'var(--btn-secondary-bg)', color: 'var(--btn-secondary-text)' }}
+          className="btn-ghost"
         >
           Limpar
         </button>

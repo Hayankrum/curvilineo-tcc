@@ -85,9 +85,6 @@ export default function CondicoesPergunta({ perguntas, perguntaAtual, condicoes,
         <div className="mt-2 flex flex-col gap-2">
           {condicoes.map((condicao, idx) => {
             const opcoes = obterOpcoesPergunta(condicao.perguntaOrigemId)
-            const perguntaOrigem = perguntasAnteriores.find(
-              (p) => p.ordem === condicao.perguntaOrigemId || p.id === condicao.perguntaOrigemId
-            )
 
             return (
               <div key={idx} className="flex items-center gap-2 text-xs">

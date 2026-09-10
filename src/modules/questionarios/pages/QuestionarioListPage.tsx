@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useState, useEffect, useCallback } from 'react'
 import { listarQuestionariosPublicos } from '../questionarios.actions'
+import BannerQuestionario from '../components/BannerQuestionario'
 
 interface Questionario {
   id: number
@@ -35,10 +36,8 @@ export default function QuestionarioListPage() {
   const [statusFiltro, setStatusFiltro] = useState('todos')
   const [pagina, setPagina] = useState(1)
   const [totalPaginas, setTotalPaginas] = useState(1)
-  const [total, setTotal] = useState(0)
 
   const carregar = useCallback(async (p: number, buscaVal: string, statusVal: string) => {
-    setLoading(true)
     const result = await listarQuestionariosPublicos({
       busca: buscaVal || undefined,
       status: statusVal !== 'todos' ? statusVal : undefined,
@@ -48,29 +47,42 @@ export default function QuestionarioListPage() {
     if ('questionarios' in result) {
       setQuestionarios(result.questionarios as unknown as Questionario[])
       setTotalPaginas(result.paginas as number)
-      setTotal(result.total as number)
     }
     setLoading(false)
   }, [])
 
   useEffect(() => {
-    carregar(1, '', 'todos')
-  }, [carregar])
+    let cancelled = false
+    listarQuestionariosPublicos({ pagina: 1, porPagina: 10 }).then((result) => {
+      if (cancelled) return
+      if ('questionarios' in result) {
+        setQuestionarios(result.questionarios as unknown as Questionario[])
+        setTotalPaginas(result.paginas as number)
+      }
+      setLoading(false)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   function handleBuscar(e: React.FormEvent) {
     e.preventDefault()
     setPagina(1)
+    setLoading(true)
     carregar(1, busca, statusFiltro)
   }
 
   function handleFiltrarStatus(status: string) {
     setStatusFiltro(status)
     setPagina(1)
+    setLoading(true)
     carregar(1, busca, status)
   }
 
   function handlePagina(p: number) {
     setPagina(p)
+    setLoading(true)
     carregar(p, busca, statusFiltro)
   }
 
@@ -84,7 +96,10 @@ export default function QuestionarioListPage() {
           style={{ backgroundColor: 'var(--btn-primary-bg)', color: 'var(--btn-primary-text)' }}
           title="Novo questionário"
         >
-          +
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
         </Link>
       </div>
 
@@ -149,6 +164,7 @@ export default function QuestionarioListPage() {
             className="rounded-lg p-5 block transition-colors hover:opacity-90"
             style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)', textDecoration: 'none' }}
           >
+            <BannerQuestionario cor={q.corTema} compacto className="mb-3" />
             <h2 className="font-medium text-lg mb-1" style={{ color: 'var(--text-primary)' }}>{q.titulo}</h2>
             <p className="text-xs mb-2" style={{ color: 'var(--text-tertiary)' }}>por {q.autor.nome}</p>
             {q.descricao && (
