@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import SinoNotificacoes from '@/modules/notificacoes/SinoNotificacoes'
+import PendingSyncBadge from '@/modules/layout/PendingSyncBadge'
 
 interface Usuario {
   id: number
@@ -66,6 +67,7 @@ export default function Navbar({ usuario }: { usuario: Usuario | null }) {
 
         <div className="ml-auto flex items-center gap-3">
           {usuario && <SinoNotificacoes />}
+          {usuario && <PendingSyncBadge />}
           {usuario ? (
             <Link
               href={`/usuarios/${usuario.id}`}

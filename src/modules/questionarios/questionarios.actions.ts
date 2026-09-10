@@ -369,7 +369,7 @@ export async function encerrarQuestionario(id: number) {
 
 // ---------- RESPOSTAS ----------
 
-export async function enviarResposta(questionarioId: number, valores: ValorRespostaInput[], nomeAnonimo?: string) {
+export async function enviarResposta(questionarioId: number, valores: ValorRespostaInput[], nomeAnonimo?: string, syncId?: string) {
   const usuario = await getUsuarioLogado()
 
   const questionario = await prisma.questionario.findUnique({
@@ -391,6 +391,18 @@ export async function enviarResposta(questionarioId: number, valores: ValorRespo
 
   if (!questionario.anonimo && !usuario) {
     return { error: 'Você precisa estar logado para responder' }
+  }
+
+  // Idempotência: se esta resposta já foi sincronizada antes (ex: a resposta
+  // chegou ao servidor mas o cliente perdeu a conexão), não criar duplicata.
+  if (syncId) {
+    const jaSincronizada = await prisma.resposta.findUnique({
+      where: { syncId },
+      select: { id: true },
+    })
+    if (jaSincronizada) {
+      return { success: true, jaExistia: true }
+    }
   }
 
   if (!questionario.anonimo && usuario) {
@@ -474,6 +486,7 @@ export async function enviarResposta(questionarioId: number, valores: ValorRespo
         usuarioId: usuarioIdParaResposta,
         questionarioId,
         nomeAnonimo: questionario.anonimo ? (nomeAnonimo || null) : null,
+        syncId: syncId || null,
       },
     })
 

@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import SinoNotificacoes from '@/modules/notificacoes/SinoNotificacoes'
+import PendingSyncBadge from '@/modules/layout/PendingSyncBadge'
 
 interface Usuario {
   id: number
@@ -52,17 +53,19 @@ export default function MobileBottomNav({ usuario }: { usuario: Usuario | null }
         {navItems.map(item => {
           const isActive = item.href === '/' ? pathname === '/' : pathname === item.href || (pathname.startsWith(item.href + '/') && item.href !== '/questionarios')
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={linkClass()}
-              style={{
-                color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
-                backgroundColor: isActive ? 'var(--accent-dim)' : 'transparent'
-              }}
-            >
-              {item.icon}
-            </Link>
+            <div key={item.href} className="relative">
+              <Link
+                href={item.href}
+                className={linkClass()}
+                style={{
+                  color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
+                  backgroundColor: isActive ? 'var(--accent-dim)' : 'transparent'
+                }}
+              >
+                {item.icon}
+              </Link>
+              {usuario && item.href === '/questionarios/meus' && <PendingSyncBadge mobile />}
+            </div>
           )
         })}
 

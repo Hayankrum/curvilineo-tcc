@@ -309,6 +309,23 @@ html.dark .prose a { color: #D5E5DB; }
     flex-shrink: 0;
     margin-top: 2px;
   }
+
+  /* Modern warning alert */
+  .alert-warning {
+    @apply text-sm font-medium px-4 py-3 rounded-xl flex items-start gap-2.5;
+    background-color: rgba(245, 158, 11, 0.14);
+    color: #d97706;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+  }
+  html.dark .alert-warning {
+    background-color: rgba(251, 191, 36, 0.16);
+    color: #fbbf24;
+    border-color: rgba(251, 191, 36, 0.4);
+  }
+  .alert-warning svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
   .success-message {
     @apply text-xs p-2 rounded-xl;
     background-color: rgba(27, 58, 58, 0.1);

@@ -1,6 +1,6 @@
 {
-  "name": "Aplicativo",
-  "short_name": "Aplicativo",
+  "name": "Lumys",
+  "short_name": "Lumys",
   "description": "Crie, compartilhe e responda questionários em segundos.",
   "start_url": "/",
   "display": "standalone",

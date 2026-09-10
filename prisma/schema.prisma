@@ -131,6 +131,7 @@ model Resposta {
   questionarioId Int
   questionario   Questionario   @relation(fields: [questionarioId], references: [id], onDelete: Cascade)
   nomeAnonimo    String?
+  syncId         String?        @unique
   criadoEm       DateTime       @default(now())
   valores        ValorResposta[]
 

@@ -157,7 +157,7 @@ export default function ConfiguracoesPage() {
 
       <div className="flex flex-col gap-6">
         <section className="rounded-lg p-5" style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--card-border)' }}>
-          <h2 className="font-medium mb-4" style={{ color: 'var(--text-primary)' }}>Aplicativo</h2>
+          <h2 className="font-medium mb-4" style={{ color: 'var(--text-primary)' }}>Lumys</h2>
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Instalar PWA</p>

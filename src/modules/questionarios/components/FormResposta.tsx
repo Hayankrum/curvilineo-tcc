@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { enviarResposta, editarResposta } from '../questionarios.actions'
+import { useOnlineStatus } from '@/lib/useOnlineStatus'
+import { usePendingRespostas } from '@/lib/useData'
 
 interface Opcao {
   id: number
@@ -52,6 +54,8 @@ interface ValoresResposta {
 
 export default function FormResposta({ questionario, anonimo, respostaExistente }: Props) {
   const router = useRouter()
+  const isOnline = useOnlineStatus()
+  const { pending, addPending } = usePendingRespostas(questionario.id)
   const [valores, setValores] = useState<ValoresResposta>(() => {
     if (!respostaExistente) return {}
     const inicial: ValoresResposta = {}
@@ -66,9 +70,18 @@ export default function FormResposta({ questionario, anonimo, respostaExistente 
   })
   const [erro, setErro] = useState<string | null>(null)
   const [enviando, setEnviando] = useState(false)
+  const [enfileirado, setEnfileirado] = useState(false)
   const [nomeAnonimo, setNomeAnonimo] = useState('')
 
   const isEdicao = !!respostaExistente
+  const jaEnfileirada = !isEdicao && pending.length > 0
+
+  function gerarSyncId() {
+    if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+      return crypto.randomUUID()
+    }
+    return `${Date.now()}-${Math.random().toString(36).slice(2)}`
+  }
 
   function atualizarTexto(perguntaId: number, texto: string) {
     setValores((prev) => ({
@@ -106,6 +119,10 @@ export default function FormResposta({ questionario, anonimo, respostaExistente 
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    if (jaEnfileirada) {
+      setErro('Você já tem uma resposta salva neste dispositivo, aguardando sincronização.')
+      return
+    }
     setErro(null)
     setEnviando(true)
 
@@ -122,6 +139,31 @@ export default function FormResposta({ questionario, anonimo, respostaExistente 
     })
 
     try {
+      if (!isOnline) {
+        await addPending({
+          questionarioId: questionario.id,
+          syncId: gerarSyncId(),
+          valores: valoresEnvio,
+          nomeAnonimo: nomeAnonimo || undefined,
+          isEdicao,
+          respostaId: respostaExistente?.id,
+        })
+
+        if ('serviceWorker' in navigator && 'SyncManager' in window) {
+          try {
+            const registration = await navigator.serviceWorker.ready
+            const swReg = registration as unknown as { sync: { register: (tag: string) => Promise<void> } }
+            await swReg.sync.register('sync-mutations')
+          } catch {
+            // se não conseguir agendar, sincroniza na próxima reconexão (useOfflineSync)
+          }
+        }
+
+        setEnfileirado(true)
+        setEnviando(false)
+        return
+      }
+
       let resultado
       if (isEdicao) {
         resultado = await editarResposta(questionario.id, valoresEnvio)
@@ -265,6 +307,42 @@ export default function FormResposta({ questionario, anonimo, respostaExistente 
         </div>
       )}
 
+      {enfileirado && (
+        <div className="alert-success flex items-center gap-2" role="status">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            <path d="M9 10h6"/>
+          </svg>
+          <span>
+            Você está offline. Sua resposta foi <strong>salva no dispositivo</strong> e será enviada automaticamente quando a conexão voltar.
+          </span>
+        </div>
+      )}
+
+      {jaEnfileirada && (
+        <div className="alert-warning flex items-center gap-2" role="status">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          <span>
+            Você já respondeu este questionário neste dispositivo. A resposta será enviada automaticamente quando a conexão voltar.
+          </span>
+        </div>
+      )}
+
+      {!isOnline && !enfileirado && !jaEnfileirada && (
+        <div className="alert-warning flex items-center gap-2" role="status">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M18 6L6 18"/>
+            <path d="M6 6l12 12"/>
+          </svg>
+          <span>
+            Você está offline. Suas respostas serão salvas localmente e sincronizadas quando a conexão voltar.
+          </span>
+        </div>
+      )}
+
       {questionario.descricao && (
         <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
           {questionario.descricao}
@@ -308,11 +386,20 @@ export default function FormResposta({ questionario, anonimo, respostaExistente 
       <div className="flex gap-2 pt-2">
         <button
           type="submit"
-          disabled={enviando}
+          disabled={enviando || enfileirado || jaEnfileirada}
           className="btn-primary"
         >
-          {enviando ? (isEdicao ? 'Salvando...' : 'Enviando...') : (isEdicao ? 'Salvar alterações' : 'Enviar respostas')}
+          {jaEnfileirada ? 'Resposta já salva' : enfileirado ? 'Resposta salva ✓' : enviando ? (isEdicao ? 'Salvando...' : 'Enviando...') : (!isOnline ? 'Salvar offline' : (isEdicao ? 'Salvar alterações' : 'Enviar respostas'))}
         </button>
+        {pending.length > 0 && (
+          <span className="inline-flex items-center gap-1.5 text-xs font-medium px-3 rounded-lg" style={{ backgroundColor: 'var(--accent-dim)', color: 'var(--text-secondary)' }}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            {pending.length} resposta(s) pendente(s) de sincronização
+          </span>
+        )}
         <button
           type="button"
           onClick={() => router.back()}

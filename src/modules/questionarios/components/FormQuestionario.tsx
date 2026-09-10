@@ -20,6 +20,8 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { criarQuestionario, editarQuestionario } from '../questionarios.actions'
+import { useOnlineStatus } from '@/lib/useOnlineStatus'
+import { addPendingMutation } from '@/lib/db'
 import ImportarJson from './ImportarJson'
 import PreviewQuestionario from './PreviewQuestionario'
 import CondicoesPergunta from './CondicoesPergunta'
@@ -367,6 +369,7 @@ function SortablePergunta({
 
 export default function FormQuestionario({ questionario }: Props) {
   const router = useRouter()
+  const isOnline = useOnlineStatus()
   const [titulo, setTitulo] = useState(questionario?.titulo || '')
   const [descricao, setDescricao] = useState(questionario?.descricao || '')
   const [perguntas, setPerguntas] = useState<PerguntaData[]>(
@@ -381,6 +384,7 @@ export default function FormQuestionario({ questionario }: Props) {
   )
   const [erro, setErro] = useState<string | null>(null)
   const [salvando, setSalvando] = useState(false)
+  const [enfileirado, setEnfileirado] = useState(false)
   const [mostrarPreview, setMostrarPreview] = useState(false)
   const [encerraEm, setEncerraEm] = useState<string>(
     questionario?.encerraEm ? new Date(questionario.encerraEm).toISOString().slice(0, 16) : ''
@@ -503,6 +507,46 @@ export default function FormQuestionario({ questionario }: Props) {
     const encerraEmDate = encerraEm ? new Date(encerraEm) : null
     const usuariosEsperadosNum = usuariosEsperados ? parseInt(usuariosEsperados, 10) : null
 
+    if (!isOnline) {
+      try {
+        await addPendingMutation({
+          url: '/api/sync',
+          method: 'POST',
+          body: JSON.stringify({
+            action: isEdicao ? 'editar_questionario' : 'criar_questionario',
+            data: {
+              ...(isEdicao ? { id: questionario.id } : {}),
+              titulo,
+              descricao,
+              perguntas,
+              encerraEm: encerraEmDate ? encerraEmDate.toISOString() : null,
+              anonimo,
+              corTema,
+              usuariosEsperados: usuariosEsperadosNum,
+            },
+          }),
+          createdAt: Date.now(),
+        })
+
+        if ('serviceWorker' in navigator && 'SyncManager' in window) {
+          try {
+            const registration = await navigator.serviceWorker.ready
+            const swReg = registration as unknown as { sync: { register: (tag: string) => Promise<void> } }
+            await swReg.sync.register('sync-mutations')
+          } catch {
+            // sincroniza na próxima reconexão via SyncProvider
+          }
+        }
+
+        setEnfileirado(true)
+        setSalvando(false)
+      } catch {
+        setErro('Não foi possível salvar o questionário')
+        setSalvando(false)
+      }
+      return
+    }
+
     try {
       let resultado
       if (isEdicao) {
@@ -535,6 +579,30 @@ export default function FormQuestionario({ questionario }: Props) {
             <line x1="12" y1="16" x2="12.01" y2="16"/>
           </svg>
           {erro}
+        </div>
+      )}
+
+      {enfileirado && (
+        <div className="alert-success flex items-center gap-2" role="status">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            <path d="M9 10h6"/>
+          </svg>
+          <span>
+            Você está offline. O questionário foi <strong>salvo no dispositivo</strong> e será enviado automaticamente quando a conexão voltar.
+          </span>
+        </div>
+      )}
+
+      {!isOnline && !enfileirado && (
+        <div className="alert-warning flex items-center gap-2" role="status">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M18 6L6 18"/>
+            <path d="M6 6l12 12"/>
+          </svg>
+          <span>
+            Você está offline. Ao salvar, o questionário ficará na fila e será sincronizado quando a conexão voltar.
+          </span>
         </div>
       )}
 
@@ -810,10 +878,10 @@ export default function FormQuestionario({ questionario }: Props) {
       >
         <button
           type="submit"
-          disabled={salvando || perguntas.length === 0}
+          disabled={salvando || enfileirado || perguntas.length === 0}
           className="btn-primary"
         >
-          {salvando ? 'Salvando...' : isEdicao ? 'Salvar alterações' : 'Criar questionário'}
+          {enfileirado ? 'Salvo na fila ✓' : salvando ? 'Salvando...' : isEdicao ? (isOnline ? 'Salvar alterações' : 'Salvar offline') : (isOnline ? 'Criar questionário' : 'Salvar offline')}
         </button>
         <button
           type="button"
