@@ -1,6 +1,6 @@
-const CACHE_STATIC = 'static-v7'
-const CACHE_PAGES = 'pages-v7'
-const CACHE_API = 'api-v7'
+const CACHE_STATIC = 'static-v8'
+const CACHE_PAGES = 'pages-v8'
+const CACHE_API = 'api-v8'
 
 self.addEventListener('install', (event) => {
   console.log('[SW] Installing...')
@@ -31,7 +31,7 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((keys) =>
       Promise.all(
         keys
-          .filter((k) => ![CACHE_STATIC, CACHE_PAGES, CACHE_API].includes(k))
+          .filter((k) => !k.startsWith(CACHE_STATIC) && !k.startsWith(CACHE_PAGES) && !k.startsWith(CACHE_API))
           .map((k) => caches.delete(k))
       )
     ).then(() => {
@@ -78,20 +78,51 @@ async function cacheFirst(request) {
   }
 }
 
-// Network first para navegação (HTML pages), fallback cache offline
-async function navigationHandler(request) {
-  const cache = await caches.open(CACHE_PAGES)
-  try {
-    const response = await fetch(request)
-    if (response && response.status === 200) {
-      cache.put(request, response.clone())
-    }
-    return response
-  } catch {
-    const cached = await cache.match(request)
-    if (cached) return cached
-    return caches.match('/offline')
+function hashStr(str) {
+  let hash = 5381
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) + hash + str.charCodeAt(i)) >>> 0
   }
+  return hash.toString(36)
+}
+
+function sessionKey(request) {
+  const cookieHeader = request.headers.get('cookie')
+  if (!cookieHeader) return 'anon'
+  const parts = cookieHeader.split(';')
+  for (const part of parts) {
+    const pair = part.trim().split('=')
+    const name = pair[0]
+    if (
+      name === 'sessionToken' ||
+      name === 'authjs.session-token' ||
+      name === '__Secure-authjs.session-token'
+    ) {
+      const value = pair.slice(1).join('=')
+      if (value) return hashStr(name + '=' + value)
+    }
+  }
+  return 'anon'
+}
+
+// Stale-while-revalidate por sessão para navegação (HTML pages)
+async function navigationHandler(request) {
+  const cache = await caches.open(`${CACHE_PAGES}-${sessionKey(request)}`)
+  const cached = await cache.match(request)
+
+  const fetchPromise = fetch(request)
+    .then((response) => {
+      if (response && response.status === 200) {
+        cache.put(request, response.clone())
+      }
+      return response
+    })
+    .catch(() => {
+      if (cached) return cached
+      return caches.match('/offline')
+    })
+
+  return cached || fetchPromise
 }
 
 self.addEventListener('fetch', (event) => {
