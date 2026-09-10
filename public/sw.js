@@ -1,6 +1,6 @@
-const CACHE_STATIC = 'static-v6'
-const CACHE_PAGES = 'pages-v6'
-const CACHE_API = 'api-v6'
+const CACHE_STATIC = 'static-v7'
+const CACHE_PAGES = 'pages-v7'
+const CACHE_API = 'api-v7'
 
 self.addEventListener('install', (event) => {
   console.log('[SW] Installing...')
@@ -78,24 +78,20 @@ async function cacheFirst(request) {
   }
 }
 
-// Stale-while-revalidate para navegação (HTML pages)
+// Network first para navegação (HTML pages), fallback cache offline
 async function navigationHandler(request) {
   const cache = await caches.open(CACHE_PAGES)
-  const cached = await cache.match(request)
-
-  const fetchPromise = fetch(request)
-    .then((response) => {
-      if (response && response.status === 200) {
-        cache.put(request, response.clone())
-      }
-      return response
-    })
-    .catch(() => {
-      if (cached) return cached
-      return caches.match('/offline')
-    })
-
-  return cached || fetchPromise
+  try {
+    const response = await fetch(request)
+    if (response && response.status === 200) {
+      cache.put(request, response.clone())
+    }
+    return response
+  } catch {
+    const cached = await cache.match(request)
+    if (cached) return cached
+    return caches.match('/offline')
+  }
 }
 
 self.addEventListener('fetch', (event) => {
